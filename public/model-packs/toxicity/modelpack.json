@@ -1,0 +1,15 @@
+{
+  "id": "toxicity-en",
+  "name": "Toxicity (English)",
+  "version": "0.0.0",
+  "license": "UNKNOWN",
+  "task": "toxicity",
+  "languages": ["en"],
+  "backend": "onnx-runtime-web",
+  "labels": [
+    { "id": "toxic", "displayName": "Toxic" }
+  ],
+  "artifacts": {
+    "modelPath": "model-packs/toxicity/model.onnx"
+  }
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detox AI - Backend Benchmark</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+            line-height: 1.6;
+        }
+        h1 { color: #2563eb; }
+        .status { padding: 1rem; border-radius: 0.5rem; margin: 1rem 0; }
+        .status.running { background: #dbeafe; }
+        .status.complete { background: #d1fae5; }
+        .status.error { background: #fee2e2; }
+        pre { background: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        .metric { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e5e7eb; }
+        .winner { font-weight: bold; color: #059669; }
+    </style>
+</head>
+<body>
+    <h1>Backend Benchmark</h1>
+    <div id="status" class="status running">Initializing...</div>
+    <div id="results"></div>
+    <pre id="raw-json"></pre>
+
+    <script type="module" src="/src/backend-benchmark-entry.ts"></script>
+</body>
+</html>

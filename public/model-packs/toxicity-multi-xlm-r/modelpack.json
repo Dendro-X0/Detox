@@ -1,0 +1,18 @@
+{
+  "id": "toxicity-multi-xlm-r",
+  "name": "Toxicity (Multilingual, XLM-R)",
+  "version": "0.0.0",
+  "license": "Apache-2.0",
+  "task": "toxicity",
+  "languages": ["*"],
+  "backend": "onnx-runtime-web",
+  "labels": [
+    { "id": "toxic", "displayName": "Toxic" }
+  ],
+  "artifacts": {
+    "modelPath": "model-packs/toxicity-multi-xlm-r/model.onnx",
+    "tokenizerJsonPath": "model-packs/toxicity-multi-xlm-r/tokenizer.json",
+    "sentencePieceModelPath": "model-packs/toxicity-multi-xlm-r/sentencepiece.bpe.model",
+    "configPath": "model-packs/toxicity-multi-xlm-r/config.json"
+  }
+}
