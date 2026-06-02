@@ -110,7 +110,11 @@ function formatTime(ts: number): string {
   return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
-function App() {
+type AppProps = {
+  readonly onRestartWizard?: () => void;
+};
+
+function App({ onRestartWizard }: AppProps) {
   const [enabled, setEnabled] = useState(false);
   const [stats, setStats] = useState<Stats>({ scanned: 0, toxic: 0 });
   const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>({
@@ -727,6 +731,9 @@ function App() {
             <div className="preset-buttons">
               <button className="preset-btn" onClick={exportSettings}>Export Settings</button>
               <button className="preset-btn" onClick={importSettings}>Import Settings</button>
+              {onRestartWizard ? (
+                <button className="preset-btn" onClick={onRestartWizard}>Set up again</button>
+              ) : null}
             </div>
           </div>
         </>

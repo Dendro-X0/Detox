@@ -6,12 +6,11 @@ import {
     DEFAULT_LABEL_ID,
     HEURISTIC_DETECTOR_ID,
 } from '../constants';
+import { getActiveKeywords } from './keywords';
 
-const NOISE_KEYWORDS: readonly string[] = ['kill', 'kys', 'die', 'stupid', 'idiot', 'moron'] as const;
-
-function classifyKeyword(text: string, threshold: number): Verdict {
+function classifyKeyword(text: string, threshold: number, keywords: readonly string[]): Verdict {
     const normalized = text.toLowerCase();
-    const matches = NOISE_KEYWORDS.filter((kw) => normalized.includes(kw)).length;
+    const matches = keywords.filter((kw) => normalized.includes(kw)).length;
     if (matches <= 0) {
         return {
             matched: false,
@@ -42,6 +41,7 @@ export const heuristicKeywordsProvider: InferenceProvider = {
     }),
     classifyBatch: async (items, options) => {
         const threshold = options.threshold ?? DEFAULT_CLASSIFY_THRESHOLD;
-        return items.map((item) => classifyResultFromVerdict(item.id, classifyKeyword(item.text, threshold)));
+        const keywords = await getActiveKeywords();
+        return items.map((item) => classifyResultFromVerdict(item.id, classifyKeyword(item.text, threshold, keywords)));
     },
 };

@@ -112,14 +112,15 @@ Core modular refactor **Phases 1–6** — complete. See [`CORE-ROADMAP.md`](../
 
 ---
 
-### Phase C — Onboarding wizard
+### Phase C — Onboarding wizard ✅
 
-- [ ] First-run flow (`onboardingComplete` in storage)
-- [ ] Steps: welcome → what bothers you → filter style → sites you use → sensitivity → done
-- [ ] Writes `policy`, `inferenceRouting`, `enforcementAction`, enabled mod ids
-- [ ] “Set up again” from dashboard
+- [x] First-run flow (`onboardingComplete` in storage)
+- [x] Steps: welcome → what bothers you → filter style → sites you use → sensitivity → done
+- [x] Writes `policy`, `inferenceRouting`, `enforcementAction`, `userKeywords`, `preferredSites`, `enabledModIds`
+- [x] “Set up again” from dashboard
+- [x] Install hook opens `options.html?wizard=1` for new users
 
-**Done when:** New users get a guided preset instead of implicit defaults (hardcoded keywords).
+**Done when:** New users get a guided preset instead of implicit defaults (hardcoded keywords). ✅
 
 ---
 

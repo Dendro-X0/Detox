@@ -16,6 +16,7 @@ type RuntimeStatus = {
 
 function PopupApp() {
   const [enabled, setEnabled] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState(false);
   const [stats, setStats] = useState<Stats>({ scanned: 0, toxic: 0 });
   const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>({
     state: 'unknown',
@@ -24,10 +25,11 @@ function PopupApp() {
   });
 
   useEffect(() => {
-    chrome.storage.local.get(['enabled', 'stats'], (res: unknown) => {
-      const record = res as { readonly enabled?: boolean; readonly stats?: Stats };
+    chrome.storage.local.get(['enabled', 'stats', 'onboardingComplete'], (res: unknown) => {
+      const record = res as { readonly enabled?: boolean; readonly stats?: Stats; readonly onboardingComplete?: boolean };
       setEnabled(record.enabled ?? true);
       setStats(record.stats ?? { scanned: 0, toxic: 0 });
+      setNeedsSetup(!record.onboardingComplete);
     });
 
     chrome.storage.onChanged.addListener((changes) => {
@@ -64,17 +66,30 @@ function PopupApp() {
     chrome.storage.local.set({ enabled: next });
   };
 
-  const openDashboard = (): void => {
-    if (chrome.runtime.openOptionsPage) {
+  const openDashboard = (wizard = false): void => {
+    const url = wizard ? 'options.html?wizard=1' : 'options.html';
+    if (chrome.runtime.openOptionsPage && !wizard) {
       void chrome.runtime.openOptionsPage();
       return;
     }
-    window.open(chrome.runtime.getURL('options.html'), '_blank');
+    window.open(chrome.runtime.getURL(url), '_blank');
   };
 
   return (
     <div className="container">
       <h1>SignalLens</h1>
+      {needsSetup ? (
+        <div className="card policy-card">
+          <p className="muted" style={{ marginTop: 0 }}>Finish setup to personalize what gets filtered.</p>
+          <button
+            className="preset-btn active"
+            style={{ width: '100%', textAlign: 'center' }}
+            onClick={() => { openDashboard(true); }}
+          >
+            Start setup wizard
+          </button>
+        </div>
+      ) : null}
       <div className="card">
         <label className="switch">
           <input type="checkbox" checked={enabled} onChange={toggle} />
@@ -111,7 +126,7 @@ function PopupApp() {
         ) : null}
       </div>
 
-      <button className="preset-btn" style={{ width: '100%', textAlign: 'center' }} onClick={openDashboard}>
+      <button className="preset-btn" style={{ width: '100%', textAlign: 'center' }} onClick={() => { openDashboard(false); }}>
         Open Dashboard
       </button>
     </div>

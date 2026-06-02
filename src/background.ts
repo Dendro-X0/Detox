@@ -108,7 +108,19 @@ function isRuntimeStatusMessage(message: CoreIpcMessage): message is Extract<Cor
     return message.type === 'runtimeStatus';
 }
 
-console.log("Detox AI: Background Service Worker Loaded");
+console.log('SignalLens: Background Service Worker Loaded');
+
+chrome.runtime.onInstalled.addListener((details) => {
+    if (details.reason !== 'install') return;
+
+    chrome.storage.local.get('onboardingComplete', (result: unknown) => {
+        const record = result as { readonly onboardingComplete?: boolean };
+        if (record.onboardingComplete) return;
+
+        const wizardUrl = chrome.runtime.getURL('options.html?wizard=1');
+        void chrome.tabs.create({ url: wizardUrl });
+    });
+});
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     if (typeof message === 'object' && message !== null && (message as { type?: unknown }).type === 'classify') {
