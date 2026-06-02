@@ -4,11 +4,16 @@ import { getMatchingAdapter } from './site-adapters/adapter-interface';
 import { globalProfiler } from './v2/core/profiler';
 import { ClassificationPipeline } from './core/pipeline/classification-pipeline';
 import { installPolicyLoader } from './core/policy/policy-store';
+import { installUserRulesLoader, subscribeToUserRulesChanges } from './core/rules/user-rules-store';
 import { installEnforcementActionLoader } from './core/registry/action-registry';
+import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
+import { subscribeToInstalledModChanges } from './core/mods/installed-mod-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
 import { getBuildProfile } from './build-profile';
+import { installAuthenticityContentBridge } from './authenticity/content-bridge';
 
 console.log(`[Core] Content script loading (profile: ${getBuildProfile()})`);
+installAuthenticityContentBridge();
 
 let isEnabled = true;
 let currentAdapter: SiteAdapter | null = null;
@@ -97,6 +102,10 @@ const pipeline = new ClassificationPipeline({
     profiler: globalProfiler,
 });
 
+subscribeToUserRulesChanges(() => {
+    pipeline.clearCache();
+});
+
 function requestNavigationCheck(): void {
     if (navigationDebounceTimerId !== null) return;
     navigationDebounceTimerId = window.setTimeout(() => {
@@ -127,19 +136,28 @@ chrome.storage.local.get('enabled', (res: unknown) => {
     void bootstrap();
 });
 
-let modsReady = false;
-let modsLoadPromise: Promise<void> | null = null;
+let modsInitialized = false;
 
 async function ensureModsLoaded(): Promise<void> {
-    if (modsReady) return;
-    if (!modsLoadPromise) {
-        modsLoadPromise = loadBuiltinMods().then(() => {
-            installEnforcementActionLoader();
-            installPolicyLoader();
-            modsReady = true;
+    await loadBuiltinMods();
+    if (!modsInitialized) {
+        installEnforcementActionLoader();
+        installPolicyLoader();
+        installUserRulesLoader();
+        subscribeToEnabledModChanges(() => {
+            void onModsConfigurationChanged();
         });
+        subscribeToInstalledModChanges(() => {
+            void onModsConfigurationChanged();
+        });
+        modsInitialized = true;
     }
-    await modsLoadPromise;
+}
+
+async function onModsConfigurationChanged(): Promise<void> {
+    await loadBuiltinMods();
+    pipeline.clearCache();
+    scheduleRescan();
 }
 
 async function bootstrap(): Promise<void> {

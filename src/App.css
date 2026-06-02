@@ -24,6 +24,12 @@
   margin-top: 1rem;
 }
 
+.rule-editor + .rule-editor {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #e5e7eb;
+}
+
 h1 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;

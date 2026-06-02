@@ -6,16 +6,24 @@
   "description": "Personal browsing layer for focus-first web reading.",
   "permissions": [
     "activeTab",
+    "contextMenus",
     "offscreen",
     "scripting",
+    "sidePanel",
     "storage"
   ],
   "host_permissions": [
     "https://huggingface.co/*",
     "https://*.huggingface.co/*",
     "https://hf.co/*",
-    "https://*.hf.co/*"
+    "https://*.hf.co/*",
+    "https://en.wikipedia.org/*",
+    "https://api.search.brave.com/*",
+    "<all_urls>"
   ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
   "action": {
     "default_popup": "index.html"
   },
@@ -49,6 +57,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://hf.co https://*.hf.co"
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://hf.co https://*.hf.co https://en.wikipedia.org https://api.search.brave.com https: http:"
   }
 }

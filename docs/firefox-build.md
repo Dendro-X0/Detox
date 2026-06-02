@@ -114,6 +114,12 @@ The Firefox build uses the same content script and popup UI as Chrome, but:
 }
 ```
 
+## Authenticity assist (Firefox)
+
+- Report UI uses **`sidebar_action`** (`sidepanel.html`) — View → Sidebar → SignalLens — Authenticity, or open via context menu after analyzing a selection.
+- If `sidebar_action` is unavailable, the extension reuses a single **report tab** (`sidepanel.html`).
+- Job/report state uses `chrome.storage.session` when supported, otherwise falls back to `chrome.storage.local`.
+
 ## Known Limitations
 
 - **Content Security Policy**: Stricter in Firefox MV2 for WASM execution

@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
         input: {
           index: 'index.html',
           options: 'options.html',
+          sidepanel: 'sidepanel.html',
           background: 'src/background-firefox.ts',
           content: 'src/content.ts',
         },

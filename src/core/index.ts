@@ -12,7 +12,9 @@ export type {
     RuntimeStatusResponse,
     RuntimeState,
 } from './ipc/messages';
-export { getPolicy, getThreshold, loadPolicy, subscribeToPolicyChanges, installPolicyLoader } from './policy/policy-store';
+export { getPolicy, getThreshold, getThresholdForHost, loadPolicy, subscribeToPolicyChanges, installPolicyLoader } from './policy/policy-store';
+export { DEFAULT_USER_RULES, type UserRulesSettings } from './types/user-rules';
+export { getUserRules, loadUserRules, saveUserRules, isDomainAllowlisted, installUserRulesLoader } from './rules/user-rules-store';
 export { fnv1a32, shouldClassifyText } from './pipeline/text-gate';
 export { ClassificationPipeline, type ClassificationPipelineDeps } from './pipeline/classification-pipeline';
 export { InferenceRuntimeHost } from './runtime/inference-runtime-host';

@@ -1,4 +1,5 @@
 import type { EnforcementAction } from '../types/enforcement';
+import { isActionModEnabled } from '../../mods/mod-manifest';
 import {
     DEFAULT_ENFORCEMENT_ACTION_SETTINGS,
     type EnforcementActionSettings,
@@ -13,12 +14,16 @@ export function registerEnforcementAction(action: EnforcementAction): void {
     actions.set(action.id, action);
 }
 
+export function unregisterEnforcementAction(id: string): void {
+    actions.delete(id);
+}
+
 export function getEnforcementAction(id: string): EnforcementAction | null {
     return actions.get(id) ?? null;
 }
 
 export function listEnforcementActions(): readonly EnforcementAction[] {
-    return [...actions.values()];
+    return [...actions.values()].filter((action) => isActionModEnabled(action.id));
 }
 
 export function getEnforcementActionSettings(): EnforcementActionSettings {
@@ -26,7 +31,10 @@ export function getEnforcementActionSettings(): EnforcementActionSettings {
 }
 
 export function getActiveEnforcementAction(): EnforcementAction {
-    const action = actions.get(cachedSettings.activeActionId);
+    const activeId = isActionModEnabled(cachedSettings.activeActionId)
+        ? cachedSettings.activeActionId
+        : DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId;
+    const action = actions.get(activeId);
     if (!action) {
         const fallback = actions.get(DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId);
         if (!fallback) {
@@ -40,8 +48,9 @@ export function getActiveEnforcementAction(): EnforcementAction {
 export async function loadEnforcementActionSettings(): Promise<EnforcementActionSettings> {
     const result = await chrome.storage.local.get('enforcementAction');
     const record = result as EnforcementActionStorageRecord;
-    if (record.enforcementAction?.activeActionId && actions.has(record.enforcementAction.activeActionId)) {
-        cachedSettings = { activeActionId: record.enforcementAction.activeActionId };
+    const storedId = record.enforcementAction?.activeActionId;
+    if (storedId && actions.has(storedId) && isActionModEnabled(storedId)) {
+        cachedSettings = { activeActionId: storedId };
     } else {
         cachedSettings = DEFAULT_ENFORCEMENT_ACTION_SETTINGS;
     }
@@ -54,7 +63,7 @@ export function subscribeToEnforcementActionChanges(
     chrome.storage.onChanged.addListener((changes) => {
         if (changes.enforcementAction) {
             const next = changes.enforcementAction.newValue as EnforcementActionSettings | undefined;
-            if (next?.activeActionId && actions.has(next.activeActionId)) {
+            if (next?.activeActionId && actions.has(next.activeActionId) && isActionModEnabled(next.activeActionId)) {
                 cachedSettings = next;
                 onChange(next);
             }

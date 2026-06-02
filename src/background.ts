@@ -1,4 +1,8 @@
 import type { CoreIpcMessage } from './core/ipc/messages';
+import {
+    installAuthenticityContextMenu,
+    registerAuthenticityBackgroundHandlers,
+} from './background-authenticity';
 
 type ClassifyMessage = {
     readonly type: 'classify';
@@ -110,7 +114,11 @@ function isRuntimeStatusMessage(message: CoreIpcMessage): message is Extract<Cor
 
 console.log('SignalLens: Background Service Worker Loaded');
 
+installAuthenticityContextMenu();
+registerAuthenticityBackgroundHandlers();
+
 chrome.runtime.onInstalled.addListener((details) => {
+    installAuthenticityContextMenu();
     if (details.reason !== 'install') return;
 
     chrome.storage.local.get('onboardingComplete', (result: unknown) => {

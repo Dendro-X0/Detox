@@ -6,6 +6,7 @@ import {
     DEFAULT_LABEL_ID,
     HEURISTIC_DETECTOR_ID,
 } from '../constants';
+import { loadUserRules, textMatchesAllowKeywords } from '../../../core/rules/user-rules-store';
 import { getActiveKeywords } from './keywords';
 
 function classifyKeyword(text: string, threshold: number, keywords: readonly string[]): Verdict {
@@ -40,8 +41,19 @@ export const heuristicKeywordsProvider: InferenceProvider = {
         hasSession: false,
     }),
     classifyBatch: async (items, options) => {
+        await loadUserRules();
         const threshold = options.threshold ?? DEFAULT_CLASSIFY_THRESHOLD;
         const keywords = await getActiveKeywords();
-        return items.map((item) => classifyResultFromVerdict(item.id, classifyKeyword(item.text, threshold, keywords)));
+        return items.map((item) => {
+            if (textMatchesAllowKeywords(item.text)) {
+                return classifyResultFromVerdict(item.id, {
+                    matched: false,
+                    score: 0,
+                    labelId: DEFAULT_LABEL_ID,
+                    detectorId: HEURISTIC_DETECTOR_ID,
+                });
+            }
+            return classifyResultFromVerdict(item.id, classifyKeyword(item.text, threshold, keywords));
+        });
     },
 };

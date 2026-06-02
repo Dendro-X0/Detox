@@ -1,6 +1,7 @@
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from '../core/types/enforcement';
 import { PRESET_THRESHOLDS } from '../core/types/policy';
 import { DEFAULT_ROUTING_SETTINGS } from '../core/types/routing';
+import { DEFAULT_USER_RULES } from '../core/types/user-rules';
 import { BOTHER_KEYWORD_MAP, SITE_MOD_MAP, type OnboardingDraft } from './types';
 
 function keywordsFromBothers(bothers: OnboardingDraft['bothers']): readonly string[] {
@@ -17,10 +18,16 @@ export function buildOnboardingStoragePatch(draft: OnboardingDraft): Record<stri
     const preset = draft.preset;
     const enabledModIds = draft.sites.map((site) => SITE_MOD_MAP[site]);
 
+    const blockKeywords = keywordsFromBothers(draft.bothers);
+
     return {
         onboardingComplete: true,
         enabled: true,
-        userKeywords: keywordsFromBothers(draft.bothers),
+        userRules: {
+            ...DEFAULT_USER_RULES,
+            blockKeywords,
+        },
+        userKeywords: blockKeywords,
         preferredSites: draft.sites,
         enabledModIds,
         policy: {

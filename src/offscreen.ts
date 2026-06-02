@@ -1,5 +1,6 @@
 import type { CoreIpcMessage } from './core/ipc/messages';
 import { InferenceRuntimeHost } from './core/runtime/inference-runtime-host';
+import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
 
 type OffscreenRequest = {
@@ -22,6 +23,9 @@ async function ensureRuntimeHost(): Promise<InferenceRuntimeHost> {
     if (!bootstrapPromise) {
         bootstrapPromise = (async () => {
             await loadBuiltinMods();
+            subscribeToEnabledModChanges(() => {
+                void loadBuiltinMods();
+            });
             runtimeHost = new InferenceRuntimeHost();
             return runtimeHost;
         })();

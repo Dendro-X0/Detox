@@ -3,7 +3,8 @@
 import type { ContentBlock } from '../../site-adapters/adapter-interface';
 import type { CoreIpcMessage } from '../ipc/messages';
 import type { FilteredItemRecord } from '../types/block';
-import { getThreshold } from '../policy/policy-store';
+import { isDomainAllowlisted } from '../rules/user-rules-store';
+import { getThresholdForHost } from '../policy/policy-store';
 import { fnv1a32, shouldClassifyText } from './text-gate';
 import type { Verdict } from '../types/verdict';
 import { verdictFromClassifyResult } from '../types/verdict';
@@ -75,6 +76,7 @@ export class ClassificationPipeline {
 
     handleBlocksAdded(blocks: readonly ContentBlock[]): void {
         if (!this.deps.isEnabled() || blocks.length === 0) return;
+        if (isDomainAllowlisted(location.hostname)) return;
 
         const items: BatchItem[] = blocks.map((block) => {
             const rect = block.element.getBoundingClientRect();
@@ -255,7 +257,7 @@ export class ClassificationPipeline {
         const request: CoreIpcMessage = {
             type: 'classifyBatch',
             items: eligibleToClassify.map((item) => ({ id: item.id, text: item.text })),
-            threshold: getThreshold(),
+            threshold: getThresholdForHost(location.hostname),
         };
 
         this.deps.profiler?.markStage('tokenizationMs');

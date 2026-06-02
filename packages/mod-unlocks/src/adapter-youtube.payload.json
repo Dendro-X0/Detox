@@ -1,0 +1,9 @@
+{
+  "format": "signallens-mod/1",
+  "modId": "adapter-youtube",
+  "version": "1.0.0",
+  "name": "YouTube adapter unlock",
+  "kind": "adapter",
+  "description": "Unlocks the YouTube site adapter in core builds.",
+  "permissionsSummary": "Reads youtube.com DOM structure."
+}

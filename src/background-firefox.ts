@@ -7,6 +7,11 @@
 
 import type { CoreIpcMessage } from './core/ipc/messages';
 import { InferenceRuntimeHost } from './core/runtime/inference-runtime-host';
+import {
+    installAuthenticityContextMenu,
+    registerAuthenticityBackgroundHandlers,
+} from './background-authenticity';
+import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
 
 let runtimeHost: InferenceRuntimeHost | null = null;
@@ -17,6 +22,9 @@ async function ensureRuntimeHost(): Promise<InferenceRuntimeHost> {
     if (!bootstrapPromise) {
         bootstrapPromise = (async () => {
             await loadBuiltinMods();
+            subscribeToEnabledModChanges(() => {
+                void loadBuiltinMods();
+            });
             runtimeHost = new InferenceRuntimeHost();
             void runtimeHost.ensureInitialized();
             return runtimeHost;
@@ -48,6 +56,13 @@ function handleMessage(
 }
 
 chrome.runtime.onMessage.addListener(handleMessage);
+
+installAuthenticityContextMenu();
+registerAuthenticityBackgroundHandlers();
+
+chrome.runtime.onInstalled.addListener(() => {
+    installAuthenticityContextMenu();
+});
 
 console.log('[Core] Firefox inference runtime host loaded');
 

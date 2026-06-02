@@ -1,22 +1,14 @@
+import { getUserRules, loadUserRules } from '../../../core/rules/user-rules-store';
+
 const BUILTIN_KEYWORDS: readonly string[] = ['kill', 'kys', 'die', 'stupid', 'idiot', 'moron'] as const;
 
 export async function getActiveKeywords(): Promise<readonly string[]> {
-    const result = await chrome.storage.local.get('userKeywords');
-    const record = result as { readonly userKeywords?: unknown };
-    const custom = record.userKeywords;
+    await loadUserRules();
+    const custom = getUserRules().blockKeywords;
 
-    if (!Array.isArray(custom)) {
+    if (custom.length === 0) {
         return BUILTIN_KEYWORDS;
     }
 
-    const normalized = custom
-        .filter((value): value is string => typeof value === 'string')
-        .map((value) => value.trim().toLowerCase())
-        .filter((value) => value.length > 0);
-
-    if (normalized.length === 0) {
-        return BUILTIN_KEYWORDS;
-    }
-
-    return [...new Set([...BUILTIN_KEYWORDS, ...normalized])];
+    return [...new Set([...BUILTIN_KEYWORDS, ...custom])];
 }

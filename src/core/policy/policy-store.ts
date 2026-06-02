@@ -10,7 +10,25 @@ export function getPolicy(): PolicySettings {
     return currentPolicy;
 }
 
+function normalizeHost(hostname: string): string {
+    return hostname.trim().toLowerCase().replace(/^www\./, '');
+}
+
 export function getThreshold(): number {
+    return currentPolicy.threshold;
+}
+
+export function getThresholdForHost(hostname: string): number {
+    const host = normalizeHost(hostname);
+    const direct = currentPolicy.perSite[host];
+    if (direct !== undefined) return direct;
+
+    for (const [siteHost, threshold] of Object.entries(currentPolicy.perSite)) {
+        if (host === siteHost || host.endsWith(`.${siteHost}`)) {
+            return threshold;
+        }
+    }
+
     return currentPolicy.threshold;
 }
 

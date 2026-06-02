@@ -124,39 +124,41 @@ Core modular refactor **Phases 1–6** — complete. See [`CORE-ROADMAP.md`](../
 
 ---
 
-### Phase D — User-defined rules
+### Phase D — User-defined rules ✅
 
-- [ ] Custom keyword / topic lists (seed heuristic or dedicated detector mod)
-- [ ] Allowlist / blocklist by domain and site-specific selectors
-- [ ] Wizard output feeds into these lists
+- [x] Custom keyword / topic lists (dashboard editor + topic presets)
+- [x] Allow keywords (never filter matching content)
+- [x] Allowed domains (pause filtering on selected sites)
+- [x] Per-site sensitivity overrides wired into pipeline threshold
+- [x] Wizard output feeds into block keyword lists
 
-**Done when:** Filtering reflects user intent; Reddit/forum pages show visible effect for typical setups.
+**Done when:** Filtering reflects user intent; Reddit/forum pages show visible effect for typical setups. ✅
 
 **Priority:** High — unlocks day-to-day value before authenticity work.
 
 ---
 
-### Phase E — Plugin library v1
+### Phase E — Plugin library v1 ✅
 
-- [ ] UI over `src/mods/mod-manifest.ts` (catalog + enable/disable)
-- [ ] Extended mod metadata: description, icon, size, permissions summary
-- [ ] Runtime enable/disable for bundled mods (dynamic import when toggled on)
+- [x] UI over `src/mods/mod-manifest.ts` (catalog + enable/disable)
+- [x] Extended mod metadata: description, size label, permissions summary
+- [x] Runtime enable/disable for bundled mods (dynamic import when toggled on)
 
-**Done when:** Users enable Reddit adapter or blur action without rebuilding.
-
----
-
-### Phase F — Signed mod installs
-
-- [ ] Downloadable mod packages (adapters, detectors, actions, analyzers)
-- [ ] Signature verification before registration
-- [ ] Heavy mods (ONNX packs) show size + download progress; lazy load on first use
-
-**Done when:** Optional mods install from the library without a full rebuild.
+**Done when:** Users enable Reddit adapter or blur action without rebuilding. ✅
 
 ---
 
-### Phase G — Authenticity assist mod (experimental → product)
+### Phase F — Signed mod installs ✅
+
+- [x] Downloadable mod packages (`signallens-mod/1` JSON + optional asset files)
+- [x] Ed25519 signature verification before install (`packages/signing/`, `scripts/sign-mod-package.mjs`)
+- [x] Heavy mod asset downloads with hash check + progress UI; lazy gate in `loadBuiltinMods`
+
+**Done when:** Optional mods install from the library without a full rebuild. ✅
+
+---
+
+### Phase G — Authenticity assist mod (experimental → product) ✅
 
 Spec: [`experimental/authenticity-analysis.md`](./experimental/authenticity-analysis.md)
 
@@ -173,14 +175,14 @@ Spec: [`experimental/authenticity-analysis.md`](./experimental/authenticity-anal
 
 **Deliverables:**
 
-- [ ] **G1 — Spike 0:** Manual feasibility script; measure citation quality and cost
-- [ ] **G2 — Selection UI:** Context menu “Analyze selection”; scope picker; side panel shell
-- [ ] **G3 — T2 search-only:** Real search results, zero LLM tokens; list links for user
-- [ ] **G4 — Grounded T3:** Fetch → verify snippets → structured LLM compare; URL allowlist enforcement
-- [ ] **G5 — Adapter integration:** `AnalysisScope` from Reddit / Quora adapters; advisory flags
-- [ ] **G6 — Dashboard:** Quota caps, API key setup, tier toggles, “search only” default option
+- [x] **G1 — Spike 0:** `scripts/authenticity-spike.mjs` (Wikipedia search latency probe)
+- [x] **G2 — Selection UI:** Context menu “Analyze selection”; side panel (`sidepanel.html`)
+- [x] **G3 — T2 search-only:** Wikipedia / Brave / custom search; auditable links in report
+- [x] **G4 — Grounded T3:** Fetch → snippet verify → OpenAI-compatible JSON compare; URL allowlist
+- [x] **G5 — Adapter integration:** Site-aware scope + advisory flag on selection (block id when available)
+- [x] **G6 — Dashboard:** Quota caps, API keys, tier toggles, search-only default (`AuthenticitySettingsPanel`)
 
-**Done when:** User can select a forum comment, receive an advisory report with auditable sources, and no content is hidden automatically.
+**Done when:** User can select a forum comment, receive an advisory report with auditable sources, and no content is hidden automatically. ✅
 
 **Depends on:** Phase B (settings surface) recommended; Phase D optional but improves adapter maturity.
 

@@ -8,7 +8,14 @@ import type { EnforcementActionId, EnforcementActionSettings } from './core/type
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import { isFullBuild } from './build-profile';
 import { getBuildProfile } from './build-profile';
-import { getModsForProfile } from './mods/mod-manifest';
+import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
+import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
+import UserRulesPanel from './dashboard/UserRulesPanel';
+import type { AuthenticitySettings } from './mods/analyzers/authenticity/settings';
+import { loadInstalledMods, type InstalledModRecord } from './core/mods/installed-mod-store';
+import { isModEnabled, isModUnlocked, loadEnabledModIds, saveEnabledModIds } from './core/mods/mod-enablement-store';
+import { loadUserRules, saveUserRules } from './core/rules/user-rules-store';
+import type { UserRulesSettings } from './core/types/user-rules';
 import type { ModelPack } from './types/model-pack';
 import { scanModelPacks, selectModelPack } from './v2/core/language-pack-manager';
 
@@ -92,8 +99,15 @@ const FILTER_STYLE_OPTIONS: readonly { readonly id: EnforcementActionId; readonl
   { id: 'collapse', label: 'Collapse', fullOnly: true },
 ];
 
+function actionModId(actionId: EnforcementActionId): string {
+  return `action-${actionId}`;
+}
+
 function getVisibleFilterStyles(): readonly { readonly id: EnforcementActionId; readonly label: string }[] {
-  return FILTER_STYLE_OPTIONS.filter((option) => !option.fullOnly || isFullBuild());
+  const profile = getBuildProfile();
+  return FILTER_STYLE_OPTIONS.filter(
+    (option) => isModUnlocked(actionModId(option.id), profile) && isModEnabled(actionModId(option.id))
+  );
 }
 
 function getPresetLabel(preset: PolicyPreset): string {
@@ -140,7 +154,6 @@ function App({ onRestartWizard }: AppProps) {
   const [enforcementAction, setEnforcementAction] = useState<EnforcementActionSettings>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS);
   const [siteRuleHost, setSiteRuleHost] = useState('');
   const [siteRuleThreshold, setSiteRuleThreshold] = useState(0.5);
-
   const saveEnforcementAction = (next: EnforcementActionSettings): void => {
     setEnforcementAction(next);
     chrome.storage.local.set({ enforcementAction: next });
@@ -354,20 +367,33 @@ function App({ onRestartWizard }: AppProps) {
   };
 
   const exportSettings = (): void => {
-    const payload = {
-      policy,
-      inferenceRouting: routing,
-      enforcementAction,
-      generatedAt: new Date().toISOString(),
-    };
-    const content = JSON.stringify(payload, null, 2);
-    const blob = new Blob([content], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'signallens-settings.json';
-    anchor.click();
-    URL.revokeObjectURL(url);
+    void Promise.all([
+      loadUserRules(),
+      loadEnabledModIds(),
+      loadInstalledMods(),
+      chrome.storage.local.get('authenticitySettings'),
+    ]).then(([userRules, enabledModIds, installedMods, authRes]) => {
+      const authenticitySettings = (authRes as { authenticitySettings?: AuthenticitySettings })
+        .authenticitySettings;
+      const payload = {
+        policy,
+        inferenceRouting: routing,
+        enforcementAction,
+        userRules,
+        enabledModIds,
+        installedMods,
+        authenticitySettings,
+        generatedAt: new Date().toISOString(),
+      };
+      const content = JSON.stringify(payload, null, 2);
+      const blob = new Blob([content], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'signallens-settings.json';
+      anchor.click();
+      URL.revokeObjectURL(url);
+    });
   };
 
   const importSettings = (): void => {
@@ -383,6 +409,10 @@ function App({ onRestartWizard }: AppProps) {
           readonly policy?: PolicySettings;
           readonly inferenceRouting?: InferenceRoutingSettings;
           readonly enforcementAction?: EnforcementActionSettings;
+          readonly userRules?: UserRulesSettings;
+          readonly enabledModIds?: readonly string[];
+          readonly installedMods?: readonly InstalledModRecord[];
+          readonly authenticitySettings?: AuthenticitySettings;
         };
         if (parsed.policy) {
           setPolicy(parsed.policy);
@@ -394,6 +424,18 @@ function App({ onRestartWizard }: AppProps) {
         if (parsed.enforcementAction) {
           saveEnforcementAction({ ...DEFAULT_ENFORCEMENT_ACTION_SETTINGS, ...parsed.enforcementAction });
         }
+        if (parsed.userRules) {
+          await saveUserRules(parsed.userRules);
+        }
+        if (parsed.enabledModIds) {
+          await saveEnabledModIds(parsed.enabledModIds);
+        }
+        if (parsed.installedMods) {
+          await chrome.storage.local.set({ installedMods: parsed.installedMods });
+        }
+        if (parsed.authenticitySettings) {
+          await chrome.storage.local.set({ authenticitySettings: parsed.authenticitySettings });
+        }
       } catch {
         window.alert('Invalid settings file.');
       }
@@ -404,8 +446,6 @@ function App({ onRestartWizard }: AppProps) {
   const isLoadingView = new URLSearchParams(window.location.search).has('loading');
   const isOptionsPage = window.location.pathname.endsWith('options.html');
   const activeProfile = getBuildProfile();
-  const visibleMods = getModsForProfile(activeProfile);
-
   if (isLoadingView) {
     return (
       <div className="container loading-container">
@@ -654,8 +694,10 @@ function App({ onRestartWizard }: AppProps) {
 
       {isOptionsPage ? (
         <>
+          <UserRulesPanel />
+
           <div className="card policy-card">
-            <h3>Per-Site Overrides</h3>
+            <h3>Per-Site Sensitivity Overrides</h3>
             <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
               Set custom filtering thresholds for specific hostnames.
             </p>
@@ -695,21 +737,9 @@ function App({ onRestartWizard }: AppProps) {
             </ul>
           </div>
 
-          <div className="card policy-card">
-            <h3>Plugin Library (Read-only)</h3>
-            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-              Runtime toggles arrive in Phase E. This catalog shows mods available for the active profile.
-            </p>
-            <div className="pack-list">
-              {visibleMods.map((mod) => (
-                <div key={mod.id} className="pack-option installable">
-                  <span className="pack-name">{mod.name}</span>
-                  <span className="pack-langs">{mod.kind}</span>
-                  <span className="pack-size">{mod.version}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <PluginLibraryPanel />
+
+          <AuthenticitySettingsPanel />
 
           <div className="card policy-card">
             <h3>Privacy</h3>

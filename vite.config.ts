@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => {
     index: 'index.html',
     offscreen: 'offscreen.html',
     options: 'options.html',
+    sidepanel: 'sidepanel.html',
   };
   if (profile === 'full') {
     rollupInput['backend-benchmark'] = 'backend-benchmark.html';

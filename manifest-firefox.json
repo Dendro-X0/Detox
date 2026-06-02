@@ -6,12 +6,20 @@
   "description": "Personal browsing layer for focus-first web reading.",
   "permissions": [
     "activeTab",
+    "contextMenus",
     "storage",
     "https://huggingface.co/*",
     "https://*.huggingface.co/*",
     "https://hf.co/*",
-    "https://*.hf.co/*"
+    "https://*.hf.co/*",
+    "https://en.wikipedia.org/*",
+    "https://api.search.brave.com/*",
+    "<all_urls>"
   ],
+  "sidebar_action": {
+    "default_title": "SignalLens — Authenticity",
+    "default_panel": "sidepanel.html"
+  },
   "browser_action": {
     "default_popup": "index.html"
   },
@@ -37,5 +45,5 @@
     "*.wasm",
     "ort/*"
   ],
-  "content_security_policy": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://hf.co https://*.hf.co"
+  "content_security_policy": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'; connect-src 'self' https://huggingface.co https://*.huggingface.co https://hf.co https://*.hf.co https://en.wikipedia.org https://api.search.brave.com https: http:"
 }

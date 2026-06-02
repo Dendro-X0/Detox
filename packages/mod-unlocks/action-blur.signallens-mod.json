@@ -1,0 +1,10 @@
+{
+  "format": "signallens-mod/1",
+  "modId": "action-blur",
+  "version": "1.0.0",
+  "name": "Blur filter unlock",
+  "kind": "action",
+  "description": "Unlocks the blur filter style in core builds.",
+  "permissionsSummary": "Updates inline styles on matched elements.",
+  "signature": "3SoEVEvq9zO9a6y/Z3w0HTb2fSYwKtkBw9lkOULNfNXEb57TJSpLLi9sJugiT22Hh9K3WOjKX1bRnsfYrOGLDA=="
+}

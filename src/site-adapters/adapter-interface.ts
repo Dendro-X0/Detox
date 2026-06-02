@@ -1,6 +1,7 @@
 /// <reference types="chrome" />
 
 import type { Verdict } from '../core/types/verdict';
+import { isAdapterModEnabled } from '../mods/mod-manifest';
 
 /**
  * A content block extracted from a webpage.
@@ -103,12 +104,17 @@ export function registerSiteAdapter(adapter: SiteAdapter): void {
     adapters.set(adapter.id, adapter);
 }
 
+export function unregisterSiteAdapter(id: string): void {
+    adapters.delete(id);
+}
+
 /**
  * Get the best matching adapter for the current page.
  * Returns null if no adapter matches.
  */
 export function getMatchingAdapter(): SiteAdapter | null {
     for (const adapter of adapters.values()) {
+        if (!isAdapterModEnabled(adapter.id)) continue;
         if (adapter.isMatch()) {
             return adapter;
         }

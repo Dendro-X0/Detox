@@ -2,11 +2,16 @@ import type { InferenceProvider } from '../types/detector';
 import { loadRoutingSettings } from '../runtime/routing-settings';
 import { PRIMARY_PROVIDER_IDS } from '../runtime/constants';
 import { HEURISTIC_DETECTOR_ID } from '../runtime/constants';
+import { isDetectorModEnabled } from '../../mods/mod-manifest';
 
 const providers = new Map<string, InferenceProvider>();
 
 export function registerProvider(provider: InferenceProvider): void {
     providers.set(provider.id, provider);
+}
+
+export function unregisterProvider(id: string): void {
+    providers.delete(id);
 }
 
 export function getProvider(id: string): InferenceProvider | null {
@@ -22,16 +27,25 @@ export async function resolveActiveProviderId(): Promise<string> {
 
     const legacy = await chrome.storage.local.get(['preferredDetectorId']);
     const preferredDetectorId = (legacy as { readonly preferredDetectorId?: unknown }).preferredDetectorId;
-    if (typeof preferredDetectorId === 'string' && providers.has(preferredDetectorId)) {
+    if (
+        typeof preferredDetectorId === 'string' &&
+        providers.has(preferredDetectorId) &&
+        isDetectorModEnabled(preferredDetectorId)
+    ) {
         return preferredDetectorId;
     }
 
-    return PRIMARY_PROVIDER_IDS[routing.primaryMode];
+    const primaryId = PRIMARY_PROVIDER_IDS[routing.primaryMode];
+    if (providers.has(primaryId) && isDetectorModEnabled(primaryId)) {
+        return primaryId;
+    }
+
+    return HEURISTIC_DETECTOR_ID;
 }
 
 export async function resolveActiveProvider(): Promise<InferenceProvider> {
     const id = await resolveActiveProviderId();
-    const provider = getProvider(id) ?? getProvider(HEURISTIC_DETECTOR_ID);
+    const provider = (isDetectorModEnabled(id) ? getProvider(id) : null) ?? getProvider(HEURISTIC_DETECTOR_ID);
     if (!provider) {
         throw new Error('No inference providers registered');
     }

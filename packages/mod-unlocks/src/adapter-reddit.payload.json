@@ -1,0 +1,9 @@
+{
+  "format": "signallens-mod/1",
+  "modId": "adapter-reddit",
+  "version": "1.0.0",
+  "name": "Reddit adapter unlock",
+  "kind": "adapter",
+  "description": "Unlocks the Reddit site adapter in core builds.",
+  "permissionsSummary": "Reads reddit.com DOM structure."
+}

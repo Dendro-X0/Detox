@@ -8,14 +8,32 @@ export function resolveModBuildProfile(env: Record<string, string>): ModBuildPro
     return env.VITE_BUILD_PROFILE === 'full' ? 'full' : 'core';
 }
 
+type ManifestWebAccessibleMv3 = readonly {
+    readonly resources: readonly string[];
+    readonly matches: readonly string[];
+}[];
+
 type ManifestJson = {
-    readonly web_accessible_resources?: readonly {
-        readonly resources: readonly string[];
-        readonly matches: readonly string[];
-    }[];
+    readonly web_accessible_resources?: ManifestWebAccessibleMv3 | readonly string[];
     readonly host_permissions?: readonly string[];
     readonly [key: string]: unknown;
 };
+
+function stripModelPackResources(
+    webAccessible: ManifestJson['web_accessible_resources']
+): ManifestJson['web_accessible_resources'] {
+    if (!webAccessible || webAccessible.length === 0) return webAccessible;
+
+    const first = webAccessible[0];
+    if (typeof first === 'string') {
+        return (webAccessible as readonly string[]).filter((resource) => !resource.includes('model-packs'));
+    }
+
+    return (webAccessible as ManifestWebAccessibleMv3).map((entry) => ({
+        ...entry,
+        resources: entry.resources.filter((resource) => !resource.includes('model-packs')),
+    }));
+}
 
 export function applyModProfileToManifest(manifest: ManifestJson, profile: ModBuildProfile): ManifestJson {
     if (profile === 'full') return manifest;
@@ -25,10 +43,7 @@ export function applyModProfileToManifest(manifest: ManifestJson, profile: ModBu
         host_permissions: (manifest.host_permissions ?? []).filter(
             (permission) => !permission.includes('huggingface') && !permission.includes('hf.co')
         ),
-        web_accessible_resources: (manifest.web_accessible_resources ?? []).map((entry) => ({
-            ...entry,
-            resources: entry.resources.filter((resource) => !resource.includes('model-packs')),
-        })),
+        web_accessible_resources: stripModelPackResources(manifest.web_accessible_resources),
     };
 }
 
