@@ -5,7 +5,35 @@ import {
     createStableId,
     registerSiteAdapter,
 } from './adapter-interface';
+import type { Verdict } from '../core/types/verdict';
+import { applyEnforcementToElement, revealEnforcementElement } from '../core/enforcement/apply-enforcement';
+import { revealBlockedContent } from '../core/enforcement/reveal-block';
 
+const REDDIT_CONTENT_SELECTORS: readonly string[] = [
+    '[slot="text-body"]',
+    '[slot="comment"]',
+    '.usertext-body',
+    '.md',
+    '.entry',
+];
+
+function resolveRedditEnforcementTarget(element: HTMLElement): HTMLElement {
+    for (const selector of REDDIT_CONTENT_SELECTORS) {
+        const contentEl = element.querySelector<HTMLElement>(selector);
+        if (contentEl && contentEl.textContent && contentEl.textContent.length >= 20) {
+            return contentEl;
+        }
+    }
+    return element;
+}
+
+function enforceRedditElement(element: HTMLElement, verdict: Verdict, blockId: string): EnforcementResult {
+    return applyEnforcementToElement(resolveRedditEnforcementTarget(element), verdict, { blockId });
+}
+
+function revealRedditElement(element: HTMLElement): void {
+    revealEnforcementElement(resolveRedditEnforcementTarget(element));
+}
 /**
  * Reddit adapter for Detox AI.
  *
@@ -14,9 +42,6 @@ import {
  * - Comments ([data-testid="comment"], .Comment, shreddit-comment)
  * - Nested comment threads
  */
-
-const MAX_ENFORCEMENT_TEXT_LENGTH: number = 800;
-const MAX_ENFORCEMENT_AREA_PX: number = 1_000_000;
 
 /** Generate a stable ID for a Reddit post or comment */
 function getRedditId(element: HTMLElement): string | null {
@@ -175,95 +200,6 @@ function createBlockFromElement(element: HTMLElement): ContentBlock | null {
     };
 }
 
-/** Apply enforcement (blur) to a Reddit content block */
-function applyEnforcementToElement(
-    element: HTMLElement,
-    verdict: { readonly isToxic: boolean; readonly score: number; readonly label: string }
-): EnforcementResult {
-    if (!verdict.isToxic) {
-        return { success: true };
-    }
-
-    // Safety checks
-    const text = element.textContent?.trim() ?? '';
-    if (text.length > MAX_ENFORCEMENT_TEXT_LENGTH) {
-        return { success: false, error: 'Element too large' };
-    }
-
-    const rect = element.getBoundingClientRect();
-    const area = rect.width * rect.height;
-    if (area > MAX_ENFORCEMENT_AREA_PX) {
-        return { success: false, error: 'Element area too large' };
-    }
-
-    // Find the content container to blur (not the entire element with buttons)
-    let target = element;
-    const contentSelectors = [
-        '[slot="text-body"]',
-        '[slot="comment"]',
-        '.usertext-body',
-        '.md',
-        '.entry',
-    ];
-
-    for (const selector of contentSelectors) {
-        const contentEl = element.querySelector<HTMLElement>(selector);
-        if (contentEl && contentEl.textContent && contentEl.textContent.length >= 20) {
-            target = contentEl;
-            break;
-        }
-    }
-
-    // Apply blur
-    target.style.filter = 'blur(10px) grayscale(100%)';
-    target.style.transition = 'filter 0.5s';
-    target.title = `Toxic content hidden by Detox AI (${verdict.label}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
-    target.style.cursor = 'pointer';
-
-    // Store original state for reveal
-    target.dataset.detoxBlocked = 'true';
-    target.dataset.detoxVerdict = JSON.stringify(verdict);
-
-    // Add click handler
-    target.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        target.style.filter = 'none';
-        target.style.cursor = 'initial';
-        target.title = '';
-        delete target.dataset.detoxBlocked;
-        delete target.dataset.detoxVerdict;
-    };
-
-    return { success: true };
-}
-
-/** Reveal a previously blocked block */
-function revealBlockElement(element: HTMLElement): void {
-    const contentSelectors = [
-        '[slot="text-body"]',
-        '[slot="comment"]',
-        '.usertext-body',
-        '.md',
-        '.entry',
-    ];
-
-    let target = element;
-    for (const selector of contentSelectors) {
-        const contentEl = element.querySelector<HTMLElement>(selector);
-        if (contentEl) {
-            target = contentEl;
-            break;
-        }
-    }
-
-    target.style.filter = 'none';
-    target.style.cursor = 'initial';
-    target.title = '';
-    delete target.dataset.detoxBlocked;
-    delete target.dataset.detoxVerdict;
-}
-
 /** Create the Reddit adapter instance */
 export function createRedditAdapter(): SiteAdapter {
     let mutationObserver: MutationObserver | null = null;
@@ -368,33 +304,26 @@ export function createRedditAdapter(): SiteAdapter {
 
         applyEnforcement: (blockId, verdict) => {
             const block = knownBlocks.get(blockId);
-            if (!block) {
-                // Try to find element by ID
-                const elements = document.querySelectorAll<HTMLElement>('[data-detox-id]');
-                for (const el of elements) {
-                    if (el.dataset.detoxId === blockId) {
-                        return applyEnforcementToElement(el, verdict);
-                    }
-                }
-                return { success: false, error: 'Block not found' };
+            if (block) {
+                return enforceRedditElement(block.element, verdict, blockId);
             }
-            return applyEnforcementToElement(block.element, verdict);
+
+            const elements = document.querySelectorAll<HTMLElement>('[data-detox-id]');
+            for (const el of elements) {
+                if (el.dataset.detoxId === blockId) {
+                    return enforceRedditElement(el, verdict, blockId);
+                }
+            }
+            return { success: false, error: 'Block not found' };
         },
 
         revealBlock: (blockId) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                revealBlockElement(block.element);
-            } else {
-                // Try to find by data attribute
-                const elements = document.querySelectorAll<HTMLElement>('[data-detox-id]');
-                for (const el of elements) {
-                    if (el.dataset.detoxId === blockId) {
-                        revealBlockElement(el);
-                        break;
-                    }
-                }
+                revealRedditElement(block.element);
+                return;
             }
+            revealBlockedContent(blockId);
         },
 
         destroy: () => {

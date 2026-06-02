@@ -5,6 +5,28 @@ import {
     createStableId,
     registerSiteAdapter,
 } from './adapter-interface';
+import type { Verdict } from '../core/types/verdict';
+import { applyEnforcementToElement, revealEnforcementElement } from '../core/enforcement/apply-enforcement';
+import { revealBlockedContent } from '../core/enforcement/reveal-block';
+
+function resolveYoutubeEnforcementTarget(element: HTMLElement): HTMLElement | null {
+    return element.querySelector<HTMLElement>('#content-text, #expander');
+}
+
+function enforceYoutubeElement(element: HTMLElement, verdict: Verdict, blockId: string): EnforcementResult {
+    const target = resolveYoutubeEnforcementTarget(element);
+    if (!target) {
+        return { success: false, error: 'Target element not found' };
+    }
+    return applyEnforcementToElement(target, verdict, { blockId });
+}
+
+function revealYoutubeElement(element: HTMLElement): void {
+    const target = resolveYoutubeEnforcementTarget(element);
+    if (target) {
+        revealEnforcementElement(target);
+    }
+}
 
 /**
  * YouTube adapter for Detox AI.
@@ -13,9 +35,6 @@ import {
  * - Comments (ytd-comment-renderer)
  * - Comment threads and replies
  */
-
-const MAX_ENFORCEMENT_TEXT_LENGTH: number = 800;
-const MAX_ENFORCEMENT_AREA_PX: number = 1_000_000;
 
 /** Generate a stable ID for a YouTube comment */
 function getYouTubeId(element: HTMLElement): string | null {
@@ -123,70 +142,6 @@ function createBlockFromElement(element: HTMLElement): ContentBlock | null {
     };
 }
 
-/** Apply enforcement (blur) to a comment element */
-function applyEnforcementToElement(
-    element: HTMLElement,
-    verdict: { readonly isToxic: boolean; readonly score: number; readonly label: string }
-): EnforcementResult {
-    if (!verdict.isToxic) {
-        return { success: true };
-    }
-
-    // Find the content text element to blur
-    const target = element.querySelector('#content-text, #expander') as HTMLElement | null;
-    if (!target) {
-        return { success: false, error: 'Target element not found' };
-    }
-
-    // Safety checks
-    const text = target.textContent?.trim() ?? '';
-    if (text.length > MAX_ENFORCEMENT_TEXT_LENGTH) {
-        return { success: false, error: 'Element too large' };
-    }
-
-    const rect = target.getBoundingClientRect();
-    const area = rect.width * rect.height;
-    if (area > MAX_ENFORCEMENT_AREA_PX) {
-        return { success: false, error: 'Element area too large' };
-    }
-
-    // Apply blur
-    target.style.filter = 'blur(10px) grayscale(100%)';
-    target.style.transition = 'filter 0.5s';
-    target.title = `Toxic content hidden by Detox AI (${verdict.label}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
-    target.style.cursor = 'pointer';
-
-    // Store state for reveal
-    target.dataset.detoxBlocked = 'true';
-    target.dataset.detoxVerdict = JSON.stringify(verdict);
-    target.dataset.detoxId = element.dataset.detoxId || 'unknown';
-
-    // Add click handler
-    target.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        target.style.filter = 'none';
-        target.style.cursor = 'initial';
-        target.title = '';
-        delete target.dataset.detoxBlocked;
-        delete target.dataset.detoxVerdict;
-    };
-
-    return { success: true };
-}
-
-/** Reveal a previously blocked element */
-function revealBlockElement(element: HTMLElement): void {
-    const target = element.querySelector('#content-text, #expander') as HTMLElement | null;
-    if (!target) return;
-
-    target.style.filter = 'none';
-    target.style.cursor = 'initial';
-    target.title = '';
-    delete target.dataset.detoxBlocked;
-    delete target.dataset.detoxVerdict;
-}
-
 /** Create the YouTube adapter instance */
 export function createYouTubeAdapter(): SiteAdapter {
     let mutationObserver: MutationObserver | null = null;
@@ -285,13 +240,12 @@ export function createYouTubeAdapter(): SiteAdapter {
         applyEnforcement: (blockId, verdict) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                return applyEnforcementToElement(block.element, verdict);
+                return enforceYoutubeElement(block.element, verdict, blockId);
             }
 
-            // Try to find by data attribute
             const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
             if (element) {
-                return applyEnforcementToElement(element, verdict);
+                return enforceYoutubeElement(element, verdict, blockId);
             }
 
             return { success: false, error: 'Block not found' };
@@ -300,13 +254,10 @@ export function createYouTubeAdapter(): SiteAdapter {
         revealBlock: (blockId) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                revealBlockElement(block.element);
-            } else {
-                const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
-                if (element) {
-                    revealBlockElement(element);
-                }
+                revealYoutubeElement(block.element);
+                return;
             }
+            revealBlockedContent(blockId);
         },
 
         destroy: () => {

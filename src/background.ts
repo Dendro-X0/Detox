@@ -1,4 +1,4 @@
-import type { DetoxIpcMessage } from './v2/core/detox-ipc';
+import type { CoreIpcMessage } from './core/ipc/messages';
 
 type ClassifyMessage = {
     readonly type: 'classify';
@@ -27,12 +27,12 @@ type ClassifyBatchItem = {
 
 type OffscreenRequest = {
     readonly requestId: string;
-    readonly payload: DetoxIpcMessage;
+    readonly payload: CoreIpcMessage;
 };
 
 type OffscreenResponse = {
     readonly requestId: string;
-    readonly payload: DetoxIpcMessage;
+    readonly payload: CoreIpcMessage;
 };
 
 const OFFSCREEN_PORT_NAME: string = 'detox-offscreen';
@@ -41,7 +41,7 @@ const REQUEST_ID_PREFIX: string = 'detox-req-';
 const REQUEST_ID_RANDOM_BASE: number = 36;
 
 let offscreenPort: chrome.runtime.Port | null = null;
-let pendingOffscreenRequests = new Map<string, (message: DetoxIpcMessage) => void>();
+let pendingOffscreenRequests = new Map<string, (message: CoreIpcMessage) => void>();
 
 function createRequestId(): string {
     const uuid = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(REQUEST_ID_RANDOM_BASE).slice(2);
@@ -53,7 +53,7 @@ function isOffscreenResponse(value: unknown): value is OffscreenResponse {
     if (!('requestId' in value) || !('payload' in value)) return false;
     const requestId = (value as { requestId?: unknown }).requestId;
     const payload = (value as { payload?: unknown }).payload;
-    return typeof requestId === 'string' && isDetoxIpcMessage(payload);
+    return typeof requestId === 'string' && isCoreIpcMessage(payload);
 }
 
 function connectOffscreenPort(): chrome.runtime.Port {
@@ -68,7 +68,7 @@ function connectOffscreenPort(): chrome.runtime.Port {
     });
     port.onDisconnect.addListener(() => {
         offscreenPort = null;
-        pendingOffscreenRequests = new Map<string, (message: DetoxIpcMessage) => void>();
+        pendingOffscreenRequests = new Map<string, (message: CoreIpcMessage) => void>();
     });
     offscreenPort = port;
     return port;
@@ -84,27 +84,27 @@ async function ensureOffscreenDocument(): Promise<void> {
     });
 }
 
-async function requestOffscreen(payload: DetoxIpcMessage): Promise<DetoxIpcMessage> {
+async function requestOffscreen(payload: CoreIpcMessage): Promise<CoreIpcMessage> {
     await ensureOffscreenDocument();
     const requestId = createRequestId();
     const request: OffscreenRequest = { requestId, payload };
     const port = connectOffscreenPort();
-    const response = await new Promise<DetoxIpcMessage>((resolve) => {
+    const response = await new Promise<CoreIpcMessage>((resolve) => {
         pendingOffscreenRequests.set(requestId, resolve);
         port.postMessage(request);
     });
     return response;
 }
 
-function isDetoxIpcMessage(value: unknown): value is DetoxIpcMessage {
+function isCoreIpcMessage(value: unknown): value is CoreIpcMessage {
     return typeof value === 'object' && value !== null && 'type' in value;
 }
 
-function isClassifyBatchMessage(message: DetoxIpcMessage): message is Extract<DetoxIpcMessage, { readonly type: 'classifyBatch' }> {
+function isClassifyBatchMessage(message: CoreIpcMessage): message is Extract<CoreIpcMessage, { readonly type: 'classifyBatch' }> {
     return message.type === 'classifyBatch';
 }
 
-function isRuntimeStatusMessage(message: DetoxIpcMessage): message is Extract<DetoxIpcMessage, { readonly type: 'runtimeStatus' }> {
+function isRuntimeStatusMessage(message: CoreIpcMessage): message is Extract<CoreIpcMessage, { readonly type: 'runtimeStatus' }> {
     return message.type === 'runtimeStatus';
 }
 
@@ -115,21 +115,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         classifyText(message as ClassifyMessage, sendResponse as (response: ClassifyResponse) => void);
         return true;
     }
-    if (!isDetoxIpcMessage(message)) return false;
+    if (!isCoreIpcMessage(message)) return false;
     if (isClassifyBatchMessage(message)) {
         console.log('Detox AI: Received classifyBatch', { count: message.items.length });
-        classifyBatch(message.items, sendResponse as (response: DetoxIpcMessage) => void);
+        classifyBatch(message.items, sendResponse as (response: CoreIpcMessage) => void);
         return true;
     }
     if (isRuntimeStatusMessage(message)) {
-        runtimeStatus(sendResponse as (response: DetoxIpcMessage) => void);
+        runtimeStatus(sendResponse as (response: CoreIpcMessage) => void);
         return true;
     }
     return false;
 });
 
-function classifyBatch(items: readonly ClassifyBatchItem[], sendResponse: (response: DetoxIpcMessage) => void): void {
-    const payload: DetoxIpcMessage = { type: 'classifyBatch', items };
+function classifyBatch(items: readonly ClassifyBatchItem[], sendResponse: (response: CoreIpcMessage) => void): void {
+    const payload: CoreIpcMessage = { type: 'classifyBatch', items };
     void requestOffscreen(payload).then((message) => {
         if (message.type === 'error') {
             console.warn('Detox AI: Offscreen classification error', message.error);
@@ -145,8 +145,8 @@ function classifyBatch(items: readonly ClassifyBatchItem[], sendResponse: (respo
     });
 }
 
-function runtimeStatus(sendResponse: (response: DetoxIpcMessage) => void): void {
-    const payload: DetoxIpcMessage = { type: 'runtimeStatus' };
+function runtimeStatus(sendResponse: (response: CoreIpcMessage) => void): void {
+    const payload: CoreIpcMessage = { type: 'runtimeStatus' };
     void requestOffscreen(payload).then((message) => {
         sendResponse(message);
     }).catch((error: unknown) => {

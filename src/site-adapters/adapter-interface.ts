@@ -1,5 +1,7 @@
 /// <reference types="chrome" />
 
+import type { Verdict } from '../core/types/verdict';
+
 /**
  * A content block extracted from a webpage.
  * This represents a unit of content that can be classified (e.g., a comment, post, or message).
@@ -77,10 +79,7 @@ export interface SiteAdapter {
      * @param verdict The classification verdict
      * @returns Result of the enforcement action
      */
-    readonly applyEnforcement: (
-        blockId: string,
-        verdict: { readonly isToxic: boolean; readonly score: number; readonly label: string }
-    ) => EnforcementResult;
+    readonly applyEnforcement: (blockId: string, verdict: Verdict) => EnforcementResult;
 
     /**
      * Reveal a previously blocked block (user clicked to show).

@@ -1,10 +1,11 @@
 import {
     type SiteAdapter,
     type ContentBlock,
-    type EnforcementResult,
     createStableId,
     registerSiteAdapter,
 } from './adapter-interface';
+import { applyEnforcementToElement } from '../core/enforcement/apply-enforcement';
+import { revealBlockedContent } from '../core/enforcement/reveal-block';
 
 /**
  * Generic fallback adapter for sites without specific adapters.
@@ -16,8 +17,6 @@ import {
  * - Comment-like sections (generic selectors)
  */
 
-const MAX_ENFORCEMENT_TEXT_LENGTH: number = 800;
-const MAX_ENFORCEMENT_AREA_PX: number = 1_000_000;
 const MIN_TEXT_LENGTH: number = 50;
 
 /** FNV-1a 32-bit hash for generating stable IDs */
@@ -178,61 +177,6 @@ function createBlockFromElement(element: HTMLElement): ContentBlock | null {
     };
 }
 
-/** Apply enforcement (blur) to an element */
-function applyEnforcementToElement(
-    element: HTMLElement,
-    verdict: { readonly isToxic: boolean; readonly score: number; readonly label: string }
-): EnforcementResult {
-    if (!verdict.isToxic) {
-        return { success: true };
-    }
-
-    // Safety checks
-    const text = element.textContent?.trim() ?? '';
-    if (text.length > MAX_ENFORCEMENT_TEXT_LENGTH) {
-        return { success: false, error: 'Element too large' };
-    }
-
-    const rect = element.getBoundingClientRect();
-    const area = rect.width * rect.height;
-    if (area > MAX_ENFORCEMENT_AREA_PX) {
-        return { success: false, error: 'Element area too large' };
-    }
-
-    // Apply blur
-    element.style.filter = 'blur(10px) grayscale(100%)';
-    element.style.transition = 'filter 0.5s';
-    element.title = `Toxic content hidden by Detox AI (${verdict.label}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
-    element.style.cursor = 'pointer';
-
-    // Store state for reveal
-    element.dataset.detoxBlocked = 'true';
-    element.dataset.detoxVerdict = JSON.stringify(verdict);
-    element.dataset.detoxId = element.dataset.detoxId || getGenericId(element);
-
-    // Add click handler
-    element.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        element.style.filter = 'none';
-        element.style.cursor = 'initial';
-        element.title = '';
-        delete element.dataset.detoxBlocked;
-        delete element.dataset.detoxVerdict;
-    };
-
-    return { success: true };
-}
-
-/** Reveal a previously blocked element */
-function revealBlockElement(element: HTMLElement): void {
-    element.style.filter = 'none';
-    element.style.cursor = 'initial';
-    element.title = '';
-    delete element.dataset.detoxBlocked;
-    delete element.dataset.detoxVerdict;
-}
-
 /** Create the generic adapter instance */
 export function createGenericAdapter(): SiteAdapter {
     let mutationObserver: MutationObserver | null = null;
@@ -320,28 +264,19 @@ export function createGenericAdapter(): SiteAdapter {
         applyEnforcement: (blockId, verdict) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                return applyEnforcementToElement(block.element, verdict);
+                return applyEnforcementToElement(block.element, verdict, { blockId });
             }
 
-            // Try to find by data attribute
             const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
             if (element) {
-                return applyEnforcementToElement(element, verdict);
+                return applyEnforcementToElement(element, verdict, { blockId });
             }
 
             return { success: false, error: 'Block not found' };
         },
 
         revealBlock: (blockId) => {
-            const block = knownBlocks.get(blockId);
-            if (block) {
-                revealBlockElement(block.element);
-            } else {
-                const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
-                if (element) {
-                    revealBlockElement(element);
-                }
-            }
+            revealBlockedContent(blockId, knownBlocks.get(blockId)?.element ?? null);
         },
 
         destroy: () => {

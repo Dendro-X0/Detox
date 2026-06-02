@@ -5,6 +5,21 @@ import {
     createStableId,
     registerSiteAdapter,
 } from './adapter-interface';
+import type { Verdict } from '../core/types/verdict';
+import { applyEnforcementToElement, revealEnforcementElement } from '../core/enforcement/apply-enforcement';
+import { revealBlockedContent } from '../core/enforcement/reveal-block';
+
+function resolveQuoraEnforcementTarget(element: HTMLElement): HTMLElement {
+    return element.querySelector<HTMLElement>('.answer_content, .content, .q-text, .p1') ?? element;
+}
+
+function enforceQuoraElement(element: HTMLElement, verdict: Verdict, blockId: string): EnforcementResult {
+    return applyEnforcementToElement(resolveQuoraEnforcementTarget(element), verdict, { blockId });
+}
+
+function revealQuoraElement(element: HTMLElement): void {
+    revealEnforcementElement(resolveQuoraEnforcementTarget(element));
+}
 
 /**
  * Quora adapter for Detox AI.
@@ -14,9 +29,6 @@ import {
  * - Comments (.Comment)
  * - Answer expansions and collapsed content
  */
-
-const MAX_ENFORCEMENT_TEXT_LENGTH: number = 800;
-const MAX_ENFORCEMENT_AREA_PX: number = 1_000_000;
 
 /** Generate a stable ID for a Quora answer or comment */
 function getQuoraId(element: HTMLElement): string | null {
@@ -156,99 +168,6 @@ function createBlockFromElement(element: HTMLElement): ContentBlock | null {
     };
 }
 
-/** Apply enforcement (blur) to an element */
-function applyEnforcementToElement(
-    element: HTMLElement,
-    verdict: { readonly isToxic: boolean; readonly score: number; readonly label: string }
-): EnforcementResult {
-    if (!verdict.isToxic) {
-        return { success: true };
-    }
-
-    // Find the content element to blur
-    const target = element.querySelector('.answer_content, .content, .q-text, .p1') as HTMLElement | null;
-    if (!target) {
-        // Fallback to blurring the whole element
-        const fallback = element;
-        if (fallback.textContent && fallback.textContent.length > MAX_ENFORCEMENT_TEXT_LENGTH) {
-            return { success: false, error: 'Element too large' };
-        }
-        const rect = fallback.getBoundingClientRect();
-        const area = rect.width * rect.height;
-        if (area > MAX_ENFORCEMENT_AREA_PX) {
-            return { success: false, error: 'Element area too large' };
-        }
-
-        fallback.style.filter = 'blur(10px) grayscale(100%)';
-        fallback.style.transition = 'filter 0.5s';
-        fallback.title = `Toxic content hidden by Detox AI (${verdict.label}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
-        fallback.style.cursor = 'pointer';
-        fallback.dataset.detoxBlocked = 'true';
-        fallback.dataset.detoxVerdict = JSON.stringify(verdict);
-        fallback.dataset.detoxId = element.dataset.detoxId || 'unknown';
-        fallback.onclick = (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-            fallback.style.filter = 'none';
-            fallback.style.cursor = 'initial';
-            fallback.title = '';
-            delete fallback.dataset.detoxBlocked;
-            delete fallback.dataset.detoxVerdict;
-        };
-        return { success: true };
-    }
-
-    // Safety checks
-    const text = target.textContent?.trim() ?? '';
-    if (text.length > MAX_ENFORCEMENT_TEXT_LENGTH) {
-        return { success: false, error: 'Element too large' };
-    }
-
-    const rect = target.getBoundingClientRect();
-    const area = rect.width * rect.height;
-    if (area > MAX_ENFORCEMENT_AREA_PX) {
-        return { success: false, error: 'Element area too large' };
-    }
-
-    // Apply blur
-    target.style.filter = 'blur(10px) grayscale(100%)';
-    target.style.transition = 'filter 0.5s';
-    target.title = `Toxic content hidden by Detox AI (${verdict.label}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
-    target.style.cursor = 'pointer';
-    target.dataset.detoxBlocked = 'true';
-    target.dataset.detoxVerdict = JSON.stringify(verdict);
-    target.dataset.detoxId = element.dataset.detoxId || 'unknown';
-    target.onclick = (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        target.style.filter = 'none';
-        target.style.cursor = 'initial';
-        target.title = '';
-        delete target.dataset.detoxBlocked;
-        delete target.dataset.detoxVerdict;
-    };
-
-    return { success: true };
-}
-
-/** Reveal a previously blocked element */
-function revealBlockElement(element: HTMLElement): void {
-    const target = element.querySelector('.answer_content, .content, .q-text, .p1') as HTMLElement | null;
-    if (target) {
-        target.style.filter = 'none';
-        target.style.cursor = 'initial';
-        target.title = '';
-        delete target.dataset.detoxBlocked;
-        delete target.dataset.detoxVerdict;
-    } else {
-        element.style.filter = 'none';
-        element.style.cursor = 'initial';
-        element.title = '';
-        delete element.dataset.detoxBlocked;
-        delete element.dataset.detoxVerdict;
-    }
-}
-
 /** Create the Quora adapter instance */
 export function createQuoraAdapter(): SiteAdapter {
     let mutationObserver: MutationObserver | null = null;
@@ -330,12 +249,12 @@ export function createQuoraAdapter(): SiteAdapter {
         applyEnforcement: (blockId, verdict) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                return applyEnforcementToElement(block.element, verdict);
+                return enforceQuoraElement(block.element, verdict, blockId);
             }
 
             const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
             if (element) {
-                return applyEnforcementToElement(element, verdict);
+                return enforceQuoraElement(element, verdict, blockId);
             }
 
             return { success: false, error: 'Block not found' };
@@ -344,13 +263,10 @@ export function createQuoraAdapter(): SiteAdapter {
         revealBlock: (blockId) => {
             const block = knownBlocks.get(blockId);
             if (block) {
-                revealBlockElement(block.element);
-            } else {
-                const element = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
-                if (element) {
-                    revealBlockElement(element);
-                }
+                revealQuoraElement(block.element);
+                return;
             }
+            revealBlockedContent(blockId);
         },
 
         destroy: () => {

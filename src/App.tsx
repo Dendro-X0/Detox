@@ -1,7 +1,12 @@
 /// <reference types="chrome" />
 import { useEffect, useState } from 'react';
 import './App.css';
-import type { DetoxIpcMessage } from './v2/core/detox-ipc';
+import type { CoreIpcMessage } from './core/ipc/messages';
+import type { InferenceRoutingSettings, PrimaryProviderMode } from './core/types/routing';
+import { DEFAULT_ROUTING_SETTINGS } from './core/types/routing';
+import type { EnforcementActionId, EnforcementActionSettings } from './core/types/enforcement';
+import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
+import { isFullBuild } from './build-profile';
 import type { ModelPack } from './types/model-pack';
 import { scanModelPacks, selectModelPack } from './v2/core/language-pack-manager';
 
@@ -13,10 +18,13 @@ type Stats = {
 type BlockedItem = {
   readonly id: string;
   readonly score: number;
-  readonly label: string;
+  readonly labelId: string;
+  readonly detectorId?: string;
   readonly preview: string;
   readonly hostname: string;
   readonly timestamp: number;
+  /** @deprecated Legacy field from older builds */
+  readonly label?: string;
 };
 
 type LanguagePackState = {
@@ -47,7 +55,11 @@ type RuntimeStatus = {
   readonly state: string;
   readonly lastError: string | null;
   readonly activePackId: string | null;
+  readonly activeDetectorId: string | null;
   readonly hasSession: boolean;
+  readonly primaryMode?: PrimaryProviderMode;
+  readonly escalationEnabled?: boolean;
+  readonly remoteApiReady?: boolean;
 };
 
 type PerformanceMetrics = {
@@ -72,6 +84,16 @@ const INSTALLABLE_PACKS: readonly InstallablePack[] = [
   { id: 'toxicity-de', name: 'German BERT', languages: ['de'], sizeMb: 45, installed: false },
 ];
 
+const FILTER_STYLE_OPTIONS: readonly { readonly id: EnforcementActionId; readonly label: string; readonly fullOnly?: boolean }[] = [
+  { id: 'dim', label: 'Dim' },
+  { id: 'blur', label: 'Blur', fullOnly: true },
+  { id: 'collapse', label: 'Collapse', fullOnly: true },
+];
+
+function getVisibleFilterStyles(): readonly { readonly id: EnforcementActionId; readonly label: string }[] {
+  return FILTER_STYLE_OPTIONS.filter((option) => !option.fullOnly || isFullBuild());
+}
+
 function getPresetLabel(preset: PolicyPreset): string {
   const labels: Record<PolicyPreset, string> = {
     conservative: 'Conservative (fewer blocks)',
@@ -89,7 +111,13 @@ function formatTime(ts: number): string {
 function App() {
   const [enabled, setEnabled] = useState(false);
   const [stats, setStats] = useState<Stats>({ scanned: 0, toxic: 0 });
-  const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>({ state: 'unknown', lastError: null, activePackId: null, hasSession: false });
+  const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>({
+    state: 'unknown',
+    lastError: null,
+    activePackId: null,
+    activeDetectorId: null,
+    hasSession: false,
+  });
   const [blockedItems, setBlockedItems] = useState<readonly BlockedItem[]>([]);
   const [policy, setPolicy] = useState<PolicySettings>({ preset: 'balanced', threshold: 0.5, perSite: {} });
   const [debugMode, setDebugMode] = useState(false);
@@ -102,13 +130,50 @@ function App() {
     autoSelected: true,
   });
   const [showPackSelector, setShowPackSelector] = useState(false);
+  const [routing, setRouting] = useState<InferenceRoutingSettings>(DEFAULT_ROUTING_SETTINGS);
+  const [enforcementAction, setEnforcementAction] = useState<EnforcementActionSettings>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS);
+
+  const saveEnforcementAction = (next: EnforcementActionSettings): void => {
+    setEnforcementAction(next);
+    chrome.storage.local.set({ enforcementAction: next });
+  };
+
+  const setActionId = (activeActionId: EnforcementActionId): void => {
+    saveEnforcementAction({ activeActionId });
+  };
+
+  const saveRouting = (next: InferenceRoutingSettings): void => {
+    setRouting(next);
+    chrome.storage.local.set({ inferenceRouting: next });
+    if (next.primaryMode === 'heuristic') {
+      chrome.storage.local.set({ preferredDetectorId: 'heuristic-keywords' });
+    } else {
+      chrome.storage.local.set({ preferredDetectorId: 'local-pack' });
+    }
+  };
+
+  const setPrimaryMode = (mode: PrimaryProviderMode): void => {
+    saveRouting({ ...routing, primaryMode: mode });
+  };
 
   useEffect(() => {
-    chrome.storage.local.get(['enabled', 'stats', 'policy'], (res: unknown) => {
-      const record = res as { readonly enabled?: boolean; readonly stats?: Stats; readonly policy?: PolicySettings };
+    chrome.storage.local.get(['enabled', 'stats', 'policy', 'inferenceRouting', 'enforcementAction'], (res: unknown) => {
+      const record = res as {
+        readonly enabled?: boolean;
+        readonly stats?: Stats;
+        readonly policy?: PolicySettings;
+        readonly inferenceRouting?: InferenceRoutingSettings;
+        readonly enforcementAction?: EnforcementActionSettings;
+      };
       setEnabled(record.enabled ?? true);
       setStats(record.stats ?? { scanned: 0, toxic: 0 });
       setPolicy(record.policy ?? { preset: 'balanced', threshold: 0.5, perSite: {} });
+      if (record.inferenceRouting) {
+        setRouting({ ...DEFAULT_ROUTING_SETTINGS, ...record.inferenceRouting });
+      }
+      if (record.enforcementAction) {
+        setEnforcementAction({ ...DEFAULT_ENFORCEMENT_ACTION_SETTINGS, ...record.enforcementAction });
+      }
     });
 
     chrome.storage.session.get('blockedItems', (res: unknown) => {
@@ -123,6 +188,12 @@ function App() {
       if (changes.policy) {
         setPolicy(changes.policy.newValue as PolicySettings);
       }
+      if (changes.inferenceRouting) {
+        setRouting(changes.inferenceRouting.newValue as InferenceRoutingSettings);
+      }
+      if (changes.enforcementAction) {
+        setEnforcementAction(changes.enforcementAction.newValue as EnforcementActionSettings);
+      }
     });
 
     chrome.storage.session.onChanged.addListener((changes) => {
@@ -132,19 +203,40 @@ function App() {
     });
 
     const pollStatus = (): void => {
-      const request: DetoxIpcMessage = { type: 'runtimeStatus' };
-      chrome.runtime.sendMessage(request, (response: DetoxIpcMessage | undefined) => {
+      const request: CoreIpcMessage = { type: 'runtimeStatus' };
+      chrome.runtime.sendMessage(request, (response: CoreIpcMessage | undefined) => {
         if (chrome.runtime.lastError) {
-          setRuntimeStatus({ state: 'error', lastError: chrome.runtime.lastError.message ?? 'Unknown runtime error', activePackId: null, hasSession: false });
+          setRuntimeStatus({
+            state: 'error',
+            lastError: chrome.runtime.lastError.message ?? 'Unknown runtime error',
+            activePackId: null,
+            activeDetectorId: null,
+            hasSession: false,
+          });
           return;
         }
         if (!response) return;
         if (response.type === 'error') {
-          setRuntimeStatus({ state: 'error', lastError: response.error, activePackId: null, hasSession: false });
+          setRuntimeStatus({
+            state: 'error',
+            lastError: response.error,
+            activePackId: null,
+            activeDetectorId: null,
+            hasSession: false,
+          });
           return;
         }
         if (response.type !== 'runtimeStatusResult') return;
-        setRuntimeStatus({ state: response.state, lastError: response.lastError, activePackId: response.activePackId, hasSession: response.hasSession });
+        setRuntimeStatus({
+          state: response.state,
+          lastError: response.lastError,
+          activePackId: response.activePackId,
+          activeDetectorId: response.activeDetectorId,
+          hasSession: response.hasSession,
+          primaryMode: response.primaryMode,
+          escalationEnabled: response.escalationEnabled,
+          remoteApiReady: response.remoteApiReady,
+        });
       });
     };
 
@@ -166,8 +258,9 @@ function App() {
     pollPerfMetrics();
     const perfIntervalId = window.setInterval(pollPerfMetrics, 1000);
 
-    // Load available packs and detect language
+    // Load available packs and detect language (full build only)
     const loadPackInfo = async (): Promise<void> => {
+      if (!isFullBuild()) return;
       try {
         const registry = await scanModelPacks();
 
@@ -268,6 +361,79 @@ function App() {
       </div>
 
       <div className="card policy-card">
+        <h3>Inference</h3>
+        <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+          {isFullBuild()
+            ? 'Heuristic mode works offline with no model files. Local pack uses bundled ONNX weights.'
+            : 'Heuristic mode — works offline with no model files.'}
+        </p>
+        {isFullBuild() ? (
+          <>
+            <div className="preset-buttons">
+              <button
+                className={`preset-btn ${routing.primaryMode === 'heuristic' ? 'active' : ''}`}
+                onClick={() => setPrimaryMode('heuristic')}
+              >
+                Heuristic (offline)
+              </button>
+              <button
+                className={`preset-btn ${routing.primaryMode === 'local-pack' ? 'active' : ''}`}
+                onClick={() => setPrimaryMode('local-pack')}
+              >
+                Local pack (ONNX)
+              </button>
+            </div>
+            <label className="stat-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
+              <input
+                type="checkbox"
+                checked={routing.escalationEnabled}
+                onChange={(e) => saveRouting({ ...routing, escalationEnabled: e.target.checked })}
+              />
+              <span className="label">Escalate uncertain items to remote API (opt-in)</span>
+            </label>
+            {routing.escalationEnabled ? (
+              <div className="pack-selector" style={{ marginTop: '0.75rem' }}>
+                <label className="stat-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                  <span className="label">API endpoint URL</span>
+                  <input
+                    type="url"
+                    placeholder="https://your-api.example/classify"
+                    value={routing.remoteApi.endpointUrl}
+                    onChange={(e) => saveRouting({
+                      ...routing,
+                      remoteApi: { ...routing.remoteApi, enabled: true, endpointUrl: e.target.value },
+                    })}
+                    style={{ width: '100%', padding: '0.35rem' }}
+                  />
+                </label>
+                <label className="stat-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem' }}>
+                  <span className="label">API key (optional)</span>
+                  <input
+                    type="password"
+                    placeholder="Bearer token"
+                    value={routing.remoteApi.apiKey}
+                    onChange={(e) => saveRouting({
+                      ...routing,
+                      remoteApi: { ...routing.remoteApi, enabled: true, apiKey: e.target.value },
+                    })}
+                    style={{ width: '100%', padding: '0.35rem' }}
+                  />
+                </label>
+                <p className="muted" style={{ fontSize: '0.8rem', marginBottom: 0 }}>
+                  Remote API: {runtimeStatus.remoteApiReady ? 'configured' : 'not configured'}
+                </p>
+              </div>
+            ) : null}
+          </>
+        ) : (
+          <div className="stat-row">
+            <span className="label">Mode:</span>
+            <span className="value">Heuristic (offline)</span>
+          </div>
+        )}
+      </div>
+
+      <div className="card policy-card">
         <h3>Filter Sensitivity</h3>
         <div className="preset-buttons">
           {(['conservative', 'balanced', 'strict'] as PolicyPreset[]).map((p) => (
@@ -285,6 +451,25 @@ function App() {
         </div>
       </div>
 
+      <div className="card policy-card">
+        <h3>Filter Style</h3>
+        <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+          Choose how filtered content appears on the page. Click any filtered block to reveal it.
+        </p>
+        <div className="preset-buttons">
+          {getVisibleFilterStyles().map((action) => (
+            <button
+              key={action.id}
+              className={`preset-btn ${enforcementAction.activeActionId === action.id ? 'active' : ''}`}
+              onClick={() => setActionId(action.id)}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {isFullBuild() ? (
       <div className="card pack-card">
         <div className="pack-header">
           <h3>Language Pack</h3>
@@ -324,7 +509,8 @@ function App() {
                   className={`pack-option ${packState.selectedPackId === pack.id ? 'active' : ''}`}
                   onClick={() => {
                     setPackState(prev => ({ ...prev, selectedPackId: pack.id, autoSelected: false }));
-                    chrome.storage.local.set({ preferredPackId: pack.id });
+                    saveRouting({ ...routing, primaryMode: 'local-pack' });
+                    chrome.storage.local.set({ preferredPackId: pack.id, preferredDetectorId: 'local-pack' });
                   }}
                 >
                   <span className="pack-name">{pack.name}</span>
@@ -351,20 +537,34 @@ function App() {
           </div>
         )}
       </div>
+      ) : null}
 
       <div className="card">
         <div className="stat-item">
           <span className="label">Runtime</span>
           <span className="value">{runtimeStatus.state}</span>
         </div>
+        {isFullBuild() ? (
+          <>
         <div className="stat-item">
           <span className="label">Pack</span>
           <span className="value">{runtimeStatus.activePackId ?? 'none'}</span>
         </div>
         <div className="stat-item">
-          <span className="label">Session</span>
-          <span className="value">{runtimeStatus.hasSession ? 'yes' : 'no'}</span>
+          <span className="label">Mode</span>
+          <span className="value">{runtimeStatus.primaryMode ?? routing.primaryMode}</span>
         </div>
+        <div className="stat-item">
+          <span className="label">Escalation</span>
+          <span className="value">{runtimeStatus.escalationEnabled ? 'on' : 'off'}</span>
+        </div>
+          </>
+        ) : (
+        <div className="stat-item">
+          <span className="label">Detector</span>
+          <span className="value">{runtimeStatus.activeDetectorId ?? 'heuristic-keywords'}</span>
+        </div>
+        )}
         {runtimeStatus.lastError ? (
           <div className="stat-item">
             <span className="label">Last error</span>
@@ -419,7 +619,7 @@ function App() {
               {blockedItems.slice(0, 10).map((item) => (
                 <li key={item.id} className="blocked-item">
                   <div className="blocked-header">
-                    <span className="badge">{item.label}</span>
+                    <span className="badge">{item.labelId ?? item.label ?? 'noise'}</span>
                     <span className="score">{(item.score * 100).toFixed(0)}%</span>
                     <span className="time">{formatTime(item.timestamp)}</span>
                   </div>

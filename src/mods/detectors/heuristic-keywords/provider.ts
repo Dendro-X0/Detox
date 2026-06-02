@@ -1,0 +1,47 @@
+import type { InferenceProvider } from '../../../core/types/detector';
+import type { Verdict } from '../../../core/types/verdict';
+import { classifyResultFromVerdict } from '../../../core/types/verdict';
+import {
+    DEFAULT_CLASSIFY_THRESHOLD,
+    DEFAULT_LABEL_ID,
+    HEURISTIC_DETECTOR_ID,
+} from '../constants';
+
+const NOISE_KEYWORDS: readonly string[] = ['kill', 'kys', 'die', 'stupid', 'idiot', 'moron'] as const;
+
+function classifyKeyword(text: string, threshold: number): Verdict {
+    const normalized = text.toLowerCase();
+    const matches = NOISE_KEYWORDS.filter((kw) => normalized.includes(kw)).length;
+    if (matches <= 0) {
+        return {
+            matched: false,
+            score: 0,
+            labelId: DEFAULT_LABEL_ID,
+            detectorId: HEURISTIC_DETECTOR_ID,
+        };
+    }
+    const score = Math.min(1, 0.35 + matches * 0.25);
+    return {
+        matched: score >= threshold,
+        score,
+        labelId: DEFAULT_LABEL_ID,
+        detectorId: HEURISTIC_DETECTOR_ID,
+    };
+}
+
+export const heuristicKeywordsProvider: InferenceProvider = {
+    id: HEURISTIC_DETECTOR_ID,
+    detectorId: HEURISTIC_DETECTOR_ID,
+    kind: 'local',
+    supports: (detectorId) => detectorId === HEURISTIC_DETECTOR_ID || detectorId === 'heuristic',
+    getRuntimeInfo: () => ({
+        state: 'ready',
+        activePackId: null,
+        lastError: null,
+        hasSession: false,
+    }),
+    classifyBatch: async (items, options) => {
+        const threshold = options.threshold ?? DEFAULT_CLASSIFY_THRESHOLD;
+        return items.map((item) => classifyResultFromVerdict(item.id, classifyKeyword(item.text, threshold)));
+    },
+};
