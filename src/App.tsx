@@ -331,8 +331,8 @@ function App() {
     return (
       <div className="container loading-container">
         <div className="loading-spinner"></div>
-        <h2>Detox AI</h2>
-        <p className="loading-text">Initializing and scanning content...</p>
+        <h2>SignalLens</h2>
+        <p className="loading-text">Preparing your focus view...</p>
         <p className="loading-subtext">This may take a moment on large pages</p>
       </div>
     );
@@ -340,13 +340,13 @@ function App() {
 
   return (
     <div className="container">
-      <h1>Detox AI</h1>
+      <h1>SignalLens</h1>
       <div className="card">
         <label className="switch">
           <input type="checkbox" checked={enabled} onChange={toggle} />
           <span className="slider round"></span>
         </label>
-        <p>{enabled ? "Protection Enabled" : "Protection Disabled"}</p>
+        <p>{enabled ? "Focus Mode Enabled" : "Focus Mode Disabled"}</p>
       </div>
 
       <div className="stats">

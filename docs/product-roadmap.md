@@ -91,13 +91,13 @@ Core modular refactor **Phases 1–6** — complete. See [`CORE-ROADMAP.md`](../
 
 ---
 
-### Phase A — Rename & reframe
+### Phase A — Rename & reframe ✅
 
-- [ ] New working name (TBD)
-- [ ] Manifest + popup copy: remove “Detox” / “toxicity” framing
-- [ ] README aligned with “browse on your terms” positioning
+- [x] New working name: **SignalLens** (temporary)
+- [x] Manifest + popup copy: remove “Detox” / “toxicity” framing
+- [x] README aligned with “browse on your terms” positioning
 
-**Done when:** Installed extension reads as a browsing utility, not a detox tool.
+**Done when:** Installed extension reads as a browsing utility, not a detox tool. ✅
 
 ---
 

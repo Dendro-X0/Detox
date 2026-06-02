@@ -1,13 +1,13 @@
-# Detox AI (Experimental)
+# SignalLens (Experimental)
 
 **Status: ⚠️ UNSTABLE / PROTOTYPE**
 
-Detox AI is a browser extension designed to filter toxic content on the web (initially Reddit) completely client-side.
+SignalLens is a browser extension that helps you browse with more focus by reducing low-value content using your own preferences.
 
 ## 🎯 Goal
 To help users browse the web with more focus and on their terms — filtering noise they define, with optional assistive tools for critical reading. Initial site support includes Reddit; inference runs client-side by default.
 
-> **Note:** Product positioning has moved from “toxicity filter” to a modular browsing layer. See [`docs/product-roadmap.md`](docs/product-roadmap.md).
+> **Note:** Current working name is **SignalLens**. Product positioning is a modular browsing layer. See [`docs/product-roadmap.md`](docs/product-roadmap.md).
 
 ## 🚧 Current Status
 This project is currently **not stable** and is undergoing a v2 redesign focused on reliability and OSS extensibility.
