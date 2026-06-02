@@ -101,14 +101,14 @@ Core modular refactor **Phases 1–6** — complete. See [`CORE-ROADMAP.md`](../
 
 ---
 
-### Phase B — Options dashboard
+### Phase B — Options dashboard ✅
 
-- [ ] `options.html` full-page UI (React, shared components with popup)
-- [ ] Sections: overview, modes, per-site overrides, plugin library (read-only catalog first), privacy, advanced (export/import)
-- [ ] Move heavy settings out of popup
-- [ ] Link to experimental mod settings (disabled until Phase G)
+- [x] `options.html` full-page UI (React, shared components with popup)
+- [x] Sections: overview, modes, per-site overrides, plugin library (read-only catalog first), privacy, advanced (export/import)
+- [x] Move heavy settings out of popup
+- [x] Link to experimental mod settings (disabled until Phase G) via dashboard/plugin roadmap messaging
 
-**Done when:** All non-essential configuration lives on the options page.
+**Done when:** All non-essential configuration lives on the options page. ✅
 
 ---
 

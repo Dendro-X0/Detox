@@ -15,6 +15,10 @@
   "browser_action": {
     "default_popup": "index.html"
   },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "background": {
     "scripts": ["src/background-firefox.js"],
     "persistent": false

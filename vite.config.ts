@@ -15,6 +15,7 @@ export default defineConfig(({ mode }) => {
   const rollupInput: Record<string, string> = {
     index: 'index.html',
     offscreen: 'offscreen.html',
+    options: 'options.html',
   };
   if (profile === 'full') {
     rollupInput['backend-benchmark'] = 'backend-benchmark.html';

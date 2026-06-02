@@ -7,6 +7,8 @@ import { DEFAULT_ROUTING_SETTINGS } from './core/types/routing';
 import type { EnforcementActionId, EnforcementActionSettings } from './core/types/enforcement';
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import { isFullBuild } from './build-profile';
+import { getBuildProfile } from './build-profile';
+import { getModsForProfile } from './mods/mod-manifest';
 import type { ModelPack } from './types/model-pack';
 import { scanModelPacks, selectModelPack } from './v2/core/language-pack-manager';
 
@@ -132,6 +134,8 @@ function App() {
   const [showPackSelector, setShowPackSelector] = useState(false);
   const [routing, setRouting] = useState<InferenceRoutingSettings>(DEFAULT_ROUTING_SETTINGS);
   const [enforcementAction, setEnforcementAction] = useState<EnforcementActionSettings>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS);
+  const [siteRuleHost, setSiteRuleHost] = useState('');
+  const [siteRuleThreshold, setSiteRuleThreshold] = useState(0.5);
 
   const saveEnforcementAction = (next: EnforcementActionSettings): void => {
     setEnforcementAction(next);
@@ -325,7 +329,78 @@ function App() {
     chrome.storage.local.set({ policy: newPolicy });
   };
 
+  const addSiteOverride = (): void => {
+    const host = siteRuleHost.trim().toLowerCase();
+    if (!host) return;
+    const nextPolicy: PolicySettings = {
+      ...policy,
+      perSite: { ...policy.perSite, [host]: siteRuleThreshold },
+    };
+    setPolicy(nextPolicy);
+    chrome.storage.local.set({ policy: nextPolicy });
+    setSiteRuleHost('');
+  };
+
+  const removeSiteOverride = (host: string): void => {
+    const nextPerSite = { ...policy.perSite };
+    delete nextPerSite[host];
+    const nextPolicy: PolicySettings = { ...policy, perSite: nextPerSite };
+    setPolicy(nextPolicy);
+    chrome.storage.local.set({ policy: nextPolicy });
+  };
+
+  const exportSettings = (): void => {
+    const payload = {
+      policy,
+      inferenceRouting: routing,
+      enforcementAction,
+      generatedAt: new Date().toISOString(),
+    };
+    const content = JSON.stringify(payload, null, 2);
+    const blob = new Blob([content], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'signallens-settings.json';
+    anchor.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const importSettings = (): void => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      try {
+        const raw = await file.text();
+        const parsed = JSON.parse(raw) as {
+          readonly policy?: PolicySettings;
+          readonly inferenceRouting?: InferenceRoutingSettings;
+          readonly enforcementAction?: EnforcementActionSettings;
+        };
+        if (parsed.policy) {
+          setPolicy(parsed.policy);
+          chrome.storage.local.set({ policy: parsed.policy });
+        }
+        if (parsed.inferenceRouting) {
+          saveRouting({ ...DEFAULT_ROUTING_SETTINGS, ...parsed.inferenceRouting });
+        }
+        if (parsed.enforcementAction) {
+          saveEnforcementAction({ ...DEFAULT_ENFORCEMENT_ACTION_SETTINGS, ...parsed.enforcementAction });
+        }
+      } catch {
+        window.alert('Invalid settings file.');
+      }
+    };
+    input.click();
+  };
+
   const isLoadingView = new URLSearchParams(window.location.search).has('loading');
+  const isOptionsPage = window.location.pathname.endsWith('options.html');
+  const activeProfile = getBuildProfile();
+  const visibleMods = getModsForProfile(activeProfile);
 
   if (isLoadingView) {
     return (
@@ -339,7 +414,7 @@ function App() {
   }
 
   return (
-    <div className="container">
+    <div className={`container${isOptionsPage ? ' options-dashboard' : ''}`}>
       <h1>SignalLens</h1>
       <div className="card">
         <label className="switch">
@@ -572,6 +647,90 @@ function App() {
           </div>
         ) : null}
       </div>
+
+      {isOptionsPage ? (
+        <>
+          <div className="card policy-card">
+            <h3>Per-Site Overrides</h3>
+            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+              Set custom filtering thresholds for specific hostnames.
+            </p>
+            <div className="stat-row" style={{ gap: '0.5rem', alignItems: 'center' }}>
+              <input
+                type="text"
+                placeholder="example.com"
+                value={siteRuleHost}
+                onChange={(e) => setSiteRuleHost(e.target.value)}
+                style={{ flex: 1, padding: '0.35rem' }}
+              />
+              <input
+                type="number"
+                min={0}
+                max={1}
+                step={0.05}
+                value={siteRuleThreshold}
+                onChange={(e) => setSiteRuleThreshold(Number(e.target.value))}
+                style={{ width: '80px', padding: '0.35rem' }}
+              />
+              <button className="preset-btn" onClick={addSiteOverride}>Add</button>
+            </div>
+            <ul className="blocked-list" style={{ maxHeight: 'unset' }}>
+              {Object.entries(policy.perSite).length === 0 ? (
+                <li className="muted">No per-site overrides yet.</li>
+              ) : (
+                Object.entries(policy.perSite).map(([host, threshold]) => (
+                  <li key={host} className="blocked-item">
+                    <div className="blocked-header">
+                      <span className="badge">{host}</span>
+                      <span className="score">{(threshold * 100).toFixed(0)}%</span>
+                    </div>
+                    <button className="debug-toggle" onClick={() => removeSiteOverride(host)}>Remove</button>
+                  </li>
+                ))
+              )}
+            </ul>
+          </div>
+
+          <div className="card policy-card">
+            <h3>Plugin Library (Read-only)</h3>
+            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+              Runtime toggles arrive in Phase E. This catalog shows mods available for the active profile.
+            </p>
+            <div className="pack-list">
+              {visibleMods.map((mod) => (
+                <div key={mod.id} className="pack-option installable">
+                  <span className="pack-name">{mod.name}</span>
+                  <span className="pack-langs">{mod.kind}</span>
+                  <span className="pack-size">{mod.version}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="card policy-card">
+            <h3>Privacy</h3>
+            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+              Local-first by default. Remote API is optional and user-configured.
+            </p>
+            <div className="stat-row">
+              <span className="label">Build profile</span>
+              <span className="value">{activeProfile}</span>
+            </div>
+            <div className="stat-row">
+              <span className="label">Remote API configured</span>
+              <span className="value">{routing.remoteApi.endpointUrl ? 'yes' : 'no'}</span>
+            </div>
+          </div>
+
+          <div className="card policy-card">
+            <h3>Advanced</h3>
+            <div className="preset-buttons">
+              <button className="preset-btn" onClick={exportSettings}>Export Settings</button>
+              <button className="preset-btn" onClick={importSettings}>Import Settings</button>
+            </div>
+          </div>
+        </>
+      ) : null}
 
       {debugMode ? (
         <div className="card">

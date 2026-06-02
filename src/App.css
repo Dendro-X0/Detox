@@ -7,6 +7,12 @@
   color: #1f2937;
 }
 
+.container.options-dashboard {
+  width: min(1080px, 94vw);
+  margin: 0 auto;
+  text-align: left;
+}
+
 h1 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;

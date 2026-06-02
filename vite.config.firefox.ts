@@ -33,6 +33,7 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         input: {
           index: 'index.html',
+          options: 'options.html',
           background: 'src/background-firefox.ts',
           content: 'src/content.ts',
         },
