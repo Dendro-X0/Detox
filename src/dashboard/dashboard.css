@@ -1,0 +1,364 @@
+/* SignalLens options / wizard app shell (not popup) */
+
+html.sl-app,
+html.sl-app body {
+  margin: 0;
+  min-height: 100%;
+  background: #e8ecf1;
+  color: #111827;
+}
+
+html.sl-app body {
+  display: block;
+  min-height: 100vh;
+}
+
+html.sl-app #root {
+  min-height: 100vh;
+}
+
+.sl-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sl-shell-header {
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.sl-shell-header-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.sl-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.sl-brand-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.sl-brand-subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #64748b;
+  font-style: normal;
+}
+
+.sl-shell-main {
+  flex: 1;
+  width: 100%;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 1.25rem 1.25rem 2.5rem;
+  box-sizing: border-box;
+}
+
+.sl-shell-footer {
+  position: sticky;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #e5e7eb;
+  padding: 0.875rem 1.25rem;
+}
+
+.sl-shell-footer-inner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Wizard progress */
+.sl-wizard-progress {
+  margin-bottom: 1.25rem;
+}
+
+.sl-wizard-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.sl-wizard-progress-track {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.sl-wizard-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #059669);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
+.sl-wizard-steps {
+  display: none;
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 640px) {
+  .sl-wizard-steps {
+    display: flex;
+  }
+}
+
+.sl-wizard-step-pill {
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.sl-wizard-step-pill.is-active {
+  background: #d1fae5;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.sl-wizard-step-pill.is-done {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+/* Panels */
+.sl-panel {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  padding: 1.25rem;
+  margin-bottom: 0;
+}
+
+.sl-panel h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.sl-panel .muted {
+  font-style: normal;
+  color: #64748b;
+}
+
+/* Dashboard layout */
+.sl-hero-row {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .sl-hero-row {
+    grid-template-columns: 1.2fr 1fr;
+  }
+}
+
+.sl-dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .sl-dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sl-span-full {
+  grid-column: 1 / -1;
+}
+
+.sl-section {
+  margin-top: 1.5rem;
+}
+
+.sl-section-title {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.sl-stats-inline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.sl-stats-inline .value {
+  font-size: 1.75rem;
+}
+
+/* Choice controls (wizard + settings) */
+.sl-choice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sl-choice-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.92rem;
+  color: #334155;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.sl-choice-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.sl-choice-item.is-active {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #065f46;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15);
+}
+
+.sl-choice-item input[type='checkbox'],
+.sl-choice-item input[type='radio'] {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  accent-color: #10b981;
+}
+
+/* Buttons */
+.sl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.sl-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.sl-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.sl-btn-primary {
+  background: #10b981;
+  border-color: #059669;
+  color: #ffffff;
+}
+
+.sl-btn-primary:hover:not(:disabled) {
+  background: #059669;
+  border-color: #047857;
+}
+
+.sl-btn-ghost {
+  background: transparent;
+}
+
+/* Options page overrides (scoped away from popup) */
+html.sl-app .container.options-dashboard {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+}
+
+html.sl-app .container.options-dashboard > h1 {
+  display: none;
+}
+
+html.sl-app .card,
+html.sl-app .policy-card,
+html.sl-app .pack-card {
+  margin-bottom: 0;
+  border-radius: 14px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+}
+
+html.sl-app .preset-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+html.sl-app .preset-btn {
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+html.sl-app .preset-btn.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+}
+
+html.sl-app .muted {
+  font-style: normal;
+  color: #64748b;
+}
+
+html.sl-app .loading-container {
+  min-height: 50vh;
+}

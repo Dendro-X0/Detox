@@ -1,6 +1,7 @@
 /// <reference types="chrome" />
 import { useEffect, useState } from 'react';
 import App from './App';
+import DashboardShell from './dashboard/DashboardShell';
 import OnboardingWizard from './OnboardingWizard';
 
 export default function OptionsApp() {
@@ -8,6 +9,7 @@ export default function OptionsApp() {
     const [showWizard, setShowWizard] = useState(false);
 
     useEffect(() => {
+        document.body.classList.add('sl-app');
         const forceWizard = new URLSearchParams(window.location.search).has('wizard');
         chrome.storage.local.get('onboardingComplete', (result: unknown) => {
             const record = result as { readonly onboardingComplete?: boolean };
@@ -17,7 +19,13 @@ export default function OptionsApp() {
     }, []);
 
     if (!ready) {
-        return <div className="container options-dashboard"><p className="muted">Loading...</p></div>;
+        return (
+            <DashboardShell title="SignalLens" subtitle="Loading your dashboard…">
+                <div className="loading-container">
+                    <div className="loading-spinner" />
+                </div>
+            </DashboardShell>
+        );
     }
 
     if (showWizard) {

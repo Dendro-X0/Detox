@@ -1,6 +1,7 @@
 /// <reference types="chrome" />
 import { useMemo, useState } from 'react';
 import './App.css';
+import DashboardShell from './dashboard/DashboardShell';
 import type { EnforcementActionId } from './core/types/enforcement';
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import type { PolicyPreset } from './core/types/policy';
@@ -8,7 +9,11 @@ import { isFullBuild } from './build-profile';
 import { applyOnboardingDraft } from './onboarding/apply-onboarding';
 import type { BotherCategory, OnboardingDraft, PreferredSite } from './onboarding/types';
 
-type WizardStep = 'welcome' | 'bothers' | 'style' | 'sites' | 'sensitivity' | 'done';
+type WizardStep = 'welcome' | 'bothers' | 'style' | 'sites' | 'sensitivity';
+
+const WIZARD_STEP_LABELS = ['Welcome', 'Topics', 'Style', 'Sites', 'Sensitivity'] as const;
+
+const STEP_ORDER: readonly WizardStep[] = ['welcome', 'bothers', 'style', 'sites', 'sensitivity'];
 
 const BOTHER_OPTIONS: readonly { readonly id: BotherCategory; readonly label: string }[] = [
     { id: 'outrage', label: 'Outrage and drama' },
@@ -26,14 +31,24 @@ const SITE_OPTIONS: readonly { readonly id: PreferredSite; readonly label: strin
 ];
 
 const FILTER_STYLES: readonly { readonly id: EnforcementActionId; readonly label: string; readonly fullOnly?: boolean }[] = [
-    { id: 'dim', label: 'Dim' },
-    { id: 'blur', label: 'Blur', fullOnly: true },
-    { id: 'collapse', label: 'Collapse', fullOnly: true },
+    { id: 'dim', label: 'Dim matched content' },
+    { id: 'blur', label: 'Blur matched content', fullOnly: true },
+    { id: 'collapse', label: 'Collapse matched content', fullOnly: true },
+];
+
+const SENSITIVITY_OPTIONS: readonly { readonly id: PolicyPreset; readonly label: string; readonly hint: string }[] = [
+    { id: 'conservative', label: 'Conservative', hint: 'Fewer matches' },
+    { id: 'balanced', label: 'Balanced', hint: 'Recommended default' },
+    { id: 'strict', label: 'Strict', hint: 'More matches' },
 ];
 
 type OnboardingWizardProps = {
     readonly onComplete: () => void;
 };
+
+function stepIndex(step: WizardStep): number {
+    return STEP_ORDER.indexOf(step);
+}
 
 export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     const [step, setStep] = useState<WizardStep>('welcome');
@@ -74,49 +89,73 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
     };
 
     const next = (): void => {
-        if (step === 'welcome') setStep('bothers');
-        else if (step === 'bothers') setStep('style');
-        else if (step === 'style') setStep('sites');
-        else if (step === 'sites') setStep('sensitivity');
-        else if (step === 'sensitivity') void finish();
+        const index = stepIndex(step);
+        if (index < STEP_ORDER.length - 1) {
+            setStep(STEP_ORDER[index + 1]!);
+            return;
+        }
+        void finish();
     };
 
     const back = (): void => {
-        if (step === 'bothers') setStep('welcome');
-        else if (step === 'style') setStep('bothers');
-        else if (step === 'sites') setStep('style');
-        else if (step === 'sensitivity') setStep('sites');
+        const index = stepIndex(step);
+        if (index > 0) setStep(STEP_ORDER[index - 1]!);
     };
 
-    return (
-        <div className="container options-dashboard wizard-container">
-            <h1>Welcome to SignalLens</h1>
-            <p className="muted">Set up your browsing preferences in under a minute.</p>
+    const footer = (
+        <>
+            {step !== 'welcome' ? (
+                <button type="button" className="sl-btn sl-btn-ghost" onClick={back} disabled={saving}>
+                    Back
+                </button>
+            ) : (
+                <span />
+            )}
+            <button type="button" className="sl-btn sl-btn-primary" onClick={next} disabled={saving}>
+                {step === 'sensitivity' ? (saving ? 'Saving…' : 'Finish setup') : 'Continue'}
+            </button>
+        </>
+    );
 
+    return (
+        <DashboardShell
+            title="Welcome to SignalLens"
+            subtitle="Set up your browsing preferences in under a minute."
+            wizardStepIndex={stepIndex(step)}
+            wizardStepLabels={WIZARD_STEP_LABELS}
+            footer={footer}
+        >
             {step === 'welcome' ? (
-                <div className="card policy-card">
-                    <h3>Step 1: Welcome</h3>
+                <div className="sl-panel">
+                    <h3>Your personal browsing layer</h3>
                     <p className="muted" style={{ marginTop: 0 }}>
-                        SignalLens helps you reduce low-value content while you browse. You stay in control: filtered items can always be revealed.
+                        SignalLens helps you reduce low-value content while you browse. You stay in control — filtered
+                        items can always be revealed.
                     </p>
-                    <p className="muted">Default mode is local and offline-friendly. No account required.</p>
+                    <p className="muted" style={{ marginBottom: 0 }}>
+                        Default mode is local and offline-friendly. No account required.
+                    </p>
                 </div>
             ) : null}
 
             {step === 'bothers' ? (
-                <div className="card policy-card">
-                    <h3>Step 2: What bothers you?</h3>
-                    <p className="muted" style={{ marginTop: 0 }}>We will use these topics as keyword signals in heuristic mode.</p>
-                    <div className="preset-buttons">
+                <div className="sl-panel">
+                    <h3>What bothers you?</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                        We&apos;ll use these topics as keyword signals in heuristic mode.
+                    </p>
+                    <div className="sl-choice-list">
                         {BOTHER_OPTIONS.map((option) => (
-                            <label key={option.id} className={`preset-btn${bothers.includes(option.id) ? ' active' : ''}`}>
+                            <label
+                                key={option.id}
+                                className={`sl-choice-item${bothers.includes(option.id) ? ' is-active' : ''}`}
+                            >
                                 <input
                                     type="checkbox"
                                     checked={bothers.includes(option.id)}
                                     onChange={() => toggleBother(option.id)}
-                                    style={{ marginRight: '0.5rem' }}
                                 />
-                                {option.label}
+                                <span>{option.label}</span>
                             </label>
                         ))}
                     </div>
@@ -124,13 +163,17 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             ) : null}
 
             {step === 'style' ? (
-                <div className="card policy-card">
-                    <h3>Step 3: Filter style</h3>
-                    <div className="preset-buttons">
+                <div className="sl-panel">
+                    <h3>Filter style</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                        Choose how matched content appears. You can change this later in settings.
+                    </p>
+                    <div className="sl-choice-list">
                         {visibleStyles.map((style) => (
                             <button
                                 key={style.id}
-                                className={`preset-btn${actionId === style.id ? ' active' : ''}`}
+                                type="button"
+                                className={`sl-choice-item${actionId === style.id ? ' is-active' : ''}`}
                                 onClick={() => setActionId(style.id)}
                             >
                                 {style.label}
@@ -141,19 +184,23 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             ) : null}
 
             {step === 'sites' ? (
-                <div className="card policy-card">
-                    <h3>Step 4: Sites you browse</h3>
-                    <p className="muted" style={{ marginTop: 0 }}>Select where you want optimized extraction behavior.</p>
-                    <div className="preset-buttons">
+                <div className="sl-panel">
+                    <h3>Sites you browse</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                        Select where you want optimized extraction behavior.
+                    </p>
+                    <div className="sl-choice-list">
                         {visibleSites.map((site) => (
-                            <label key={site.id} className={`preset-btn${sites.includes(site.id) ? ' active' : ''}`}>
+                            <label
+                                key={site.id}
+                                className={`sl-choice-item${sites.includes(site.id) ? ' is-active' : ''}`}
+                            >
                                 <input
                                     type="checkbox"
                                     checked={sites.includes(site.id)}
                                     onChange={() => toggleSite(site.id)}
-                                    style={{ marginRight: '0.5rem' }}
                                 />
-                                {site.label}
+                                <span>{site.label}</span>
                             </label>
                         ))}
                     </div>
@@ -161,30 +208,30 @@ export default function OnboardingWizard({ onComplete }: OnboardingWizardProps) 
             ) : null}
 
             {step === 'sensitivity' ? (
-                <div className="card policy-card">
-                    <h3>Step 5: Sensitivity</h3>
-                    <div className="preset-buttons">
-                        {(['conservative', 'balanced', 'strict'] as PolicyPreset[]).map((value) => (
+                <div className="sl-panel">
+                    <h3>Sensitivity</h3>
+                    <p className="muted" style={{ marginTop: 0 }}>
+                        How aggressively should SignalLens flag content that matches your rules?
+                    </p>
+                    <div className="sl-choice-list">
+                        {SENSITIVITY_OPTIONS.map((option) => (
                             <button
-                                key={value}
-                                className={`preset-btn${preset === value ? ' active' : ''}`}
-                                onClick={() => setPreset(value)}
+                                key={option.id}
+                                type="button"
+                                className={`sl-choice-item${preset === option.id ? ' is-active' : ''}`}
+                                onClick={() => setPreset(option.id)}
                             >
-                                {value === 'conservative' ? 'Conservative (fewer matches)' : value === 'strict' ? 'Strict (more matches)' : 'Balanced'}
+                                <span>
+                                    <strong>{option.label}</strong>
+                                    <span className="muted" style={{ display: 'block', fontSize: '0.8rem' }}>
+                                        {option.hint}
+                                    </span>
+                                </span>
                             </button>
                         ))}
                     </div>
                 </div>
             ) : null}
-
-            <div className="wizard-actions">
-                {step !== 'welcome' ? (
-                    <button className="preset-btn" onClick={back} disabled={saving}>Back</button>
-                ) : null}
-                <button className="preset-btn active" onClick={next} disabled={saving}>
-                    {step === 'sensitivity' ? (saving ? 'Saving...' : 'Finish setup') : 'Continue'}
-                </button>
-            </div>
-        </div>
+        </DashboardShell>
     );
 }

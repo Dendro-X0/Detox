@@ -13,16 +13,7 @@
   text-align: left;
 }
 
-.wizard-container h1 {
-  margin-bottom: 0.5rem;
-}
-
-.wizard-actions {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
+/* Legacy wizard classes — superseded by DashboardShell + dashboard.css */
 
 .rule-editor + .rule-editor {
   margin-top: 1.25rem;

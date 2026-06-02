@@ -8,6 +8,7 @@ import type { EnforcementActionId, EnforcementActionSettings } from './core/type
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import { isFullBuild } from './build-profile';
 import { getBuildProfile } from './build-profile';
+import DashboardShell from './dashboard/DashboardShell';
 import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
 import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
 import UserRulesPanel from './dashboard/UserRulesPanel';
@@ -447,38 +448,52 @@ function App({ onRestartWizard }: AppProps) {
   const isOptionsPage = window.location.pathname.endsWith('options.html');
   const activeProfile = getBuildProfile();
   if (isLoadingView) {
-    return (
-      <div className="container loading-container">
+    const loadingBody = (
+      <div className="loading-container">
         <div className="loading-spinner"></div>
         <h2>SignalLens</h2>
         <p className="loading-text">Preparing your focus view...</p>
         <p className="loading-subtext">This may take a moment on large pages</p>
       </div>
     );
+    if (isOptionsPage) {
+      return (
+        <DashboardShell title="SignalLens" subtitle="Preparing your session…">
+          {loadingBody}
+        </DashboardShell>
+      );
+    }
+    return <div className="container loading-container">{loadingBody}</div>;
   }
 
-  return (
+  const dashboardContent = (
     <div className={`container${isOptionsPage ? ' options-dashboard' : ''}`}>
-      <h1>SignalLens</h1>
-      <div className="card">
-        <label className="switch">
-          <input type="checkbox" checked={enabled} onChange={toggle} />
-          <span className="slider round"></span>
-        </label>
-        <p>{enabled ? "Focus Mode Enabled" : "Focus Mode Disabled"}</p>
+      {!isOptionsPage ? <h1>SignalLens</h1> : null}
+
+      <div className={isOptionsPage ? 'sl-hero-row' : undefined}>
+        <div className="card">
+          <label className="switch">
+            <input type="checkbox" checked={enabled} onChange={toggle} />
+            <span className="slider round"></span>
+          </label>
+          <p>{enabled ? 'Focus Mode Enabled' : 'Focus Mode Disabled'}</p>
+        </div>
+
+        <div className="card">
+          <div className={isOptionsPage ? 'sl-stats-inline' : 'stats'}>
+            <div className="stat-item">
+              <span className="value">{stats.scanned}</span>
+              <span className="label">Scanned</span>
+            </div>
+            <div className="stat-item">
+              <span className="value">{stats.toxic}</span>
+              <span className="label">Blocked</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="stats">
-        <div className="stat-item">
-          <span className="value">{stats.scanned}</span>
-          <span className="label">Scanned</span>
-        </div>
-        <div className="stat-item">
-          <span className="value">{stats.toxic}</span>
-          <span className="label">Blocked</span>
-        </div>
-      </div>
-
+      <div className={isOptionsPage ? 'sl-dashboard-grid' : undefined}>
       <div className="card policy-card">
         <h3>Inference</h3>
         <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
@@ -691,12 +706,15 @@ function App({ onRestartWizard }: AppProps) {
           </div>
         ) : null}
       </div>
+      </div>
 
       {isOptionsPage ? (
-        <>
-          <UserRulesPanel />
+        <section className="sl-section">
+          <h2 className="sl-section-title">Rules &amp; plugins</h2>
+          <div className="sl-dashboard-grid">
+          <div className="sl-span-full"><UserRulesPanel /></div>
 
-          <div className="card policy-card">
+          <div className="card policy-card sl-span-full">
             <h3>Per-Site Sensitivity Overrides</h3>
             <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
               Set custom filtering thresholds for specific hostnames.
@@ -737,9 +755,9 @@ function App({ onRestartWizard }: AppProps) {
             </ul>
           </div>
 
-          <PluginLibraryPanel />
+          <div className="sl-span-full"><PluginLibraryPanel /></div>
 
-          <AuthenticitySettingsPanel />
+          <div className="sl-span-full"><AuthenticitySettingsPanel /></div>
 
           <div className="card policy-card">
             <h3>Privacy</h3>
@@ -756,7 +774,7 @@ function App({ onRestartWizard }: AppProps) {
             </div>
           </div>
 
-          <div className="card policy-card">
+          <div className="card policy-card sl-span-full">
             <h3>Advanced</h3>
             <div className="preset-buttons">
               <button className="preset-btn" onClick={exportSettings}>Export Settings</button>
@@ -766,7 +784,8 @@ function App({ onRestartWizard }: AppProps) {
               ) : null}
             </div>
           </div>
-        </>
+          </div>
+        </section>
       ) : null}
 
       {debugMode ? (
@@ -832,6 +851,19 @@ function App({ onRestartWizard }: AppProps) {
       )}
     </div>
   );
+
+  if (isOptionsPage) {
+    return (
+      <DashboardShell
+        title="SignalLens"
+        subtitle="Manage filtering, plugins, and authenticity assist."
+      >
+        {dashboardContent}
+      </DashboardShell>
+    );
+  }
+
+  return dashboardContent;
 }
 
 export default App;
