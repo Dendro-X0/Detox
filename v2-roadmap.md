@@ -1,5 +1,10 @@
 # Detox AI v2 – Goals & Design Specification
 
+> **Planning status:** Technical implementation complete (see [`CORE-ROADMAP.md`](./CORE-ROADMAP.md)).  
+> **Forward product work:** [`docs/product-roadmap.md`](docs/product-roadmap.md).  
+> **Experimental features:** [`docs/experimental/`](docs/experimental/).  
+> This document remains as **historical design context** for v2 decisions.
+
 ## 1) Purpose
 Detox AI v2 is a browser extension for filtering user-visible content (e.g. Reddit posts/comments) using on-device detectors (small local models by default). It is OSS-first and designed for community-maintained extensibility.
 

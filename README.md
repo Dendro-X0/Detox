@@ -5,7 +5,9 @@
 Detox AI is a browser extension designed to filter toxic content on the web (initially Reddit) completely client-side.
 
 ## 🎯 Goal
-To scan DOM text nodes, classify them using an in-browser AI model, and blur out content identified as toxic, all without sending user data to a remote server.
+To help users browse the web with more focus and on their terms — filtering noise they define, with optional assistive tools for critical reading. Initial site support includes Reddit; inference runs client-side by default.
+
+> **Note:** Product positioning has moved from “toxicity filter” to a modular browsing layer. See [`docs/product-roadmap.md`](docs/product-roadmap.md).
 
 ## 🚧 Current Status
 This project is currently **not stable** and is undergoing a v2 redesign focused on reliability and OSS extensibility.
@@ -69,10 +71,11 @@ Note: the ONNX artifact is large. This is acceptable for a first working prototy
 ### Build
 1. Install dependencies:
    - `pnpm install`
-2. Download model pack assets (one-time per machine):
-   - `pnpm fetch:modelpack`
-3. Build the extension:
+2. Build the extension (core profile — no model weights required):
    - `pnpm build`
+3. Optional — full profile with ONNX and site adapters:
+   - `pnpm fetch:modelpack` (if using local pack)
+   - `pnpm build:full`
 
 ### Build (Firefox MV2)
 Firefox uses a separate MV2 manifest and a Vite build config (CRXJS is MV3-only).
@@ -117,7 +120,15 @@ Load the unpacked extension from:
 - **Chrome offscreen document runtime**
 
 ## 📄 Docs
-- Firefox: `docs/firefox-build.md`
+
+| Document | Description |
+|----------|-------------|
+| [`docs/README.md`](docs/README.md) | Documentation index |
+| [`docs/product-roadmap.md`](docs/product-roadmap.md) | **Product phases A–G** (current planning) |
+| [`docs/experimental/authenticity-analysis.md`](docs/experimental/authenticity-analysis.md) | Selection-first claim assist (experimental) |
+| [`CORE-ROADMAP.md`](CORE-ROADMAP.md) | Technical core refactor (complete) |
+| [`docs/firefox-build.md`](docs/firefox-build.md) | Firefox MV2 build |
 
 ## 🛑 Roadmap
-See `v2-roadmap.md`.
+
+See [`ROADMAP.md`](ROADMAP.md) → [`docs/product-roadmap.md`](docs/product-roadmap.md).

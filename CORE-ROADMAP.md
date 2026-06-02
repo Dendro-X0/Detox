@@ -1,6 +1,9 @@
 # Core Module Roadmap (Working Document)
 
-> Delete this file once all phases below are complete and verified.
+> **Status: Technical phases 1–6 complete.**  
+> **Successor:** [`docs/product-roadmap.md`](docs/product-roadmap.md) (product phases A–G).  
+> **Doc index:** [`docs/README.md`](docs/README.md).  
+> Delete this file once product Phase A is verified and README is updated.
 
 ## Product value
 
@@ -115,7 +118,19 @@ src/mods/actions/   — pluggable enforcement actions (blur, dim, collapse)
 | `InferenceProvider` | Local or remote backend routing |
 | `EnforcementAction` | Visual treatment for matched blocks |
 
+### Future interfaces (Track 2 — not implemented)
+
+| Interface | Role |
+|---|---|
+| `PageAnalyzer` | Build `PageContext` + `AnalysisScope` from DOM |
+| `RetrievalProvider` | Search / fact-check → verified `SourceReference[]` |
+| `AuthenticityAnalyzer` | Claims + grounded report; advisory only |
+
+Spec: [`docs/experimental/authenticity-analysis.md`](docs/experimental/authenticity-analysis.md)
+
 ## Notes
 
 - Project rename TBD; codebase may still use legacy `detox` prefixes during migration.
-- Repository remains private until core v0.1 is stable.
+- Repository remains private until product v0.1 (Phases A + C + D) is stable.
+- **Product roadmap:** [`docs/product-roadmap.md`](docs/product-roadmap.md)
+- **Experimental:** [`docs/experimental/authenticity-analysis.md`](docs/experimental/authenticity-analysis.md)
