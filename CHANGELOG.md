@@ -13,6 +13,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   - Mod signing scripts: `signing:generate`, `signing:apply-anchor`, `signing:resign`, `store:sync-meta`
   - [`store/SCREENSHOTS.md`](store/SCREENSHOTS.md) capture guide; updated [`v2.2-store-prep.md`](docs/planning/v2.2-store-prep.md)
 - **Wizard install E2E** — `tests/onboarding/wizard-install-e2e.spec.ts` covers quick start and preset **Start browsing** → fixture filtering (Chrome)
+- **Production mod signing** — rotated trust anchor; re-signed unlock packages; `pnpm store:verify` scripts
+- **CI** — wizard E2E, Firefox bundle job, store release checks
 
 ## [2.1.2] - 2026-06-01
 

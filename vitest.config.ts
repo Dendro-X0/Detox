@@ -14,6 +14,7 @@ export default defineConfig({
             'tests/i18n/**/*.spec.ts',
             'tests/onboarding/**/*.spec.ts',
             'tests/scripts/**/*.spec.ts',
+            'tests/store/**/*.spec.ts',
             'tests/rules/**/*.spec.ts',
             'tests/popup/**/*.spec.ts',
         ],

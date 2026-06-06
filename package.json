@@ -40,6 +40,8 @@
     "signing:apply-anchor": "node scripts/apply-mod-trust-anchor.mjs",
     "signing:resign": "node scripts/resign-mod-packages.mjs",
     "store:sync-meta": "node scripts/sync-store-meta.mjs",
+    "store:verify": "node scripts/verify-store-meta.mjs",
+    "store:verify:online": "node scripts/verify-store-meta.mjs --check-url",
     "test:firefox": "pnpm build:core:firefox && vitest run --config vitest.config.ts tests/firefox"
   },
   "dependencies": {

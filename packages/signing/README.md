@@ -43,6 +43,8 @@ pnpm release:verify
 
 Keep `prod-private.pem` offline or in CI secrets only.
 
+**Important:** Back up `packages/signing/prod-private.pem` after generation — it is gitignored and required to sign future mod packages.
+
 ## Install in the extension
 
 1. Build core: `pnpm build`
