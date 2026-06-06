@@ -614,6 +614,7 @@
       "style": "Style",
       "sensitivity": "Sensitivity",
       "whitelist": "Work apps",
+      "authenticity": "Research assist",
       "done": "Ready"
     },
     "shell": {
@@ -647,6 +648,9 @@
       "reviewSensitivity": "Sensitivity",
       "reviewLanguage": "Language",
       "reviewWhitelist": "Site whitelist",
+      "reviewAuthenticity": "Authenticity assist",
+      "authenticityEnabled": "Enabled (search-only)",
+      "authenticityDisabled": "Off",
       "whitelistCount": "{{count}} groups enabled",
       "topicsCount": "{{count}} selected",
       "tipBrowse": "Open a normal website (not chrome:// pages) with a feed or comments.",
@@ -705,6 +709,17 @@
       "description": "Optional. SignalLens won't scan or filter pages on these sites — useful for email, documents, and spreadsheets.",
       "skipHint": "You can skip this step or change whitelist sites anytime under Rules in the dashboard.",
       "noneSelected": "None"
+    },
+    "authenticity": {
+      "heading": "Research selected text (optional)",
+      "description": "Authenticity assist checks claims against public sources. It is advisory only — nothing is hidden automatically.",
+      "experimentalNote": "Experimental feature. Uses Wikipedia by default (no API key). Public sources only.",
+      "enableLabel": "Enable authenticity assist",
+      "enableHint": "Search-only mode by default — zero LLM tokens until you add an API key later.",
+      "llmApiKeyLabel": "LLM API key (optional)",
+      "llmApiKeyPlaceholder": "Skip for search-only mode",
+      "llmApiKeyHint": "Only needed for LLM synthesis (T3). You can add this later in Plugins.",
+      "skipHint": "Leave unchecked to skip — enable anytime from Plugins in the dashboard."
     },
     "sensitivityPresets": {
       "conservative": {

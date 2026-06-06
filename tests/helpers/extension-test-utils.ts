@@ -247,6 +247,7 @@ export async function completeWizardPresetStartBrowsing(page: Page): Promise<voi
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Start browsing' }).click();
 }
 

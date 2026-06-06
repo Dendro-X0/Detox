@@ -10,11 +10,18 @@ export { BOTHER_KEYWORD_MAP } from '../core/types/bother-keywords';
 
 export type PreferredSite = 'reddit' | 'youtube';
 
+/** Optional wizard step — off by default; enables search-only Wikipedia assist. */
+export type AuthenticityAssistOptIn = {
+    readonly enabled: boolean;
+    readonly llmApiKey?: string;
+};
+
 export type PresetModeOnboardingDraft = {
     readonly setupPath: 'preset-mode';
     readonly browsingModeId: BrowsingModeId;
     readonly localeId: LocaleId;
     readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];
+    readonly authenticityAssist?: AuthenticityAssistOptIn;
 };
 
 export type CustomOnboardingDraft = {
@@ -24,6 +31,7 @@ export type CustomOnboardingDraft = {
     readonly actionId: EnforcementActionId;
     readonly preset: PolicyPreset;
     readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];
+    readonly authenticityAssist?: AuthenticityAssistOptIn;
 };
 
 export type OnboardingDraft = PresetModeOnboardingDraft | CustomOnboardingDraft;

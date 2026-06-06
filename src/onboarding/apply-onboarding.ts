@@ -7,6 +7,7 @@ import { DEFAULT_USER_RULES } from '../core/types/user-rules';
 import { isModUnlocked, REQUIRED_MOD_IDS } from '../mods/mod-manifest';
 import { LOCALE_STORAGE_KEY } from '../i18n/types';
 import { domainsFromPresetIds } from '../core/rules/site-whitelist-presets';
+import { buildWizardAuthenticitySettings } from './authenticity-opt-in';
 import { BOTHER_KEYWORD_MAP, type OnboardingDraft } from './types';
 
 function resolveAllowDomains(draft: OnboardingDraft): readonly string[] {
@@ -45,6 +46,10 @@ const INFERENCE_DEFAULTS = {
     onboardingComplete: true,
 };
 
+function authenticityPatchForDraft(draft: OnboardingDraft): Record<string, unknown> {
+    return { authenticitySettings: buildWizardAuthenticitySettings(draft.authenticityAssist) };
+}
+
 export function buildPresetModeOnboardingPatch(
     draft: Extract<OnboardingDraft, { setupPath: 'preset-mode' }>
 ): Record<string, unknown> {
@@ -57,6 +62,7 @@ export function buildPresetModeOnboardingPatch(
         ...INFERENCE_DEFAULTS,
         [LOCALE_STORAGE_KEY]: draft.localeId,
         ...modePatch,
+        ...authenticityPatchForDraft(draft),
     };
 }
 
@@ -84,6 +90,7 @@ export function buildCustomOnboardingPatch(draft: Extract<OnboardingDraft, { set
         enforcementAction: {
             activeActionId: draft.actionId ?? DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId,
         },
+        ...authenticityPatchForDraft(draft),
     };
 }
 

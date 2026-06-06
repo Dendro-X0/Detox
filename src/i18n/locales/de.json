@@ -614,6 +614,7 @@
       "style": "Stil",
       "sensitivity": "Empfindlichkeit",
       "whitelist": "Arbeits-Apps",
+      "authenticity": "Recherche-Hilfe",
       "done": "Fertig"
     },
     "shell": {
@@ -647,6 +648,9 @@
       "reviewSensitivity": "Empfindlichkeit",
       "reviewLanguage": "Sprache",
       "reviewWhitelist": "Seiten-Whitelist",
+      "reviewAuthenticity": "Authentizitäts-Assistent",
+      "authenticityEnabled": "Aktiviert (nur Suche)",
+      "authenticityDisabled": "Aus",
       "whitelistCount": "{{count}} Gruppen aktiv",
       "topicsCount": "{{count}} ausgewählt",
       "tipBrowse": "Öffnen Sie eine normale Website (keine chrome://-Seiten) mit Feed oder Kommentaren.",
@@ -705,6 +709,17 @@
       "description": "Optional. SignalLens scannt und filtert diese Seiten nicht — nützlich für E-Mail, Dokumente und Tabellen.",
       "skipHint": "Sie können diesen Schritt überspringen oder die Whitelist jederzeit unter Regeln im Dashboard ändern.",
       "noneSelected": "Keine"
+    },
+    "authenticity": {
+      "heading": "Ausgewählten Text recherchieren (optional)",
+      "description": "Der Authentizitäts-Assistent prüft Behauptungen anhand öffentlicher Quellen. Nur beratend — nichts wird automatisch ausgeblendet.",
+      "experimentalNote": "Experimentelle Funktion. Standardmäßig Wikipedia (kein API-Schlüssel). Nur öffentliche Quellen.",
+      "enableLabel": "Authentizitäts-Assistent aktivieren",
+      "enableHint": "Standardmäßig nur Suche — keine LLM-Tokens, bis Sie später einen API-Schlüssel hinzufügen.",
+      "llmApiKeyLabel": "LLM-API-Schlüssel (optional)",
+      "llmApiKeyPlaceholder": "Überspringen für Nur-Suche-Modus",
+      "llmApiKeyHint": "Nur für LLM-Synthese (T3) nötig. Später unter Plugins hinzufügbar.",
+      "skipHint": "Deaktiviert lassen zum Überspringen — jederzeit unter Plugins im Dashboard aktivierbar."
     },
     "sensitivityPresets": {
       "conservative": {

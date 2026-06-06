@@ -352,7 +352,7 @@ Historical letter-phases (A–G, H, I) remain documented in [`product-roadmap.md
 1. **v2.2.0 store:** Firefox manual QA, screenshots, unlisted submit ([`v2.2-store-prep.md`](./v2.2-store-prep.md))
 2. **Filtering:** false-positive audit on dogfood corpus; mode preset validation
 3. **Authenticity:** ClaimReview/Wikipedia retrieval scripts; auditable gather → verify → analyze tests
-4. **Wizard:** optional authenticity opt-in step; restore defaults ✅
+4. **Wizard:** optional authenticity opt-in step ✅; restore defaults ✅
 5. **Scanner:** site-hint tuning; SPA acceptance hardening
 
 ---

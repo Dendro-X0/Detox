@@ -63,5 +63,9 @@ export const WIZARD_STEP_COVERAGE = {
     style: { storageKeys: ['enforcementAction'] as const, notes: 'Custom path only — dim/blur/collapse.' },
     sensitivity: { storageKeys: ['policy'] as const, notes: 'Custom path only — preset + threshold.' },
     whitelist: { storageKeys: ['userRules'] as const, notes: 'Merges preset domains into userRules.allowDomains.' },
+    authenticity: {
+        storageKeys: ['authenticitySettings'] as const,
+        notes: 'Optional opt-in; search-only Wikipedia default when enabled.',
+    },
     done: { storageKeys: ['onboardingComplete', 'enabled'] as const, notes: 'Marks setup complete; enables filtering.' },
 } as const;

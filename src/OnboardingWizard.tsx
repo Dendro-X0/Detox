@@ -21,7 +21,7 @@ import {
     type SiteWhitelistPresetId,
 } from './core/rules/site-whitelist-presets';
 
-type WizardStep = 'welcome' | 'language' | 'mode' | 'topics' | 'style' | 'sensitivity' | 'whitelist' | 'done';
+type WizardStep = 'welcome' | 'language' | 'mode' | 'topics' | 'style' | 'sensitivity' | 'whitelist' | 'authenticity' | 'done';
 
 type SetupPath = 'preset-mode' | 'custom';
 
@@ -45,8 +45,8 @@ const FILTER_STYLE_IDS: readonly { readonly id: EnforcementActionId; readonly fu
 
 const SENSITIVITY_IDS: readonly PolicyPreset[] = ['conservative', 'balanced', 'strict'];
 
-const CUSTOM_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'topics', 'style', 'sensitivity', 'whitelist', 'done'];
-const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whitelist', 'done'];
+const CUSTOM_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'topics', 'style', 'sensitivity', 'whitelist', 'authenticity', 'done'];
+const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whitelist', 'authenticity', 'done'];
 
 const RECOMMENDED_MODE_ID: BrowsingModeId = 'focus';
 
@@ -64,6 +64,7 @@ function stepLabelsForPath(
                   'wizard.stepLabels.style',
                   'wizard.stepLabels.sensitivity',
                   'wizard.stepLabels.whitelist',
+                  'wizard.stepLabels.authenticity',
                   'wizard.stepLabels.done',
               ]
             : [
@@ -71,6 +72,7 @@ function stepLabelsForPath(
                   'wizard.stepLabels.language',
                   'wizard.stepLabels.mode',
                   'wizard.stepLabels.whitelist',
+                  'wizard.stepLabels.authenticity',
                   'wizard.stepLabels.done',
               ];
     return keys.map((key) => t(key));
@@ -88,12 +90,16 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const [prefillReady, setPrefillReady] = useState(false);
     const [isSetupAgain, setIsSetupAgain] = useState(false);
     const [whitelistPresetIds, setWhitelistPresetIds] = useState<readonly SiteWhitelistPresetId[]>([]);
+    const [authenticityEnabled, setAuthenticityEnabled] = useState(false);
+    const [authenticityLlmApiKey, setAuthenticityLlmApiKey] = useState('');
 
     useEffect(() => {
         void loadOnboardingPrefill(navigator.language).then((prefill) => {
             setLocaleId(prefill.localeId);
             setIsSetupAgain(prefill.isSetupAgain);
             setWhitelistPresetIds(prefill.whitelistPresetIds);
+            setAuthenticityEnabled(prefill.authenticityEnabled);
+            setAuthenticityLlmApiKey(prefill.authenticityLlmApiKey);
             if (prefill.setupPath === 'preset-mode' && prefill.browsingModeId) {
                 setSetupPath('preset-mode');
                 setBrowsingModeId(prefill.browsingModeId);
@@ -161,6 +167,12 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
 
     const buildDraft = (): OnboardingDraft => {
         const whitelist = whitelistPresetIds.length > 0 ? whitelistPresetIds : undefined;
+        const authenticityAssist = authenticityEnabled
+            ? {
+                  enabled: true as const,
+                  llmApiKey: authenticityLlmApiKey.trim() || undefined,
+              }
+            : undefined;
         if (setupPath === 'custom') {
             return {
                 setupPath: 'custom',
@@ -169,6 +181,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 actionId,
                 preset,
                 whitelistPresetIds: whitelist,
+                authenticityAssist,
             };
         }
         return {
@@ -176,6 +189,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             browsingModeId: browsingModeId ?? RECOMMENDED_MODE_ID,
             localeId,
             whitelistPresetIds: whitelist,
+            authenticityAssist,
         };
     };
 
@@ -233,6 +247,10 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             return;
         }
         if (step === 'whitelist') {
+            setStep('authenticity');
+            return;
+        }
+        if (step === 'authenticity') {
             setStep('done');
             return;
         }
@@ -292,11 +310,18 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
 
     const reviewRows = useMemo(() => {
         const whitelistRow = { label: t('wizard.done.reviewWhitelist'), value: whitelistSummary };
+        const authenticityRow = {
+            label: t('wizard.done.reviewAuthenticity'),
+            value: authenticityEnabled
+                ? t('wizard.done.authenticityEnabled')
+                : t('wizard.done.authenticityDisabled'),
+        };
         if (setupPath === 'preset-mode') {
             return [
                 { label: t('wizard.done.reviewMode'), value: activeModeLabel ?? '—' },
                 { label: t('wizard.done.reviewLanguage'), value: localeLabel },
                 whitelistRow,
+                authenticityRow,
             ];
         }
         return [
@@ -305,8 +330,19 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             { label: t('wizard.done.reviewSensitivity'), value: t(`wizard.sensitivityPresets.${preset}.label`) },
             { label: t('wizard.done.reviewLanguage'), value: localeLabel },
             whitelistRow,
+            authenticityRow,
         ];
-    }, [actionId, activeModeLabel, localeLabel, preset, setupPath, t, topicsSummary, whitelistSummary]);
+    }, [
+        actionId,
+        activeModeLabel,
+        authenticityEnabled,
+        localeLabel,
+        preset,
+        setupPath,
+        t,
+        topicsSummary,
+        whitelistSummary,
+    ]);
 
     const footer = (
         <div className="sl-wizard-footer">
@@ -604,6 +640,52 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                         </div>
                         <p className="muted" style={{ fontSize: '0.82rem', marginBottom: 0 }}>
                             {t('wizard.whitelist.skipHint')}
+                        </p>
+                    </div>
+                ) : null}
+
+                {step === 'authenticity' ? (
+                    <div className="sl-panel">
+                        <h3>{t('wizard.authenticity.heading')}</h3>
+                        <p className="muted" style={{ marginTop: 0 }}>
+                            {t('wizard.authenticity.description')}
+                        </p>
+                        <p className="sl-wizard-callout">{t('wizard.authenticity.experimentalNote')}</p>
+                        <label className="sl-choice-item sl-choice-item--checkbox">
+                            <input
+                                type="checkbox"
+                                checked={authenticityEnabled}
+                                onChange={(event) => setAuthenticityEnabled(event.target.checked)}
+                            />
+                            <span className="sl-choice-item-body">
+                                <strong>{t('wizard.authenticity.enableLabel')}</strong>
+                                <span className="muted sl-choice-item-hint">
+                                    {t('wizard.authenticity.enableHint')}
+                                </span>
+                            </span>
+                        </label>
+                        {authenticityEnabled ? (
+                            <div className="sl-form-stack" style={{ marginTop: '1rem' }}>
+                                <div className="sl-form-field">
+                                    <label className="sl-form-label" htmlFor="wizard-authenticity-llm-key">
+                                        {t('wizard.authenticity.llmApiKeyLabel')}
+                                    </label>
+                                    <input
+                                        id="wizard-authenticity-llm-key"
+                                        type="password"
+                                        className="sl-input"
+                                        placeholder={t('wizard.authenticity.llmApiKeyPlaceholder')}
+                                        value={authenticityLlmApiKey}
+                                        onChange={(event) => setAuthenticityLlmApiKey(event.target.value)}
+                                    />
+                                    <p className="sl-form-hint" style={{ marginBottom: 0 }}>
+                                        {t('wizard.authenticity.llmApiKeyHint')}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : null}
+                        <p className="muted" style={{ fontSize: '0.82rem', marginBottom: 0 }}>
+                            {t('wizard.authenticity.skipHint')}
                         </p>
                     </div>
                 ) : null}

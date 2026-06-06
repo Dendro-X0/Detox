@@ -18,6 +18,8 @@ export type OnboardingPrefill = {
     readonly preset: PolicyPreset;
     readonly sites: readonly PreferredSite[];
     readonly whitelistPresetIds: readonly SiteWhitelistPresetId[];
+    readonly authenticityEnabled: boolean;
+    readonly authenticityLlmApiKey: string;
 };
 
 const DEFAULT_BOTHERS: readonly BotherCategory[] = ['outrage', 'spam'];
@@ -31,6 +33,7 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
         'enforcementAction',
         'userRules',
         'preferredSites',
+        'authenticitySettings',
     ]);
 
     const record = result as {
@@ -44,6 +47,7 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
             readonly allowDomains?: readonly string[];
         };
         readonly preferredSites?: readonly PreferredSite[];
+        readonly authenticitySettings?: { readonly enabled?: boolean; readonly llmApiKey?: string };
     };
 
     const isSetupAgain = record.onboardingComplete === true;
@@ -66,6 +70,12 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
             ? inferBotherCategoriesFromKeywords(blockKeywords)
             : DEFAULT_BOTHERS;
 
+    const authSettings = record.authenticitySettings;
+    const authenticityEnabled =
+        isSetupAgain && authSettings?.enabled === true;
+    const authenticityLlmApiKey =
+        isSetupAgain && authSettings?.llmApiKey ? authSettings.llmApiKey : '';
+
     return {
         isSetupAgain,
         localeId,
@@ -76,5 +86,7 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
         preset: record.policy?.preset ?? 'balanced',
         sites: record.preferredSites?.length ? record.preferredSites : ['reddit'],
         whitelistPresetIds: isSetupAgain ? enabledPresetIdsFromDomains(allowDomains) : [],
+        authenticityEnabled,
+        authenticityLlmApiKey,
     };
 }
