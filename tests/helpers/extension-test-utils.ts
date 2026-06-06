@@ -211,6 +211,61 @@ export async function waitForBlockedCount(page: Page, expected: number): Promise
     }).toBe(expected);
 }
 
+export async function readExtensionStorage(
+    context: BrowserContext,
+    keys?: readonly string[]
+): Promise<Record<string, unknown>> {
+    const serviceWorker = await getExtensionServiceWorker(context);
+    return serviceWorker.evaluate(async (storageKeys) => {
+        if (storageKeys && storageKeys.length > 0) {
+            return chrome.storage.local.get([...storageKeys]);
+        }
+        return chrome.storage.local.get(null);
+    }, keys ?? null);
+}
+
+export async function openWizardOptionsPage(
+    context: BrowserContext,
+    extensionId: string
+): Promise<Page> {
+    await clearExtensionStorage(context);
+    const page = await context.newPage();
+    await page.goto(`chrome-extension://${extensionId}/options.html?wizard=1`, {
+        waitUntil: 'domcontentloaded',
+    });
+    await page.getByRole('button', { name: 'Quick start (Focus)' }).waitFor({ state: 'visible', timeout: 30_000 });
+    return page;
+}
+
+export async function completeWizardQuickStart(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Quick start (Focus)' }).click();
+}
+
+/** Preset path: Welcome → … → Done → Start browsing (no dashboard). */
+export async function completeWizardPresetStartBrowsing(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole('button', { name: 'Start browsing' }).click();
+}
+
+export async function waitForWizardApplied(context: BrowserContext): Promise<void> {
+    await expect.poll(async () => {
+        const stored = await readExtensionStorage(context, ['onboardingComplete', 'enabled']);
+        return stored.onboardingComplete === true && stored.enabled === true;
+    }, { timeout: 15_000, intervals: [100, 250, 500] }).toBe(true);
+}
+
+export async function openFilteringFixtureAfterWizard(
+    context: BrowserContext
+): Promise<Page> {
+    const page = await context.newPage();
+    await page.goto(`${E2E_FIXTURE_ORIGIN}/filtering/core-targets.html`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2_000);
+    return page;
+}
+
 export async function readExtensionStats(context: BrowserContext): Promise<{ scanned: number; toxic: number }> {
     const serviceWorker = await getExtensionServiceWorker(context);
     return serviceWorker.evaluate(async () => {

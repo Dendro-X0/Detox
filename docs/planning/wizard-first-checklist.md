@@ -99,8 +99,9 @@ Copy stresses that dashboard fine-tuning is **optional**.
 - [x] Per-site rules, authenticity, mod install collapsed by default in dashboard
 - [x] `pnpm release:verify` + `pnpm test:firefox` + `pnpm test:e2e:core` green (dev signing key warning expected)
 - [x] README reflects core-first pre-release status
-- [ ] Manual QA: install → wizard only → visit fixture → filtered content visible
+- [x] Chrome install smoke: `tests/onboarding/wizard-install-e2e.spec.ts` (quick start + Start browsing → fixture dims)
 - [ ] Firefox manual rows **1–8** and **14** signed off ([`firefox-qa.md`](../guides/firefox-qa.md))
+- [ ] Tag **`v2.1.2`** after Firefox manual sign-off
 
 ## Exit criteria (v2.2.x dogfood)
 
