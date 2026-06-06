@@ -1,6 +1,6 @@
 # SignalLens
 
-**Version:** 2.1.2 · **Stage:** Pre-release (v2.1.x dogfood → [v3.0.0 public launch](docs/planning/version-roadmap.md))
+**Version:** 2.2.0 · **Stage:** Pre-release RC (unlisted store submit → [v3.0.0 public launch](docs/planning/version-roadmap.md))
 
 SignalLens is a browser extension that helps you browse with more focus by reducing low-value content using **your** rules — keywords, browsing modes, and site whitelists. Optional authenticity assist provides advisory source checks on text you select; it never auto-blocks content for “truth.”
 

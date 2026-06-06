@@ -6,14 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-06-06
+
 ### Added
-- **v2.2.0 store prep tooling**
-  - [`store/store-meta.json`](store/store-meta.json) — canonical privacy policy URL + repo metadata
-  - Options Privacy tab link via [`src/config/store-links.ts`](src/config/store-links.ts)
-  - Mod signing scripts: `signing:generate`, `signing:apply-anchor`, `signing:resign`, `store:sync-meta`
-  - [`store/SCREENSHOTS.md`](store/SCREENSHOTS.md) capture guide; updated [`v2.2-store-prep.md`](docs/planning/v2.2-store-prep.md)
-- **Wizard install E2E** — `tests/onboarding/wizard-install-e2e.spec.ts` covers quick start and preset **Start browsing** → fixture filtering (Chrome)
-- **Production mod signing** — rotated trust anchor; re-signed unlock packages; `pnpm store:verify` scripts
+- **Store release candidate**
+  - Production Ed25519 mod trust anchor; re-signed unlock packages
+  - [`store/store-meta.json`](store/store-meta.json) privacy policy URL + Options Privacy tab link
+  - Mod signing scripts (`signing:generate`, `signing:apply-anchor`, `signing:resign`) and `store:verify`
+  - [`store/SCREENSHOTS.md`](store/SCREENSHOTS.md) capture guide
+- **Wizard install E2E** — Chrome quick start + **Start browsing** → fixture filtering
 - **CI** — wizard E2E, Firefox bundle job, store release checks
 
 ## [2.1.2] - 2026-06-01

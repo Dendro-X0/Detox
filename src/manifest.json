@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "SignalLens",
-  "version": "2.1.2",
-  "version_name": "2.1.2",
+  "version": "2.2.0",
+  "version_name": "2.2.0",
   "description": "Personal browsing layer for focus-first web reading.",
   "permissions": [
     "activeTab",

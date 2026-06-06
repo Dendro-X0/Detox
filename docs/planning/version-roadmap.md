@@ -1,7 +1,7 @@
 # Version Roadmap
 
 > **North star:** **v3.0.0** — first **production-ready** release suitable for **initial public rollout** on Chrome Web Store and Firefox Add-ons.  
-> **Current version:** `2.1.2` (wizard-first UX + heuristics; manual QA before tag)  
+> **Current version:** `2.2.0` (unlisted store RC — screenshots + Firefox manual QA before submit)  
 > **Related docs:** [Product phases (historical)](./product-roadmap.md) · [Technical core](../../CORE-ROADMAP.md) · [Authenticity assist](../experimental/authenticity-analysis.md) · [Store release](../guides/store-release.md)
 
 ---
