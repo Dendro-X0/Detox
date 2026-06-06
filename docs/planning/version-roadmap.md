@@ -347,13 +347,13 @@ Historical letter-phases (A–G, H, I) remain documented in [`product-roadmap.md
 
 ---
 
-## Immediate next steps (close v2.1.x → open v2.2.x)
+## Immediate next steps (v2.3.x refinement — active)
 
-1. **Manual smoke:** install → wizard **Start browsing** only → confirm filtering on a normal page ([`wizard-first-checklist.md`](./wizard-first-checklist.md))
-2. **Firefox manual QA:** rows 1–8 and 14 in [`firefox-qa.md`](../guides/firefox-qa.md)
-3. **Tag `v2.1.2`** — done; zips in `releases/`
-4. **Open v2.2.0:** screenshots, bump to 2.2.0, unlisted store listing ([`v2.2-store-prep.md`](./v2.2-store-prep.md))
-5. Plan **2.3.x** refinement sprints (scanner → filtering → authenticity script-first pipeline)
+1. **v2.2.0 store:** Firefox manual QA, screenshots, unlisted submit ([`v2.2-store-prep.md`](./v2.2-store-prep.md))
+2. **Filtering:** false-positive audit on dogfood corpus; mode preset validation
+3. **Authenticity:** ClaimReview/Wikipedia retrieval scripts; auditable gather → verify → analyze tests
+4. **Wizard:** optional authenticity opt-in step; restore defaults ✅
+5. **Scanner:** site-hint tuning; SPA acceptance hardening
 
 ---
 

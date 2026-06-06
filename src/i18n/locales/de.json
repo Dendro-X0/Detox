@@ -143,6 +143,8 @@
       "exportSettings": "Einstellungen exportieren",
       "importSettings": "Einstellungen importieren",
       "setupAgain": "Erneut einrichten",
+      "restoreDefaults": "Assistent-Standard wiederherstellen",
+      "restoreDefaultsConfirm": "Filterung auf Focus-Standard vom Installationsassistenten zurücksetzen? Block-Schlüsselwörter, Whitelist und pro-Website-Regeln werden gelöscht.",
       "invalidImport": "Die Einstellungsdatei konnte nicht gelesen werden. Prüfen Sie das JSON-Format und versuchen Sie es erneut."
     },
     "privacy": {
@@ -461,6 +463,10 @@
     "noSources": "Keine Quellen aufgeführt.",
     "snippetVerified": "Snippet verifiziert",
     "snippetUnverified": "Snippet unverifiziert",
+    "evidenceTrailSummary": "Belegkette ({{queries}} Suchen · {{sources}} Quellen)",
+    "evidenceQuery": "Abfrage",
+    "evidenceSource": "Quelle",
+    "evidenceFetchFailed": "Abruf fehlgeschlagen",
     "epistemic": {
       "unsupported": "Quellen nicht gefunden",
       "disputed": "Umstritten",

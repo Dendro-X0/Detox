@@ -9,6 +9,7 @@ import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import { isFullBuild } from './build-profile';
 import { getBuildProfile } from './build-profile';
 import { PRIVACY_POLICY_URL } from './config/store-links';
+import { restoreWizardDefaults } from './core/settings/restore-wizard-defaults';
 import DashboardShell from './dashboard/DashboardShell';
 import BrowsingModesPanel from './dashboard/BrowsingModesPanel';
 import DashboardQuickLinks from './dashboard/DashboardQuickLinks';
@@ -466,6 +467,11 @@ function App({ onRestartWizard }: AppProps) {
     input.click();
   };
 
+  const restoreDefaults = (): void => {
+    if (!window.confirm(t('settings.advanced.restoreDefaultsConfirm'))) return;
+    void restoreWizardDefaults();
+  };
+
   const isLoadingView = new URLSearchParams(window.location.search).has('loading');
   const isOptionsPage = window.location.pathname.endsWith('options.html');
   const activeProfile = getBuildProfile();
@@ -632,6 +638,7 @@ function App({ onRestartWizard }: AppProps) {
     <div className="card policy-card">
       <h3>{t('settings.advanced.heading')}</h3>
       <div className="preset-buttons">
+        <button className="preset-btn" onClick={restoreDefaults}>{t('settings.advanced.restoreDefaults')}</button>
         <button className="preset-btn" onClick={exportSettings}>{t('settings.advanced.exportSettings')}</button>
         <button className="preset-btn" onClick={importSettings}>{t('settings.advanced.importSettings')}</button>
         {onRestartWizard ? (

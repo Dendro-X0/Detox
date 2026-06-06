@@ -326,6 +326,44 @@ export default function AuthenticitySidePanel() {
                     <p className="muted" style={{ fontSize: '0.75rem', marginTop: '0.75rem' }}>
                         {localizeCompoundMessage(report.limitations, t, { count: report.references.length })}
                     </p>
+                    {(report.queries.length > 0 || report.references.length > 0) && (
+                        <details className="card policy-card" style={{ marginTop: '0.65rem' }}>
+                            <summary style={{ cursor: 'pointer', fontSize: '0.85rem' }}>
+                                {t('sidepanel.evidenceTrailSummary', {
+                                    queries: report.queries.length,
+                                    sources: report.references.length,
+                                })}
+                            </summary>
+                            {report.queries.length > 0 ? (
+                                <ul className="blocked-list" style={{ maxHeight: '140px', marginTop: '0.5rem' }}>
+                                    {report.queries.map((entry) => (
+                                        <li key={`${entry.claimId}-${entry.query}`} className="muted" style={{ fontSize: '0.75rem' }}>
+                                            <strong>{t('sidepanel.evidenceQuery')}:</strong> {entry.query}
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
+                            {report.references.length > 0 ? (
+                                <ul className="blocked-list" style={{ maxHeight: '220px', marginTop: '0.5rem' }}>
+                                    {report.references.map((ref) => (
+                                        <li key={ref.id} className="blocked-item">
+                                            <a href={ref.url} target="_blank" rel="noopener noreferrer">
+                                                {ref.title || ref.url}
+                                            </a>
+                                            <p className="muted" style={{ fontSize: '0.75rem', margin: '0.2rem 0 0' }}>
+                                                {ref.snippetVerified
+                                                    ? t('sidepanel.snippetVerified')
+                                                    : ref.fetchedAt
+                                                      ? t('sidepanel.snippetUnverified')
+                                                      : t('sidepanel.evidenceFetchFailed')}
+                                                {' · '}{ref.stance}
+                                            </p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : null}
+                        </details>
+                    )}
                 </div>
             )}
         </div>

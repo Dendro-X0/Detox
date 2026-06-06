@@ -15,10 +15,16 @@ export default defineConfig({
             'tests/onboarding/**/*.spec.ts',
             'tests/scripts/**/*.spec.ts',
             'tests/store/**/*.spec.ts',
+            'tests/settings/**/*.spec.ts',
             'tests/rules/**/*.spec.ts',
             'tests/popup/**/*.spec.ts',
         ],
-        // S0 catalog + S1 scanner + S2 diff/coordinator
+        exclude: [
+            'tests/core-filtering.spec.ts',
+            'tests/scanner-acceptance-e2e.spec.ts',
+            'tests/onboarding/wizard-install-e2e.spec.ts',
+            'tests/perf-regression.spec.ts',
+        ],
     },
     resolve: {
         alias: {

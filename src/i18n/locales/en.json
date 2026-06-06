@@ -143,6 +143,8 @@
       "exportSettings": "Export Settings",
       "importSettings": "Import Settings",
       "setupAgain": "Set up again",
+      "restoreDefaults": "Restore wizard defaults",
+      "restoreDefaultsConfirm": "Reset filtering to Focus mode defaults from the install wizard? Site whitelist and custom keywords will be cleared. Allow-list domains are cleared too.",
       "invalidImport": "Could not read that settings file. Check the JSON format and try again."
     },
     "privacy": {
@@ -461,6 +463,10 @@
     "noSources": "No sources listed.",
     "snippetVerified": "Snippet verified",
     "snippetUnverified": "Snippet unverified",
+    "evidenceTrailSummary": "Evidence trail ({{queries}} searches · {{sources}} sources)",
+    "evidenceQuery": "Query",
+    "evidenceSource": "Source",
+    "evidenceFetchFailed": "Could not fetch",
     "epistemic": {
       "unsupported": "Sources not found",
       "disputed": "Disputed",

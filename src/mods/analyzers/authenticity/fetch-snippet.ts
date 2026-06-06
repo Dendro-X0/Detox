@@ -8,7 +8,8 @@ function stripHtml(html: string): string {
     return text.replace(/\s+/g, ' ').trim();
 }
 
-function snippetOverlap(fetched: string, snippet: string): boolean {
+/** Returns true when fetched page text contains the search snippet probe. */
+export function snippetOverlapsFetchedText(fetched: string, snippet: string): boolean {
     const normalizedFetched = fetched.toLowerCase();
     const normalizedSnippet = snippet.toLowerCase().trim();
     if (normalizedSnippet.length < 24) return true;
@@ -33,7 +34,7 @@ export async function enrichReferenceFromFetch(
         const raw = await response.text();
         const text = contentType.includes('html') ? stripHtml(raw) : raw;
         const excerpt = text.slice(0, settings.maxSnippetChars);
-        const verified = snippetOverlap(excerpt, reference.snippet || excerpt.slice(0, 120));
+        const verified = snippetOverlapsFetchedText(excerpt, reference.snippet || excerpt.slice(0, 120));
         return {
             ...reference,
             snippet: verified ? reference.snippet || excerpt.slice(0, 400) : excerpt.slice(0, 400),

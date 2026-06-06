@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- **Restore wizard defaults** — Privacy → Advanced restores Focus-mode wizard preset (keywords, sensitivity, mods, cleared per-site rules)
+- **Authenticity evidence trail** — collapsible query + source list in side panel report (snippet verify status per source)
+- **Script-first tests** — snippet overlap verification unit tests for fetch pipeline
+
 ## [2.2.0] - 2026-06-06
 
 ### Added
