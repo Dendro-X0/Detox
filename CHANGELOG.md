@@ -7,6 +7,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **False-positive audit corpus** — Focus-mode dogfood fixtures (`tests/fixtures/filtering/focus-corpus.json`); CI gate via `pnpm test:filter-audit`
+- **Tiered keyword scoring** — balanced threshold requires multi-hit or strong phrase weight; short promo bypass for gated text
 - **Wikipedia retrieval script (authenticity T2)** — opensearch + MediaWiki extract API gather; verified snippets in search-only and synthesis paths; session cache
 - **Restore wizard defaults** — Privacy → Advanced restores Focus-mode wizard preset (keywords, sensitivity, mods, cleared per-site rules)
 - **Authenticity evidence trail** — collapsible query + source list in side panel report (snippet verify status per source)

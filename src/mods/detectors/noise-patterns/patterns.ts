@@ -1,6 +1,6 @@
 import type { Verdict } from '../../../core/types/verdict';
 import { BOTHER_KEYWORD_MAP } from '../../../core/types/bother-keywords';
-import { scoreFromKeywordWeight } from '../../../core/rules/keyword-score';
+import { scoreFromKeywordHits } from '../../../core/rules/keyword-score';
 import { weightedKeywordHits } from '../../../core/rules/keyword-match';
 import { DEFAULT_LABEL_ID, NOISE_PATTERNS_DETECTOR_ID } from '../constants';
 
@@ -12,11 +12,11 @@ const CATEGORY_LABELS: Record<NoisePatternCategory, string> = {
     'engagement-bait': 'engagement-bait',
 };
 
-/** Extra patterns beyond user block lists — catches common feed noise phrasing. */
+/** Extra patterns beyond user block lists — supplemental only; keep narrow to limit false positives. */
 const EXTRA_PATTERNS_BY_CATEGORY: Record<NoisePatternCategory, readonly string[]> = {
-    promo: ['% off', 'limited time only', 'sign up now', 'giveaway'],
-    outrage: ['meltdown', 'clown show', 'peak clown'],
-    'engagement-bait': ['mind blown', 'i was today years old', 'let that sink in'],
+    promo: ['% off', 'flash sale', 'limited time only', 'sign up now', 'giveaway'],
+    outrage: [],
+    'engagement-bait': [],
 };
 
 const PATTERNS_BY_CATEGORY: Record<NoisePatternCategory, readonly string[]> = {
@@ -41,7 +41,7 @@ export function classifyNoisePatterns(text: string, threshold: number): Verdict 
         const weight = weightedKeywordHits(text, keywords);
         if (weight <= 0) continue;
 
-        const score = scoreFromKeywordWeight(weight);
+        const score = scoreFromKeywordHits(text, keywords);
         const matched = score >= threshold;
         if (score > best.score) {
             best = {

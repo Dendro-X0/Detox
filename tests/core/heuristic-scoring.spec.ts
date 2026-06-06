@@ -11,11 +11,20 @@ const FOCUS_KEYWORDS = [
 ];
 
 describe('heuristic scoring', () => {
-    it('requires phrase or multiple hits at balanced threshold (0.5)', () => {
-        expect(scoreFromKeywordHits('This is absolutely unhinged behavior online.', FOCUS_KEYWORDS)).toBeGreaterThanOrEqual(0.5);
+    it('requires phrase plus token or multi-hit at balanced threshold (0.5)', () => {
+        expect(scoreFromKeywordHits('This is absolutely unhinged behavior online.', FOCUS_KEYWORDS)).toBe(0.48);
+        expect(
+            scoreFromKeywordHits('This is absolutely unhinged and outraged behavior online.', FOCUS_KEYWORDS)
+        ).toBeGreaterThanOrEqual(0.5);
         expect(scoreFromKeywordHits('People are furious today.', FOCUS_KEYWORDS)).toBeLessThan(0.5);
         expect(
             scoreFromKeywordHits('People are furious and outraged today.', FOCUS_KEYWORDS)
+        ).toBeGreaterThanOrEqual(0.5);
+        expect(
+            scoreFromKeywordHits(
+                'This is an outrageous scandal that has everyone furious online today.',
+                FOCUS_KEYWORDS
+            )
         ).toBeGreaterThanOrEqual(0.5);
     });
 
@@ -41,7 +50,11 @@ describe('heuristic scoring', () => {
         expect(verdict.labelId).toBe('promo');
     });
 
-    it('scoreFromKeywordWeight caps at 1', () => {
+    it('scoreFromKeywordWeight tiers for balanced threshold', () => {
+        expect(scoreFromKeywordWeight(1)).toBe(0.35);
+        expect(scoreFromKeywordWeight(2, 1)).toBe(0.48);
+        expect(scoreFromKeywordWeight(2, 2)).toBe(0.52);
+        expect(scoreFromKeywordWeight(3)).toBeGreaterThanOrEqual(0.5);
         expect(scoreFromKeywordWeight(10)).toBe(1);
     });
 

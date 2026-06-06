@@ -232,7 +232,7 @@ flowchart LR
 ### Exit criteria
 
 - [ ] Scanner acceptance suite green; no runaway rescans on SPA fixtures
-- [ ] Filtering: balanced mode false-positive rate acceptable on dogfood corpus
+- [x] Filtering: balanced mode false-positive rate acceptable on dogfood corpus
 - [ ] Authenticity: end-to-end path uses script gather → snippet verify → LLM compare; zero hallucinated URLs in test set
 - [ ] Privacy policy states **public sources only** for authenticity retrieval
 - [ ] Full build optional; core-only users can reach all v3.0.0 filtering features

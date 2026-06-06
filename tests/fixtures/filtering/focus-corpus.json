@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "mode": "focus",
+  "threshold": 0.5,
+  "samples": [
+    {
+      "id": "pass-news-analysis",
+      "expect": "pass",
+      "note": "Neutral news analysis without bait keywords",
+      "text": "We reviewed the quarterly results and the team shared thoughtful feedback on next steps for the product roadmap."
+    },
+    {
+      "id": "pass-gardening",
+      "expect": "pass",
+      "note": "E2E neutral fixture copy",
+      "text": "This paragraph describes calm gardening techniques and seasonal planting schedules for backyard vegetables and herbs that grow well in temperate climates during the spring months each year."
+    },
+    {
+      "id": "pass-symbolic-lol",
+      "expect": "pass",
+      "note": "Short token lol must not match inside symbolic",
+      "text": "The symbolic logic course covers propositional proofs and model checking without social feed noise."
+    },
+    {
+      "id": "pass-skill-building",
+      "expect": "pass",
+      "note": "Removed kill token; skill building should never match hostility",
+      "text": "Our skill building workshop helps junior developers practice code review and mentoring techniques each week."
+    },
+    {
+      "id": "pass-saas-docs",
+      "expect": "pass",
+      "note": "Legitimate product documentation mentioning trials",
+      "text": "Developers can start a free trial of the API tier from the documentation page after creating an organization account."
+    },
+    {
+      "id": "pass-theater-review",
+      "expect": "pass",
+      "note": "Figurative language in arts criticism",
+      "text": "The director uses the clown show metaphor throughout the second act, but the review stays analytical about staging and pacing."
+    },
+    {
+      "id": "pass-shocking-results",
+      "expect": "pass",
+      "note": "Single weak engagement token in professional context",
+      "text": "The lab results were shocking at first glance, yet the published paper explains the methodology in detail across twelve pages."
+    },
+    {
+      "id": "pass-postgres-today",
+      "expect": "pass",
+      "note": "Meme phrase used earnestly in technical learning",
+      "text": "I was today years old when I learned about PostgreSQL partial indexes and how they reduce write amplification on large tables."
+    },
+    {
+      "id": "pass-conference-sponsored",
+      "expect": "pass",
+      "note": "Academic sponsorship disclosure",
+      "text": "This keynote is sponsored by the conference organizers and covers database internals without promotional calls to action."
+    },
+    {
+      "id": "pass-hot-take-analysis",
+      "expect": "pass",
+      "note": "Structured commentary, not bait headline",
+      "text": "Hot take: the policy debate needs more primary sources. Here is a summary of three peer-reviewed studies and their limitations."
+    },
+    {
+      "id": "pass-mandalorian-quote",
+      "expect": "pass",
+      "note": "Meme phrase embedded in long explanatory prose",
+      "text": "This is the way our team handles incident response: write a timeline first, then publish customer communication after legal review."
+    },
+    {
+      "id": "pass-short-ui",
+      "expect": "pass",
+      "note": "Below classify length without promo signal",
+      "text": "Thanks for the update."
+    },
+    {
+      "id": "block-outrage-scandal",
+      "expect": "block",
+      "note": "E2E blocked fixture — multi-hit outrage",
+      "text": "This is an outrageous scandal that has everyone furious online today. People are sharing angry rants about the decision and demanding immediate change from leadership teams worldwide."
+    },
+    {
+      "id": "block-spam-promo",
+      "expect": "block",
+      "note": "Classic spam comment",
+      "text": "Use code SAVE20 for a limited offer — buy now and subscribe now via the link in bio."
+    },
+    {
+      "id": "block-engagement-bait",
+      "expect": "block",
+      "note": "Clickbait headline phrasing",
+      "text": "You won't believe what happens next in this shocking story — wait until you see the ending."
+    },
+    {
+      "id": "block-unhinged",
+      "expect": "block",
+      "note": "Strong outrage phrase",
+      "text": "This is absolutely unhinged behavior and people are right to be outraged about it online."
+    },
+    {
+      "id": "block-noise-flash-sale",
+      "expect": "block",
+      "note": "Noise-pattern promo supplemental",
+      "text": "Flash sale — 50% off today only! Sign up now before this limited time only offer expires."
+    },
+    {
+      "id": "block-affiliate-spam",
+      "expect": "block",
+      "note": "Affiliate spam stack",
+      "text": "My affiliate link gets you a promo code discount — act now and order now while supplies last."
+    },
+    {
+      "id": "block-bait-cmm",
+      "expect": "block",
+      "note": "Engagement bait thread title",
+      "text": "Unpopular opinion: change my mind about this controversial topic in the comments below."
+    },
+    {
+      "id": "block-short-promo",
+      "expect": "block",
+      "note": "Short text gate bypass via buy now",
+      "text": "Buy now — 70% off!"
+    },
+    {
+      "id": "block-meltdown-bait",
+      "expect": "block",
+      "note": "Multi-hit outrage keywords",
+      "text": "People are furious and outraged online — this is absolutely unhinged behavior in the replies."
+    },
+    {
+      "id": "block-giveaway",
+      "expect": "block",
+      "note": "Giveaway promo pattern",
+      "text": "Enter our giveaway now! Click here for a free trial and use code WINNER at checkout."
+    }
+  ]
+}

@@ -7,12 +7,13 @@ import {
     HEURISTIC_DETECTOR_ID,
 } from '../constants';
 import { loadUserRules, textMatchesAllowKeywords } from '../../../core/rules/user-rules-store';
-import { scoreFromKeywordWeight } from '../../../core/rules/keyword-score';
+import { scoreFromKeywordHits, isKeywordScoreBlocked } from '../../../core/rules/keyword-score';
 import { weightedKeywordHits } from '../../../core/rules/keyword-match';
 import { getActiveKeywords } from './keywords';
 
 function classifyKeyword(text: string, threshold: number, keywords: readonly string[]): Verdict {
     const weight = weightedKeywordHits(text, keywords);
+    const score = scoreFromKeywordHits(text, keywords);
     if (weight <= 0) {
         return {
             matched: false,
@@ -21,9 +22,8 @@ function classifyKeyword(text: string, threshold: number, keywords: readonly str
             detectorId: HEURISTIC_DETECTOR_ID,
         };
     }
-    const score = scoreFromKeywordWeight(weight);
     return {
-        matched: score >= threshold,
+        matched: isKeywordScoreBlocked(text, keywords, threshold),
         score,
         labelId: DEFAULT_LABEL_ID,
         detectorId: HEURISTIC_DETECTOR_ID,

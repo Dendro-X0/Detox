@@ -19,6 +19,7 @@
     "lint": "node node_modules/eslint/bin/eslint.js .",
     "preview": "node node_modules/vite/bin/vite.js preview",
     "test:scanner": "vitest run --config vitest.config.ts",
+    "test:filter-audit": "vitest run --config vitest.config.ts tests/core/false-positive-audit.spec.ts",
     "test:scanner:s0": "vitest run --config vitest.config.ts -t \"S0\"",
     "test:scanner:s4": "vitest run --config vitest.config.ts -t \"S4\"",
     "test:scanner:s5": "vitest run --config vitest.config.ts -t \"S5\"",
