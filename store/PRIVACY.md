@@ -10,6 +10,7 @@ SignalLens is a browser extension that helps you filter web content using **your
 - **Default filtering is local.** Keyword matching and pattern detection run on text extracted from pages you visit. No account is required.
 - **We do not operate a backend** for core filtering. Settings and stats are stored in your browser (`chrome.storage.local` / `browser.storage.local`).
 - **Optional features may send data off-device** only when you enable them and supply your own API keys or endpoints.
+- **Authenticity assist uses public sources only.** Search queries go to APIs you configure (Wikipedia, Google Fact Check / ClaimReview, Brave, or your custom endpoint). The extension does not access login-gated, paywalled, or private content.
 
 ## Data processed locally
 
@@ -28,7 +29,7 @@ You control these in **Options → Plugins → Authenticity assist** and related
 | Feature | When data leaves device | What is sent |
 |---------|-------------------------|--------------|
 | **Remote API detector** (full build, opt-in) | Only if you configure an endpoint | Text snippets you classify, per your API contract |
-| **Authenticity assist — search** | If enabled with Wikipedia / Brave / custom search | Search queries derived from your selection |
+| **Authenticity assist — search** | If enabled with Wikipedia / ClaimReview / Brave / custom search | Search queries derived from your selection; only **public** APIs and URLs |
 | **Authenticity assist — LLM synthesis** | If enabled with your endpoint + API key | Claims and fetched source snippets you approved for analysis |
 | **Local ONNX pack** (full build) | Stays on device | Model inference runs locally |
 

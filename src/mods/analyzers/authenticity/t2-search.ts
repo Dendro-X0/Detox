@@ -1,8 +1,9 @@
 import type { AuthenticitySettings } from './settings';
 import type { SourceReference } from './types';
 import { searchWikipedia, type WikipediaSearchHit } from './wikipedia-retrieval';
+import { searchClaimReview, type ClaimReviewSearchHit } from './claimreview-retrieval';
 
-export type SearchHit = WikipediaSearchHit;
+export type SearchHit = WikipediaSearchHit | ClaimReviewSearchHit;
 
 export async function runSearch(
     query: string,
@@ -11,6 +12,8 @@ export async function runSearch(
     switch (settings.searchProvider) {
         case 'wikipedia':
             return searchWikipedia(query, settings.maxSearchResults);
+        case 'claimreview':
+            return searchClaimReview(query, settings.factCheckApiKey, settings.maxSearchResults);
         case 'brave':
             return searchBrave(query, settings);
         case 'custom':

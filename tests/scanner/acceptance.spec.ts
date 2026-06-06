@@ -37,11 +37,13 @@ describe('S4 — acceptance catalog', () => {
             'infinite-scroll.html',
             'spa-route-a.html',
             'spa-route-b.html',
+            'spa-pushstate.html',
         ];
         for (const file of files) {
             expect(fs.existsSync(path.join(ACCEPTANCE_FIXTURE_DIR, file))).toBe(true);
         }
         expect(ACCEPTANCE_SCENARIOS.length).toBe(5);
+        expect(fs.existsSync(path.join(ACCEPTANCE_FIXTURE_DIR, 'spa-pushstate.html'))).toBe(true);
     });
 });
 

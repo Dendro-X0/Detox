@@ -26,7 +26,7 @@
     "test:scanner:pipeline": "vitest run --config vitest.config.ts -t \"8.4 — pipeline\"",
     "test:scanner:perf": "vitest run --config vitest.config.ts -t \"8.4 — scanner perf\"",
     "test:core": "pnpm test:scanner && pnpm test:e2e:core",
-    "test:ci": "pnpm test:scanner && pnpm build:core && pnpm exec playwright install chromium && pnpm exec playwright test tests/core-filtering.spec.ts tests/onboarding/wizard-install-e2e.spec.ts tests/scanner-acceptance-e2e.spec.ts",
+    "test:ci": "pnpm test:scanner && pnpm test:filter-audit && pnpm build:core && pnpm exec playwright install chromium && pnpm exec playwright test tests/core-filtering.spec.ts tests/onboarding/wizard-install-e2e.spec.ts tests/scanner-acceptance-e2e.spec.ts",
     "generate:fixtures": "node scripts/generate-acceptance-fixtures.mjs",
     "locale:de": "node scripts/fill-de-overrides.mjs && node scripts/generate-de-locale.mjs",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",

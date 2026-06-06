@@ -15,6 +15,30 @@ test.beforeAll(() => {
 });
 
 test.describe('S4 — acceptance (extension + recorded snapshots)', () => {
+    test('SPA pushState navigation resets scan stats without full reload', async ({ context }) => {
+        const seed = createFilteringStorageSeed();
+        const page = await openAcceptanceFixturePage(context, 'acceptance/spa-pushstate.html', seed);
+
+        await waitForExtensionStats(context, { scanned: 2 });
+        const statsAfterA = await readExtensionStats(context);
+        expect(statsAfterA.scanned).toBeGreaterThanOrEqual(3);
+
+        await page.getByRole('button', { name: 'Navigate to route B' }).click();
+        await expect.poll(() => page.url(), { timeout: 10_000 }).toContain('route=b');
+
+        await expect.poll(async () => (await readExtensionStats(context)).scanned, {
+            timeout: 45_000,
+            intervals: [500, 1000, 2000],
+        }).toBeLessThan(statsAfterA.scanned);
+
+        await waitForExtensionStats(context, { scanned: 2 });
+        const statsAfterB = await readExtensionStats(context);
+        expect(statsAfterB.scanned).toBeGreaterThanOrEqual(2);
+        expect(statsAfterB.scanned).toBeLessThanOrEqual(3);
+
+        await page.close();
+    });
+
     test('SPA navigation resets per-page scan stats without bleed', async ({ context }) => {
         const seed = createFilteringStorageSeed();
         const pageA = await openAcceptanceFixturePage(context, 'acceptance/spa-route-a.html', seed);

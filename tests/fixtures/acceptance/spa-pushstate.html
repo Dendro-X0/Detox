@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Acceptance — SPA pushState</title>
+</head>
+<body>
+  <main id="route-a">
+    <h1>Route A — settings</h1>
+    <p data-fixture-unit="route-a-1">
+      Route A paragraph one explains notification preferences for digest emails and mobile
+      alerts when teammates mention your handle in shared project spaces during business hours.
+    </p>
+    <p data-fixture-unit="route-a-2">
+      Route A paragraph two describes privacy controls that limit profile visibility to
+      organization members while keeping public portfolio links available for recruiting.
+    </p>
+    <p data-fixture-unit="route-a-3">
+      Route A paragraph three outlines export options for account data including message
+      history archives delivered as encrypted bundles within forty-eight hours of request.
+    </p>
+  </main>
+  <main id="route-b" hidden>
+    <h1>Route B — inbox</h1>
+    <p data-fixture-unit="route-b-1">
+      Route B paragraph one summarizes unread threads sorted by priority with labels applied
+      automatically when messages mention deadlines or customer escalations from support queues.
+    </p>
+    <p data-fixture-unit="route-b-2">
+      Route B paragraph two explains how archived conversations remain searchable while removed
+      from the default inbox view to reduce noise during focused work blocks each morning.
+    </p>
+  </main>
+  <button type="button" id="navigate-b">Navigate to route B</button>
+  <script>
+    (function () {
+      const routeA = document.getElementById('route-a');
+      const routeB = document.getElementById('route-b');
+      const button = document.getElementById('navigate-b');
+
+      function showRoute(route) {
+        const isB = route === 'b';
+        if (isB) {
+          routeA.remove();
+        } else if (!document.body.contains(routeA)) {
+          document.body.insertBefore(routeA, routeB);
+        }
+        routeB.hidden = !isB;
+        button.hidden = isB;
+      }
+
+      button.addEventListener('click', function () {
+        history.pushState({ route: 'b' }, '', '?route=b');
+        showRoute('b');
+      });
+
+      window.addEventListener('popstate', function () {
+        const params = new URLSearchParams(location.search);
+        showRoute(params.get('route') === 'b' ? 'b' : 'a');
+      });
+
+      const initial = new URLSearchParams(location.search).get('route');
+      if (initial === 'b') {
+        showRoute('b');
+      }
+    })();
+  </script>
+</body>
+</html>

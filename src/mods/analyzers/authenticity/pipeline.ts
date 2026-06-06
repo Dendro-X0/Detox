@@ -6,6 +6,7 @@ import { getAuthenticitySettings, loadAuthenticitySettings } from './settings-st
 import { buildSearchQueryForClaim, extractClaimsFromText, runT0Heuristics } from './t0-heuristics';
 import { filterClaimsWithT1 } from './t1-checkworthiness';
 import { hitsToReferences, runSearch } from './t2-search';
+import { enrichClaimReviewReferences, type ClaimReviewSearchHit } from './claimreview-retrieval';
 import { enrichWikipediaReferences } from './wikipedia-retrieval';
 import { buildSearchOnlyAssessments, synthesizeAssessments } from './t3-synthesis';
 import type { AnalysisScope, AuthenticityJobState, AuthenticityReport, SearchQueryRecord, SourceReference } from './types';
@@ -78,6 +79,7 @@ export async function runAuthenticityAnalysis(input: {
     const queries: SearchQueryRecord[] = [];
     const references: SourceReference[] = [];
     const allowedUrls = new Set<string>();
+    const claimReviewHitsByUrl = new Map<string, ClaimReviewSearchHit>();
 
     if (settings.tierT2 && settings.searchProvider !== 'none') {
         await updateJob({
@@ -96,6 +98,9 @@ export async function runAuthenticityAnalysis(input: {
             const hits = await runSearch(query, settings);
             for (const hit of hits) {
                 allowedUrls.add(hit.url);
+                if (settings.searchProvider === 'claimreview') {
+                    claimReviewHitsByUrl.set(hit.url, hit as ClaimReviewSearchHit);
+                }
             }
             const refs = hitsToReferences(hits, claim.id);
             references.push(...refs);
@@ -117,6 +122,18 @@ export async function runAuthenticityAnalysis(input: {
             vettedReferences,
             settings.maxSnippetChars
         );
+    }
+
+    if (settings.searchProvider === 'claimreview' && vettedReferences.length > 0) {
+        await updateJob({
+            jobId,
+            phase: 'fetching',
+            progress: searchOnly ? 60 : 48,
+            message: i18nMessage('authenticity.job.fetchingSnippets'),
+            report: null,
+            error: null,
+        });
+        vettedReferences = enrichClaimReviewReferences(vettedReferences, claimReviewHitsByUrl);
     }
 
     if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim() && settings.llmModel.trim()) {

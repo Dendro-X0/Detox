@@ -17,6 +17,7 @@ import SlSelect from './components/SlSelect';
 
 const SEARCH_PROVIDER_IDS: readonly AuthenticitySearchProvider[] = [
     'wikipedia',
+    'claimreview',
     'brave',
     'custom',
     'none',
@@ -167,6 +168,19 @@ export default function AuthenticitySettingsPanel() {
                     }
                     options={searchProviderOptions}
                 />
+                {settings.searchProvider === 'claimreview' ? (
+                    <div className="sl-form-field">
+                        <label className="sl-form-label" htmlFor="authenticity-factcheck-key">{t('authenticity.factCheckApiKey')}</label>
+                        <input
+                            id="authenticity-factcheck-key"
+                            type="password"
+                            className="sl-input"
+                            placeholder={t('authenticity.factCheckApiKeyPlaceholder')}
+                            value={settings.factCheckApiKey}
+                            onChange={(e) => persist({ ...settings, factCheckApiKey: e.target.value })}
+                        />
+                    </div>
+                ) : null}
                 {settings.searchProvider === 'brave' ? (
                     <div className="sl-form-field">
                         <label className="sl-form-label" htmlFor="authenticity-brave-key">{t('authenticity.braveApiKey')}</label>

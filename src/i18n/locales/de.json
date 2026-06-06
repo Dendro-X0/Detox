@@ -387,10 +387,13 @@
     "provider": "Anbieter",
     "searchProviders": {
       "wikipedia": "Wikipedia (öffentliche API, kein Schlüssel)",
+      "claimreview": "ClaimReview / Google Fact Check API",
       "brave": "Brave Search API",
       "custom": "Eigener Such-Endpunkt",
       "none": "Keine"
     },
+    "factCheckApiKey": "Google Fact Check API-Schlüssel",
+    "factCheckApiKeyPlaceholder": "Google Fact Check API-Schlüssel",
     "braveApiKey": "Brave-API-Schlüssel",
     "braveApiKeyPlaceholder": "Brave-API-Schlüssel",
     "customSearchUrl": "Eigene Such-URL",

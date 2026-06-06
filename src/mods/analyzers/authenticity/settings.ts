@@ -1,4 +1,4 @@
-export type AuthenticitySearchProvider = 'none' | 'wikipedia' | 'brave' | 'custom';
+export type AuthenticitySearchProvider = 'none' | 'wikipedia' | 'claimreview' | 'brave' | 'custom';
 
 export type AuthenticitySettings = {
     readonly enabled: boolean;
@@ -15,6 +15,7 @@ export type AuthenticitySettings = {
     readonly maxSnippetChars: number;
     readonly dailyQuota: number;
     readonly searchProvider: AuthenticitySearchProvider;
+    readonly factCheckApiKey: string;
     readonly braveApiKey: string;
     readonly customSearchUrl: string;
     readonly llmEndpoint: string;
@@ -36,6 +37,7 @@ export const DEFAULT_AUTHENTICITY_SETTINGS: AuthenticitySettings = {
     maxSnippetChars: 1200,
     dailyQuota: 20,
     searchProvider: 'wikipedia',
+    factCheckApiKey: '',
     braveApiKey: '',
     customSearchUrl: '',
     llmEndpoint: '',
