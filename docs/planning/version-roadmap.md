@@ -351,8 +351,8 @@ Historical letter-phases (A–G, H, I) remain documented in [`product-roadmap.md
 
 1. **Manual smoke:** install → wizard **Start browsing** only → confirm filtering on a normal page ([`wizard-first-checklist.md`](./wizard-first-checklist.md))
 2. **Firefox manual QA:** rows 1–8 and 14 in [`firefox-qa.md`](../guides/firefox-qa.md)
-3. **Tag `v2.1.2`** when manual sign-off complete (versions bumped; zips in `releases/`)
-4. **Open v2.2.0:** follow [`v2.2-store-prep.md`](./v2.2-store-prep.md) — production mod-signing key, privacy URL, screenshots, unlisted listing
+3. **Tag `v2.1.2`** — done; zips in `releases/`
+4. **Open v2.2.0:** screenshots, bump to 2.2.0, unlisted store listing ([`v2.2-store-prep.md`](./v2.2-store-prep.md))
 5. Plan **2.3.x** refinement sprints (scanner → filtering → authenticity script-first pipeline)
 
 ---

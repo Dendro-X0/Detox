@@ -101,7 +101,7 @@ Copy stresses that dashboard fine-tuning is **optional**.
 - [x] README reflects core-first pre-release status
 - [x] Chrome install smoke: `tests/onboarding/wizard-install-e2e.spec.ts` (quick start + Start browsing → fixture dims)
 - [ ] Firefox manual rows **1–8** and **14** signed off ([`firefox-qa.md`](../guides/firefox-qa.md))
-- [ ] Tag **`v2.1.2`** after Firefox manual sign-off
+- [x] Tag **`v2.1.2`** (Firefox manual still required before AMO submit)
 
 ## Exit criteria (v2.2.x dogfood)
 
