@@ -6,6 +6,7 @@ import { getAuthenticitySettings, loadAuthenticitySettings } from './settings-st
 import { buildSearchQueryForClaim, extractClaimsFromText, runT0Heuristics } from './t0-heuristics';
 import { filterClaimsWithT1 } from './t1-checkworthiness';
 import { hitsToReferences, runSearch } from './t2-search';
+import { enrichWikipediaReferences } from './wikipedia-retrieval';
 import { buildSearchOnlyAssessments, synthesizeAssessments } from './t3-synthesis';
 import type { AnalysisScope, AuthenticityJobState, AuthenticityReport, SearchQueryRecord, SourceReference } from './types';
 import { filterReferencesToAllowlist } from './url-allowlist';
@@ -103,6 +104,21 @@ export async function runAuthenticityAnalysis(input: {
 
     let vettedReferences = filterReferencesToAllowlist(references, allowedUrls, settings.extraAllowedDomains);
 
+    if (settings.searchProvider === 'wikipedia' && vettedReferences.length > 0) {
+        await updateJob({
+            jobId,
+            phase: 'fetching',
+            progress: searchOnly ? 60 : 48,
+            message: i18nMessage('authenticity.job.fetchingSnippets'),
+            report: null,
+            error: null,
+        });
+        vettedReferences = await enrichWikipediaReferences(
+            vettedReferences,
+            settings.maxSnippetChars
+        );
+    }
+
     if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim() && settings.llmModel.trim()) {
         await updateJob({
             jobId,
@@ -116,6 +132,10 @@ export async function runAuthenticityAnalysis(input: {
         const enriched: SourceReference[] = [];
         for (const ref of vettedReferences.slice(0, settings.maxSearchResults * settings.maxClaims)) {
             if (cancelRequested) throw new Error('cancelled');
+            if (ref.snippetVerified && ref.fetchedAt > 0) {
+                enriched.push(ref);
+                continue;
+            }
             enriched.push(await enrichReferenceFromFetch(ref, allowedUrls, settings));
         }
         vettedReferences = enriched;

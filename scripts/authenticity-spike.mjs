@@ -1,38 +1,36 @@
 #!/usr/bin/env node
 /**
- * Spike 0 — manual feasibility check for authenticity assist.
- * Fetches a Wikipedia search for a sample claim and prints cost/latency hints.
+ * Manual feasibility check for authenticity Wikipedia gather (T2 script-first).
  *
  * Usage: node scripts/authenticity-spike.mjs "Your claim text here"
  */
+import {
+    fetchWikipediaExtracts,
+    searchWikipedia,
+} from '../src/mods/analyzers/authenticity/wikipedia-retrieval.ts';
+
 const claim = process.argv[2] ?? 'Coffee may reduce the risk of type 2 diabetes according to recent studies.';
 const started = Date.now();
 
-const params = new URLSearchParams({
-    action: 'opensearch',
-    search: claim.slice(0, 120),
-    limit: '5',
-    namespace: '0',
-    format: 'json',
-    origin: '*',
-});
-
-const url = `https://en.wikipedia.org/w/api.php?${params.toString()}`;
-const response = await fetch(url);
-const elapsed = Date.now() - started;
-
-if (!response.ok) {
-    console.error('Search failed', response.status);
-    process.exit(1);
-}
-
-const body = await response.json();
-const titles = body[1] ?? [];
-const urls = body[3] ?? [];
+const hits = await searchWikipedia(claim.slice(0, 120), 3);
+const searchMs = Date.now() - started;
 
 console.log('Claim:', claim);
-console.log(`Wikipedia opensearch: ${elapsed}ms, ${titles.length} hits`);
-for (let i = 0; i < titles.length; i += 1) {
-    console.log(`  - ${titles[i]} → ${urls[i]}`);
+console.log(`Wikipedia opensearch: ${searchMs}ms, ${hits.length} hits`);
+for (const hit of hits) {
+    console.log(`  - ${hit.title} → ${hit.url}`);
+    if (hit.description) console.log(`    ${hit.description}`);
 }
-console.log('\nNotes: zero LLM tokens in search-only mode; measure citation quality manually.');
+
+if (hits.length > 0) {
+    const extractStarted = Date.now();
+    const titles = hits.map((h) => h.title);
+    const extracts = await fetchWikipediaExtracts(titles, 400);
+    console.log(`\nExtract API: ${Date.now() - extractStarted}ms`);
+    for (const title of titles) {
+        const text = extracts.get(title);
+        console.log(`  - ${title}: ${text ? `${text.slice(0, 120)}…` : '(no extract)'}`);
+    }
+}
+
+console.log('\nNotes: zero LLM tokens in search-only mode; snippets come from public MediaWiki API.');

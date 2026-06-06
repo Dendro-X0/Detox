@@ -321,7 +321,7 @@ const de = {
     'authenticity.allowFullPage': 'Ganzseiten-Analyse im Seitenpanel erlauben (auf Social Feeds nicht empfohlen)',
     'authenticity.searchHeading': 'Suche',
     'authenticity.provider': 'Anbieter',
-    'authenticity.searchProviders.wikipedia': 'Wikipedia (kostenlos, Demo)',
+    'authenticity.searchProviders.wikipedia': 'Wikipedia (öffentliche API, kein Schlüssel)',
     'authenticity.searchProviders.brave': 'Brave Search API',
     'authenticity.searchProviders.custom': 'Eigener Such-Endpunkt',
     'authenticity.searchProviders.none': 'Keine',

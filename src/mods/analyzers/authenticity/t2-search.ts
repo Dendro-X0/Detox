@@ -1,11 +1,8 @@
 import type { AuthenticitySettings } from './settings';
 import type { SourceReference } from './types';
+import { searchWikipedia, type WikipediaSearchHit } from './wikipedia-retrieval';
 
-export type SearchHit = {
-    readonly url: string;
-    readonly title: string;
-    readonly description: string;
-};
+export type SearchHit = WikipediaSearchHit;
 
 export async function runSearch(
     query: string,
@@ -21,28 +18,6 @@ export async function runSearch(
         default:
             return [];
     }
-}
-
-async function searchWikipedia(query: string, limit: number): Promise<readonly SearchHit[]> {
-    const params = new URLSearchParams({
-        action: 'opensearch',
-        search: query,
-        limit: String(limit),
-        namespace: '0',
-        format: 'json',
-        origin: '*',
-    });
-    const response = await fetch(`https://en.wikipedia.org/w/api.php?${params.toString()}`);
-    if (!response.ok) return [];
-    const body = (await response.json()) as [string, string[], string[], string[]];
-    const titles = body[1] ?? [];
-    const descriptions = body[2] ?? [];
-    const urls = body[3] ?? [];
-    return titles.map((title, index) => ({
-        url: urls[index] ?? `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g, '_'))}`,
-        title,
-        description: descriptions[index] ?? '',
-    }));
 }
 
 async function searchBrave(query: string, settings: AuthenticitySettings): Promise<readonly SearchHit[]> {

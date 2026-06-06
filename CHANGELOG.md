@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **Wikipedia retrieval script (authenticity T2)** — opensearch + MediaWiki extract API gather; verified snippets in search-only and synthesis paths; session cache
 - **Restore wizard defaults** — Privacy → Advanced restores Focus-mode wizard preset (keywords, sensitivity, mods, cleared per-site rules)
 - **Authenticity evidence trail** — collapsible query + source list in side panel report (snippet verify status per source)
 - **Script-first tests** — snippet overlap verification unit tests for fetch pipeline

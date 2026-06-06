@@ -386,7 +386,7 @@
     "searchHeading": "Suche",
     "provider": "Anbieter",
     "searchProviders": {
-      "wikipedia": "Wikipedia (kostenlos, Demo)",
+      "wikipedia": "Wikipedia (öffentliche API, kein Schlüssel)",
       "brave": "Brave Search API",
       "custom": "Eigener Such-Endpunkt",
       "none": "Keine"

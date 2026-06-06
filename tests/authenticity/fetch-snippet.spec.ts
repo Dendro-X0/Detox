@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { snippetOverlapsFetchedText } from '../../src/mods/analyzers/authenticity/fetch-snippet';
+import { snippetOverlapsFetchedText } from '../../src/mods/analyzers/authenticity/snippet-verify';
 
 describe('snippetOverlapsFetchedText', () => {
     it('accepts short snippets without strict overlap', () => {

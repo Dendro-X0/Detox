@@ -1,6 +1,11 @@
 import type { AuthenticitySettings } from './settings';
 import type { SourceReference } from './types';
+import {
+    fetchWikipediaExtractForUrl,
+    isWikipediaArticleUrl,
+} from './wikipedia-retrieval';
 import { isUrlAllowed } from './url-allowlist';
+import { snippetOverlapsFetchedText } from './snippet-verify';
 
 function stripHtml(html: string): string {
     const withoutScripts = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ');
@@ -8,14 +13,7 @@ function stripHtml(html: string): string {
     return text.replace(/\s+/g, ' ').trim();
 }
 
-/** Returns true when fetched page text contains the search snippet probe. */
-export function snippetOverlapsFetchedText(fetched: string, snippet: string): boolean {
-    const normalizedFetched = fetched.toLowerCase();
-    const normalizedSnippet = snippet.toLowerCase().trim();
-    if (normalizedSnippet.length < 24) return true;
-    const probe = normalizedSnippet.slice(0, Math.min(80, normalizedSnippet.length));
-    return normalizedFetched.includes(probe);
-}
+export { snippetOverlapsFetchedText } from './snippet-verify';
 
 export async function enrichReferenceFromFetch(
     reference: SourceReference,
@@ -25,6 +23,25 @@ export async function enrichReferenceFromFetch(
     if (!isUrlAllowed(reference.url, allowedUrls, settings.extraAllowedDomains)) {
         return { ...reference, snippetVerified: false };
     }
+
+    if (isWikipediaArticleUrl(reference.url)) {
+        try {
+            const extract = await fetchWikipediaExtractForUrl(reference.url, settings.maxSnippetChars);
+            if (!extract) {
+                return { ...reference, snippetVerified: false, fetchedAt: Date.now() };
+            }
+            const verified = snippetOverlapsFetchedText(extract, reference.snippet || extract.slice(0, 120));
+            return {
+                ...reference,
+                snippet: extract.slice(0, 400),
+                snippetVerified: verified || extract.length > 0,
+                fetchedAt: Date.now(),
+            };
+        } catch {
+            return { ...reference, snippetVerified: false, fetchedAt: Date.now() };
+        }
+    }
+
     try {
         const response = await fetch(reference.url, { credentials: 'omit' });
         if (!response.ok) {
