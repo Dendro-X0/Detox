@@ -13,11 +13,19 @@ type ManifestWebAccessibleMv3 = readonly {
     readonly matches: readonly string[];
 }[];
 
+type ManifestCsp = string | { readonly extension_pages?: string; readonly [key: string]: unknown };
+
 type ManifestJson = {
-    readonly web_accessible_resources?: ManifestWebAccessibleMv3 | readonly string[];
-    readonly host_permissions?: readonly string[];
-    readonly [key: string]: unknown;
+    permissions?: string[];
+    web_accessible_resources?: ManifestWebAccessibleMv3 | string[];
+    host_permissions?: string[];
+    content_security_policy?: ManifestCsp;
+    [key: string]: unknown;
 };
+
+function isModelPackHostPermission(permission: string): boolean {
+    return permission.includes('huggingface') || permission.includes('hf.co');
+}
 
 function stripModelPackResources(
     webAccessible: ManifestJson['web_accessible_resources']
@@ -26,25 +34,67 @@ function stripModelPackResources(
 
     const first = webAccessible[0];
     if (typeof first === 'string') {
-        return (webAccessible as readonly string[]).filter((resource) => !resource.includes('model-packs'));
+        return (webAccessible as readonly string[]).filter(
+            (resource) => !resource.includes('model-packs') && !resource.includes('ort')
+        );
     }
 
     return (webAccessible as ManifestWebAccessibleMv3).map((entry) => ({
         ...entry,
-        resources: entry.resources.filter((resource) => !resource.includes('model-packs')),
+        resources: entry.resources.filter(
+            (resource) => !resource.includes('model-packs') && !resource.includes('ort')
+        ),
     }));
 }
 
-export function applyModProfileToManifest(manifest: ManifestJson, profile: ModBuildProfile): ManifestJson {
+function stripModelHostsFromCsp(csp: string): string {
+    return csp
+        .replace(/\s*https:\/\/\*\.huggingface\.co/g, '')
+        .replace(/\s*https:\/\/huggingface\.co/g, '')
+        .replace(/\s*https:\/\/\*\.hf\.co/g, '')
+        .replace(/\s*https:\/\/hf\.co/g, '')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+}
+
+function stripModelHostsFromManifestCsp(csp: ManifestCsp): ManifestCsp {
+    if (typeof csp === 'string') {
+        return stripModelHostsFromCsp(csp);
+    }
+    if (typeof csp.extension_pages === 'string') {
+        return {
+            ...csp,
+            extension_pages: stripModelHostsFromCsp(csp.extension_pages),
+        };
+    }
+    return csp;
+}
+
+export function applyModProfileToManifest<T extends ManifestJson>(manifest: T, profile: ModBuildProfile): T {
     if (profile === 'full') return manifest;
 
-    return {
+    const next: ManifestJson = {
         ...manifest,
-        host_permissions: (manifest.host_permissions ?? []).filter(
-            (permission) => !permission.includes('huggingface') && !permission.includes('hf.co')
-        ),
         web_accessible_resources: stripModelPackResources(manifest.web_accessible_resources),
     };
+
+    if (Array.isArray(manifest.permissions)) {
+        next.permissions = manifest.permissions.filter(
+            (permission) => typeof permission === 'string' && !isModelPackHostPermission(permission)
+        );
+    }
+
+    if (manifest.host_permissions !== undefined) {
+        next.host_permissions = manifest.host_permissions.filter(
+            (permission) => !isModelPackHostPermission(permission)
+        );
+    }
+
+    if (manifest.content_security_policy !== undefined) {
+        next.content_security_policy = stripModelHostsFromManifestCsp(manifest.content_security_policy);
+    }
+
+    return next as T;
 }
 
 export function modProfilePlugin(profile: ModBuildProfile, outDir: string): Plugin {

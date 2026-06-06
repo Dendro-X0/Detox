@@ -1,41 +1,37 @@
 /// <reference types="chrome" />
 
-import type { ContentBlock } from '../../site-adapters/adapter-interface';
+import type { ContentUnit } from '../scanner/content-unit';
+import { applyUnitEnforcement } from '../enforcement/apply-unit-enforcement';
+import { ENFORCEMENT_DATASET } from '../enforcement/element-state';
 import type { CoreIpcMessage } from '../ipc/messages';
 import type { FilteredItemRecord } from '../types/block';
 import { isDomainAllowlisted } from '../rules/user-rules-store';
 import { getThresholdForHost } from '../policy/policy-store';
-import { fnv1a32, shouldClassifyText } from './text-gate';
+import { sessionGet, sessionSet } from '../storage/extension-session';
+import { recordBlocksDiscovered, recordBlocksScanned } from '../storage/scan-stats-store';
+import { shouldClassifyText } from './text-gate';
 import type { Verdict } from '../types/verdict';
 import { verdictFromClassifyResult } from '../types/verdict';
+import { DEFAULT_LABEL_ID, HEURISTIC_DETECTOR_ID } from '../../mods/detectors/constants';
+import { ProgressiveScanPump } from './progressive-scan-pump';
+import { ScanWorkRegistry, type ScanWorkItem } from './scan-work-registry';
 
-const BATCH_SIZE = 32;
-const BATCH_INTERVAL_MS = 150;
-const VISIBLE_BATCH_RATIO = 0.7;
+const CLASSIFY_CHUNK_SIZE = 32;
 const MAX_STORED_FILTERED = 50;
 const PREVIEW_MAX_LENGTH = 60;
+const VISIBLE_PRIORITY = 2;
 
-type BatchItem = {
-    readonly id: string;
-    readonly text: string;
-    readonly hash: string;
-    readonly block: ContentBlock;
-    readonly isVisible: boolean;
-};
+function currentPageKey(): string {
+    return `${location.origin}${location.pathname}${location.search}`;
+}
 
-type StatsStorageRecord = {
-    readonly stats?: {
-        scanned: number;
-        toxic: number;
-    };
-};
+function isUnitVisible(unit: ContentUnit): boolean {
+    const rect = unit.element.getBoundingClientRect();
+    return rect.top < window.innerHeight + 120 && rect.bottom > -120;
+}
 
 export type ClassificationPipelineDeps = {
     readonly isEnabled: () => boolean;
-    readonly getAdapter: () => {
-        applyEnforcement: (blockId: string, verdict: Verdict) => unknown;
-        revealBlock: (blockId: string) => void;
-    } | null;
     readonly onClassificationRecorded?: () => void;
     readonly onBatchProcessed?: (durationMs: number) => void;
     readonly onQueueDepth?: (depth: number) => void;
@@ -49,15 +45,19 @@ export type ClassificationPipelineDeps = {
 export class ClassificationPipeline {
     private readonly deps: ClassificationPipelineDeps;
     private readonly verdictCache = new Map<string, Verdict>();
-    private pendingBatches: BatchItem[][] = [];
-    private readonly visibleQueue: BatchItem[] = [];
-    private readonly hiddenQueue: BatchItem[] = [];
-    private batchTimeoutId: number | null = null;
+    private readonly registry = new ScanWorkRegistry();
+    private readonly pump: ProgressiveScanPump;
+    private readonly scannedUnitIds = new Set<string>();
     private intersectionObserver: IntersectionObserver | null = null;
     private batchSequence = 0;
 
     constructor(deps: ClassificationPipelineDeps) {
         this.deps = deps;
+        this.pump = new ProgressiveScanPump({
+            runSlice: (maxItems, budgetMs) => this.runScanSlice(maxItems, budgetMs),
+            hasBacklog: () => this.registry.pendingCount() > 0,
+            onSliceComplete: () => this.emitQueueDepth(),
+        });
     }
 
     clearCache(): void {
@@ -65,113 +65,125 @@ export class ClassificationPipeline {
     }
 
     clearQueues(): void {
-        this.pendingBatches = [];
-        this.visibleQueue.length = 0;
-        this.hiddenQueue.length = 0;
-        if (this.batchTimeoutId !== null) {
-            window.clearTimeout(this.batchTimeoutId);
-            this.batchTimeoutId = null;
+        this.registry.clear();
+        this.scannedUnitIds.clear();
+        this.pump.reset();
+        if (this.intersectionObserver) {
+            this.intersectionObserver.disconnect();
+            this.intersectionObserver = null;
         }
     }
 
-    handleBlocksAdded(blocks: readonly ContentBlock[]): void {
-        if (!this.deps.isEnabled() || blocks.length === 0) return;
+    kickProgressiveScan(immediate = false): void {
+        if (this.registry.pendingCount() > 0) {
+            this.pump.kick(immediate);
+        }
+    }
+
+    getScanProgress(): { readonly pending: number; readonly done: number; readonly total: number } {
+        return {
+            pending: this.registry.pendingCount(),
+            done: this.registry.doneCount(),
+            total: this.registry.totalCount(),
+        };
+    }
+
+    handleUnitsAdded(units: readonly ContentUnit[]): void {
+        if (!this.deps.isEnabled() || units.length === 0) return;
         if (isDomainAllowlisted(location.hostname)) return;
 
-        const items: BatchItem[] = blocks.map((block) => {
-            const rect = block.element.getBoundingClientRect();
-            const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-            this.observeBlockElement(block);
-            return {
-                id: block.id,
-                text: block.text,
-                hash: fnv1a32(block.text),
-                block,
-                isVisible,
-            };
-        });
-
-        for (const item of items) {
-            if (item.isVisible) {
-                this.visibleQueue.push(item);
-            } else {
-                this.hiddenQueue.push(item);
-            }
+        const added = this.registry.addUnits(units, isUnitVisible);
+        if (added > 0) {
+            void recordBlocksDiscovered(added, currentPageKey());
         }
 
-        this.scheduleBatchProcessing();
+        for (const unit of units) {
+            this.observeUnitElement(unit);
+        }
+
+        this.emitQueueDepth();
+        this.pump.kick(true);
     }
 
-    handleBlocksRemoved(blockIds: readonly string[]): void {
-        for (const id of blockIds) {
-            const block = [...this.visibleQueue, ...this.hiddenQueue].find((i) => i.id === id)?.block;
-            if (block) this.unobserveBlockElement(block);
-        }
+    handleUnitsRemoved(unitIds: readonly string[]): void {
+        if (unitIds.length === 0) return;
+        this.registry.remove(unitIds);
+        this.emitQueueDepth();
+    }
 
-        for (let i = this.visibleQueue.length - 1; i >= 0; i -= 1) {
-            if (blockIds.includes(this.visibleQueue[i].id)) {
-                this.visibleQueue.splice(i, 1);
-            }
+    handleUnitsUpdated(units: readonly ContentUnit[]): void {
+        if (units.length === 0) return;
+        for (const unit of units) {
+            this.registry.updateUnitReference(unit);
+            this.observeUnitElement(unit);
         }
-        for (let i = this.hiddenQueue.length - 1; i >= 0; i -= 1) {
-            if (blockIds.includes(this.hiddenQueue[i].id)) {
-                this.hiddenQueue.splice(i, 1);
-            }
-        }
-
-        for (const batch of this.pendingBatches) {
-            for (let i = batch.length - 1; i >= 0; i -= 1) {
-                if (blockIds.includes(batch[i].id)) {
-                    batch.splice(i, 1);
-                }
-            }
-        }
-        this.pendingBatches = this.pendingBatches.filter((b) => b.length > 0);
     }
 
     getQueueDepth(): number {
-        return this.visibleQueue.length + this.hiddenQueue.length + this.pendingBatches.flat().length;
+        return this.registry.pendingCount();
+    }
+
+    private emitQueueDepth(): void {
+        this.deps.onQueueDepth?.(this.registry.pendingCount());
     }
 
     private initIntersectionObserver(): void {
         if (this.intersectionObserver) return;
 
         this.intersectionObserver = new IntersectionObserver((entries) => {
+            let visibilityChanged = false;
             for (const entry of entries) {
                 const element = entry.target as HTMLElement;
-                const id = element.dataset.detoxId;
+                const id = element.dataset[ENFORCEMENT_DATASET.blockId];
                 if (!id) continue;
-                this.updateItemVisibility(id, entry.isIntersecting);
+                this.registry.updateVisibility(id, entry.isIntersecting);
+                visibilityChanged = true;
+            }
+            if (visibilityChanged && this.registry.pendingCount() > 0) {
+                this.pump.kick();
             }
         }, {
             root: null,
-            rootMargin: '100px',
-            threshold: 0.1,
+            rootMargin: '200px',
+            threshold: 0,
         });
     }
 
-    private updateItemVisibility(id: string, isVisible: boolean): void {
-        const inVisibleIdx = this.visibleQueue.findIndex((i) => i.id === id);
-        const inHiddenIdx = this.hiddenQueue.findIndex((i) => i.id === id);
-
-        if (isVisible) {
-            if (inHiddenIdx >= 0) {
-                const item = this.hiddenQueue.splice(inHiddenIdx, 1)[0];
-                if (item) this.visibleQueue.push(item);
-            }
-        } else if (inVisibleIdx >= 0) {
-            const item = this.visibleQueue.splice(inVisibleIdx, 1)[0];
-            if (item) this.hiddenQueue.push(item);
+    private observeUnitElement(unit: ContentUnit): void {
+        const target = unit.element;
+        if (!target.dataset[ENFORCEMENT_DATASET.blockId]) {
+            target.dataset[ENFORCEMENT_DATASET.blockId] = unit.id;
         }
-    }
-
-    private observeBlockElement(block: ContentBlock): void {
         if (!this.intersectionObserver) this.initIntersectionObserver();
-        this.intersectionObserver?.observe(block.element);
+        this.intersectionObserver?.observe(target);
     }
 
-    private unobserveBlockElement(block: ContentBlock): void {
-        this.intersectionObserver?.unobserve(block.element);
+    private async runScanSlice(maxItems: number, budgetMs: number): Promise<number> {
+        const started = performance.now();
+        let processed = 0;
+
+        while (
+            processed < maxItems &&
+            performance.now() - started < budgetMs &&
+            this.registry.pendingCount() > 0
+        ) {
+            const chunkSize = Math.min(CLASSIFY_CHUNK_SIZE, maxItems - processed);
+            const batch = this.registry.takeBatch(chunkSize);
+            if (batch.length === 0) break;
+
+            const ids = batch.map((item) => item.id);
+            try {
+                await this.processBatchItems(batch);
+                this.registry.markDone(ids);
+                processed += batch.length;
+            } catch (error) {
+                console.warn('[Core] scan slice failed', error);
+                this.registry.releaseProcessing(ids);
+                break;
+            }
+        }
+
+        return processed;
     }
 
     private sanitizePreview(text: string): string {
@@ -180,7 +192,7 @@ export class ClassificationPipeline {
         return cleaned.slice(0, PREVIEW_MAX_LENGTH) + '...';
     }
 
-    private recordFilteredItem(id: string, verdict: Verdict, content: string): void {
+    private async recordFilteredItem(id: string, verdict: Verdict, content: string): Promise<void> {
         const item: FilteredItemRecord = {
             id,
             score: verdict.score,
@@ -190,66 +202,59 @@ export class ClassificationPipeline {
             hostname: location.hostname,
             timestamp: Date.now(),
         };
-        chrome.storage.session.get('blockedItems', (res: unknown) => {
-            const record = res as { blockedItems?: readonly FilteredItemRecord[] };
-            const existing = record.blockedItems ?? [];
-            const updated = [item, ...existing].slice(0, MAX_STORED_FILTERED);
-            chrome.storage.session.set({ blockedItems: updated });
-        });
+        const existing = (await sessionGet<readonly FilteredItemRecord[]>('blockedItems')) ?? [];
+        const updated = [item, ...existing].slice(0, MAX_STORED_FILTERED);
+        await sessionSet('blockedItems', updated);
     }
 
-    private updateScannedStats(delta: number): void {
-        if (delta <= 0) return;
-        chrome.storage.local.get('stats', (res: unknown) => {
-            const record = res as StatsStorageRecord;
-            const stats = record.stats ?? { scanned: 0, toxic: 0 };
-            chrome.storage.local.set({ stats: { scanned: stats.scanned + delta, toxic: stats.toxic } });
-        });
-    }
-
-    private updateFilteredStats(delta: number): void {
-        if (delta <= 0) return;
-        chrome.storage.local.get('stats', (res: unknown) => {
-            const record = res as StatsStorageRecord;
-            const stats = record.stats ?? { scanned: 0, toxic: 0 };
-            chrome.storage.local.set({ stats: { scanned: stats.scanned, toxic: stats.toxic + delta } });
-        });
-    }
-
-    private async processBatchItems(items: readonly BatchItem[]): Promise<void> {
+    private async processBatchItems(items: readonly ScanWorkItem[]): Promise<void> {
         const batchStartTime = performance.now();
         this.batchSequence += 1;
         const batchId = `${location.hostname}:${this.batchSequence}`;
         this.deps.profiler?.startBatch(batchId);
 
         const sorted = [...items].sort((a, b) => {
-            if (a.isVisible === b.isVisible) return 0;
-            return a.isVisible ? -1 : 1;
+            if (a.priority === b.priority) return 0;
+            return a.priority >= VISIBLE_PRIORITY ? -1 : 1;
         });
 
         if (!this.deps.isEnabled() || sorted.length === 0) return;
 
-        const adapter = this.deps.getAdapter();
         const hashes = sorted.map((item) => ({ id: item.id, text: item.text, hash: item.hash }));
-        const skipped = hashes.filter((h) => !shouldClassifyText(h.text));
         const toClassify = hashes.filter((h) => !this.verdictCache.has(h.hash));
         const cached = hashes.filter((h) => this.verdictCache.has(h.hash));
+
+        let filteredDelta = 0;
 
         for (const c of cached) {
             const verdict = this.verdictCache.get(c.hash);
             if (verdict) {
-                const block = sorted.find((i) => i.id === c.id)?.block;
-                if (block && adapter) {
-                    adapter.applyEnforcement(block.id, verdict);
-                    if (verdict.matched) this.recordFilteredItem(block.id, verdict, block.text);
+                const unit = sorted.find((i) => i.id === c.id)?.unit;
+                if (unit && unit.element.dataset[ENFORCEMENT_DATASET.userRevealed] !== 'true') {
+                    applyUnitEnforcement(unit.id, unit.element, verdict);
+                    if (verdict.matched) {
+                        filteredDelta += 1;
+                        void this.recordFilteredItem(unit.id, verdict, unit.text);
+                    }
                 }
                 this.deps.onClassificationRecorded?.();
             }
         }
-        this.updateScannedStats(cached.length + skipped.length);
 
         const eligibleToClassify = toClassify.filter((h) => shouldClassifyText(h.text) && !this.verdictCache.has(h.hash));
+        const gateSkipped = toClassify.filter((h) => !shouldClassifyText(h.text));
+        for (const gateItem of gateSkipped) {
+            this.verdictCache.set(gateItem.hash, {
+                matched: false,
+                score: 0,
+                labelId: DEFAULT_LABEL_ID,
+                detectorId: HEURISTIC_DETECTOR_ID,
+            });
+            this.deps.onClassificationRecorded?.();
+        }
+
         if (eligibleToClassify.length === 0) {
+            await this.recordUniqueScans(sorted, filteredDelta);
             this.deps.profiler?.endBatch(items.length);
             return;
         }
@@ -271,26 +276,23 @@ export class ClassificationPipeline {
                         return;
                     }
                     if (response?.type === 'classifyBatchResult') {
-                        this.updateScannedStats(response.results.length);
-                        let filteredDelta = 0;
                         for (const result of response.results) {
                             const original = eligibleToClassify.find((x) => x.id === result.id);
-                            const originalBlock = sorted.find((i) => i.id === result.id)?.block;
-                            if (!original || !originalBlock) continue;
+                            const originalUnit = sorted.find((i) => i.id === result.id)?.unit;
+                            if (!original || !originalUnit) continue;
 
                             const verdict = verdictFromClassifyResult(result);
                             this.verdictCache.set(original.hash, verdict);
 
                             if (verdict.matched) {
                                 filteredDelta += 1;
-                                if (adapter) {
-                                    adapter.applyEnforcement(originalBlock.id, verdict);
-                                    this.recordFilteredItem(originalBlock.id, verdict, originalBlock.text);
+                                if (originalUnit.element.dataset[ENFORCEMENT_DATASET.userRevealed] !== 'true') {
+                                    applyUnitEnforcement(originalUnit.id, originalUnit.element, verdict);
+                                    void this.recordFilteredItem(originalUnit.id, verdict, originalUnit.text);
                                 }
                             }
                             this.deps.onClassificationRecorded?.();
                         }
-                        this.updateFilteredStats(filteredDelta);
                         this.deps.onBatchProcessed?.(performance.now() - batchStartTime);
                     }
                     this.deps.profiler?.markStage('postProcessingMs');
@@ -298,55 +300,18 @@ export class ClassificationPipeline {
                 });
             });
         } finally {
+            await this.recordUniqueScans(sorted, filteredDelta);
             this.deps.profiler?.endBatch(items.length);
         }
     }
 
-    private scheduleBatchProcessing(): void {
-        if (this.batchTimeoutId !== null) return;
-
-        this.deps.onQueueDepth?.(this.getQueueDepth());
-
-        this.batchTimeoutId = window.setTimeout(async () => {
-            this.batchTimeoutId = null;
-
-            const currentBatch: BatchItem[] = [];
-            const visibleTarget = Math.ceil(BATCH_SIZE * VISIBLE_BATCH_RATIO);
-
-            while (currentBatch.length < visibleTarget && this.visibleQueue.length > 0) {
-                const item = this.visibleQueue.shift();
-                if (item) currentBatch.push(item);
-            }
-
-            while (currentBatch.length < BATCH_SIZE && this.hiddenQueue.length > 0) {
-                const item = this.hiddenQueue.shift();
-                if (item) currentBatch.push(item);
-            }
-
-            while (currentBatch.length < BATCH_SIZE && this.pendingBatches.length > 0) {
-                const batch = this.pendingBatches.shift();
-                if (!batch) break;
-                for (const item of batch) {
-                    if (currentBatch.length < BATCH_SIZE) {
-                        if (item.isVisible) {
-                            this.visibleQueue.push(item);
-                        } else {
-                            this.hiddenQueue.push(item);
-                        }
-                    } else {
-                        if (!this.pendingBatches[0]) this.pendingBatches[0] = [];
-                        this.pendingBatches[0].unshift(item);
-                    }
-                }
-            }
-
-            if (currentBatch.length > 0) {
-                await this.processBatchItems(currentBatch);
-            }
-
-            if (this.visibleQueue.length > 0 || this.hiddenQueue.length > 0 || this.pendingBatches.length > 0) {
-                this.scheduleBatchProcessing();
-            }
-        }, BATCH_INTERVAL_MS);
+    private async recordUniqueScans(items: readonly ScanWorkItem[], filteredDelta: number): Promise<void> {
+        let scannedDelta = 0;
+        for (const item of items) {
+            if (this.scannedUnitIds.has(item.id)) continue;
+            this.scannedUnitIds.add(item.id);
+            scannedDelta += 1;
+        }
+        await recordBlocksScanned(scannedDelta, filteredDelta, currentPageKey());
     }
 }

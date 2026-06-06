@@ -11,6 +11,7 @@ node_modules
 dist
 dist-firefox
 dist-ssr
+releases
 *.local
 
 # Playwright
@@ -32,5 +33,7 @@ playwright-report
 public/model-packs/toxicity-multi-xlm-r/*
 !public/model-packs/toxicity-multi-xlm-r/modelpack.json
 
-# ORT WASM binaries are fetched during build
-public/ort/*
+# Production mod signing keys (never commit)
+packages/signing/prod-private.pem
+packages/signing/prod-public.pem
+

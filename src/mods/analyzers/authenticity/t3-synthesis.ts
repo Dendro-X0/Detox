@@ -1,3 +1,4 @@
+import { i18nMessage } from '../../../i18n/localize';
 import type { AuthenticitySettings } from './settings';
 import type { AuthenticityAssessment, Claim, SourceReference } from './types';
 
@@ -17,7 +18,7 @@ export async function synthesizeAssessments(
     allowedReferenceIds: ReadonlySet<string>,
     settings: AuthenticitySettings
 ): Promise<readonly AuthenticityAssessment[]> {
-    if (!settings.llmEndpoint.trim()) {
+    if (!settings.llmEndpoint.trim() || !settings.llmModel.trim()) {
         return buildSearchOnlyAssessments(claims, references);
     }
 
@@ -74,11 +75,11 @@ export async function synthesizeAssessments(
             const refIds = (row?.referenceIds ?? []).filter((id) => allowedReferenceIds.has(id));
             return {
                 claimId: claim.id,
-                summary: row?.summary ?? 'LLM comparison unavailable — review sources manually.',
+                summary: row?.summary ?? i18nMessage('authenticity.assessments.llmUnavailable'),
                 confidence: row?.confidence ?? 'low',
                 epistemicStatus: row?.epistemicStatus ?? 'unknown',
                 referenceIds: refIds,
-                limitations: row?.limitations ?? 'Automated comparison; verify sources yourself.',
+                limitations: row?.limitations ?? i18nMessage('authenticity.assessments.verifyYourself'),
                 advisoryOnly: true as const,
             };
         });
@@ -96,12 +97,12 @@ export function buildSearchOnlyAssessments(
         claimId: claim.id,
         summary:
             refIds.length > 0
-                ? 'Sources found — open links below to verify this claim yourself.'
-                : 'No corroborating sources found in search results.',
+                ? i18nMessage('authenticity.assessments.sourcesFound')
+                : i18nMessage('authenticity.assessments.noSources'),
         confidence: 'low' as const,
         epistemicStatus: refIds.length > 0 ? ('unknown' as const) : ('unsupported' as const),
         referenceIds: refIds,
-        limitations: 'Search-only mode — no automated synthesis.',
+        limitations: i18nMessage('authenticity.assessments.searchOnlyLimitation'),
         advisoryOnly: true as const,
     }));
 }

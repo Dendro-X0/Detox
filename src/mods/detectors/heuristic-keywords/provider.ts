@@ -7,12 +7,13 @@ import {
     HEURISTIC_DETECTOR_ID,
 } from '../constants';
 import { loadUserRules, textMatchesAllowKeywords } from '../../../core/rules/user-rules-store';
+import { scoreFromKeywordWeight } from '../../../core/rules/keyword-score';
+import { weightedKeywordHits } from '../../../core/rules/keyword-match';
 import { getActiveKeywords } from './keywords';
 
 function classifyKeyword(text: string, threshold: number, keywords: readonly string[]): Verdict {
-    const normalized = text.toLowerCase();
-    const matches = keywords.filter((kw) => normalized.includes(kw)).length;
-    if (matches <= 0) {
+    const weight = weightedKeywordHits(text, keywords);
+    if (weight <= 0) {
         return {
             matched: false,
             score: 0,
@@ -20,7 +21,7 @@ function classifyKeyword(text: string, threshold: number, keywords: readonly str
             detectorId: HEURISTIC_DETECTOR_ID,
         };
     }
-    const score = Math.min(1, 0.35 + matches * 0.25);
+    const score = scoreFromKeywordWeight(weight);
     return {
         matched: score >= threshold,
         score,

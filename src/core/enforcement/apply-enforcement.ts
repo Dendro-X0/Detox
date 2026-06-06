@@ -1,7 +1,7 @@
 import type { Verdict } from '../types/verdict';
 import type { EnforcementContext } from '../types/enforcement';
 import { DEFAULT_ENFORCEMENT_CONTEXT } from '../types/enforcement';
-import type { EnforcementResult } from '../../site-adapters/adapter-interface';
+import type { EnforcementResult } from './enforcement-result';
 import {
     getActiveEnforcementAction,
     getEnforcementAction,

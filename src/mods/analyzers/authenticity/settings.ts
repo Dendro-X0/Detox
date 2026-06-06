@@ -3,10 +3,13 @@ export type AuthenticitySearchProvider = 'none' | 'wikipedia' | 'brave' | 'custo
 export type AuthenticitySettings = {
     readonly enabled: boolean;
     readonly tierT0: boolean;
+    readonly tierT1: boolean;
     readonly tierT2: boolean;
     readonly tierT3: boolean;
     /** When true, skip LLM synthesis even if T3 is enabled. */
     readonly searchOnlyDefault: boolean;
+    /** Allow full-page scope in the side panel (discouraged on dense sites). */
+    readonly allowFullPage: boolean;
     readonly maxClaims: number;
     readonly maxSearchResults: number;
     readonly maxSnippetChars: number;
@@ -23,9 +26,11 @@ export type AuthenticitySettings = {
 export const DEFAULT_AUTHENTICITY_SETTINGS: AuthenticitySettings = {
     enabled: false,
     tierT0: true,
+    tierT1: true,
     tierT2: true,
     tierT3: false,
     searchOnlyDefault: true,
+    allowFullPage: true,
     maxClaims: 3,
     maxSearchResults: 5,
     maxSnippetChars: 1200,
@@ -35,7 +40,7 @@ export const DEFAULT_AUTHENTICITY_SETTINGS: AuthenticitySettings = {
     customSearchUrl: '',
     llmEndpoint: '',
     llmApiKey: '',
-    llmModel: 'gpt-4o-mini',
+    llmModel: '',
     extraAllowedDomains: [],
 };
 

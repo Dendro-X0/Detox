@@ -1,8 +1,17 @@
 import type { CoreIpcMessage } from './core/ipc/messages';
 import {
+    OFFSCREEN_PORT_NAME,
+    OFFSCREEN_REQUEST_ID_PREFIX,
+} from './core/runtime/constants';
+import {
     installAuthenticityContextMenu,
     registerAuthenticityBackgroundHandlers,
 } from './background-authenticity';
+import { installRoutingLoader } from './core/runtime/routing-settings';
+import {
+    ensureInlineRuntimeHost,
+    needsOffscreenRuntime,
+} from './core/runtime/runtime-host-bootstrap';
 
 type ClassifyMessage = {
     readonly type: 'classify';
@@ -24,11 +33,6 @@ type ErrorResponse = {
 
 type ClassifyResponse = ResultResponse | ErrorResponse;
 
-type ClassifyBatchItem = {
-    readonly id: string;
-    readonly text: string;
-};
-
 type OffscreenRequest = {
     readonly requestId: string;
     readonly payload: CoreIpcMessage;
@@ -39,9 +43,7 @@ type OffscreenResponse = {
     readonly payload: CoreIpcMessage;
 };
 
-const OFFSCREEN_PORT_NAME: string = 'detox-offscreen';
 const OFFSCREEN_PAGE: string = 'offscreen.html';
-const REQUEST_ID_PREFIX: string = 'detox-req-';
 const REQUEST_ID_RANDOM_BASE: number = 36;
 
 let offscreenPort: chrome.runtime.Port | null = null;
@@ -49,7 +51,7 @@ let pendingOffscreenRequests = new Map<string, (message: CoreIpcMessage) => void
 
 function createRequestId(): string {
     const uuid = typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(REQUEST_ID_RANDOM_BASE).slice(2);
-    return `${REQUEST_ID_PREFIX}${uuid}`;
+    return `${OFFSCREEN_REQUEST_ID_PREFIX}${uuid}`;
 }
 
 function isOffscreenResponse(value: unknown): value is OffscreenResponse {
@@ -114,6 +116,7 @@ function isRuntimeStatusMessage(message: CoreIpcMessage): message is Extract<Cor
 
 console.log('SignalLens: Background Service Worker Loaded');
 
+installRoutingLoader();
 installAuthenticityContextMenu();
 registerAuthenticityBackgroundHandlers();
 
@@ -137,8 +140,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
     if (!isCoreIpcMessage(message)) return false;
     if (isClassifyBatchMessage(message)) {
-        console.log('Detox AI: Received classifyBatch', { count: message.items.length });
-        classifyBatch(message.items, sendResponse as (response: CoreIpcMessage) => void);
+        console.log('Detox AI: Received classifyBatch', {
+            count: message.items.length,
+            threshold: message.threshold,
+        });
+        classifyBatch(message, sendResponse as (response: CoreIpcMessage) => void);
         return true;
     }
     if (isRuntimeStatusMessage(message)) {
@@ -148,31 +154,39 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     return false;
 });
 
-function classifyBatch(items: readonly ClassifyBatchItem[], sendResponse: (response: CoreIpcMessage) => void): void {
-    const payload: CoreIpcMessage = { type: 'classifyBatch', items };
-    void requestOffscreen(payload).then((message) => {
-        if (message.type === 'error') {
-            console.warn('Detox AI: Offscreen classification error', message.error);
+function classifyBatch(
+    message: Extract<CoreIpcMessage, { type: 'classifyBatch' }>,
+    sendResponse: (response: CoreIpcMessage) => void
+): void {
+    void dispatchRuntimeMessage(message).then((response) => {
+        if (response.type === 'error') {
+            console.warn('Detox AI: Classification error', response.error);
         }
-        if (message.type === 'classifyBatchResult') {
-            console.log('Detox AI: Sending classifyBatchResult', { count: message.results.length });
+        if (response.type === 'classifyBatchResult') {
+            console.log('Detox AI: Sending classifyBatchResult', { count: response.results.length });
         }
-        sendResponse(message);
+        sendResponse(response);
     }).catch((error: unknown) => {
         const errorString = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
-        console.error('Detox AI: Offscreen classifyBatch failed', error);
+        console.error('Detox AI: classifyBatch failed', error);
         sendResponse({ type: 'error', error: errorString });
     });
 }
 
 function runtimeStatus(sendResponse: (response: CoreIpcMessage) => void): void {
     const payload: CoreIpcMessage = { type: 'runtimeStatus' };
-    void requestOffscreen(payload).then((message) => {
-        sendResponse(message);
-    }).catch((error: unknown) => {
+    void dispatchRuntimeMessage(payload).then(sendResponse).catch((error: unknown) => {
         const errorString = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
         sendResponse({ type: 'error', error: errorString });
     });
+}
+
+async function dispatchRuntimeMessage(payload: CoreIpcMessage): Promise<CoreIpcMessage> {
+    if (await needsOffscreenRuntime()) {
+        return requestOffscreen(payload);
+    }
+    const host = await ensureInlineRuntimeHost();
+    return host.handleMessage(payload);
 }
 
 function classifyText(_message: ClassifyMessage, sendResponse: (response: ClassifyResponse) => void): void {

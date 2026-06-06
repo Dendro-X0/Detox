@@ -9,9 +9,24 @@ export function fnv1a32(text: string): string {
 
 /**
  * Lightweight gate to skip blocks unlikely to benefit from classification.
- * Language-specific packs (mods) may replace or extend this later.
+ * Short blocks with obvious promo/bait phrases still pass through.
  */
+import { hasShortTextSignal } from '../rules/keyword-score';
+
+const MIN_CLASSIFY_LENGTH = 20;
+const MIN_SHORT_SIGNAL_LENGTH = 12;
+const MIN_ASCII_LETTERS = 6;
+
 export function shouldClassifyText(text: string): boolean {
+    const trimmed = text.trim();
+    if (trimmed.length < MIN_SHORT_SIGNAL_LENGTH) return false;
+
+    if (trimmed.length < MIN_CLASSIFY_LENGTH && hasShortTextSignal(trimmed)) {
+        return true;
+    }
+
+    if (trimmed.length < MIN_CLASSIFY_LENGTH) return false;
+
     let asciiLetterCount = 0;
     let nonLatinCount = 0;
     for (let i = 0; i < text.length; i += 1) {
@@ -21,8 +36,7 @@ export function shouldClassifyText(text: string): boolean {
         const isBasicLatin = code <= 0x024f;
         if (!isBasicLatin) nonLatinCount += 1;
     }
-    const minLetters = 12;
-    if (asciiLetterCount < minLetters && nonLatinCount > 0) return false;
+    if (asciiLetterCount < MIN_ASCII_LETTERS && nonLatinCount > 0) return false;
     const nonLatinRatio = text.length > 0 ? nonLatinCount / text.length : 0;
     return nonLatinRatio < 0.15;
 }

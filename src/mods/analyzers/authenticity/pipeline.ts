@@ -4,11 +4,13 @@ import { enrichReferenceFromFetch } from './fetch-snippet';
 import { getCachedReport, setCachedReport } from './report-cache';
 import { getAuthenticitySettings, loadAuthenticitySettings } from './settings-store';
 import { buildSearchQueryForClaim, extractClaimsFromText, runT0Heuristics } from './t0-heuristics';
+import { filterClaimsWithT1 } from './t1-checkworthiness';
 import { hitsToReferences, runSearch } from './t2-search';
 import { buildSearchOnlyAssessments, synthesizeAssessments } from './t3-synthesis';
 import type { AnalysisScope, AuthenticityJobState, AuthenticityReport, SearchQueryRecord, SourceReference } from './types';
 import { filterReferencesToAllowlist } from './url-allowlist';
 import { scopeTextForCache } from './scope-resolver';
+import { i18nMessage } from '../../../i18n/localize';
 
 let cancelRequested = false;
 
@@ -44,7 +46,7 @@ export async function runAuthenticityAnalysis(input: {
             jobId,
             phase: 'complete',
             progress: 100,
-            message: 'Loaded cached report',
+            message: i18nMessage('authenticity.job.cachedReport'),
             report: cached,
             error: null,
         });
@@ -56,16 +58,19 @@ export async function runAuthenticityAnalysis(input: {
         jobId,
         phase: 'extracting',
         progress: 10,
-        message: 'Extracting claims…',
+        message: i18nMessage('authenticity.job.extractingClaims'),
         report: null,
         error: null,
     });
 
-    const claims = settings.tierT0
-        ? extractClaimsFromText(input.scope.text, settings.maxClaims)
-        : extractClaimsFromText(input.scope.text, settings.maxClaims);
+    const rawClaims = extractClaimsFromText(input.scope.text, settings.maxClaims);
+    const t0Notes = settings.tierT0 ? runT0Heuristics(input.scope.text, rawClaims) : [];
 
-    const t0Notes = settings.tierT0 ? runT0Heuristics(input.scope.text, claims) : [];
+    const t1Result = settings.tierT1
+        ? filterClaimsWithT1(rawClaims, settings.maxClaims)
+        : { claims: rawClaims.slice(0, settings.maxClaims), notes: [] as string[] };
+    const claims = t1Result.claims;
+    const t1Notes = t1Result.notes;
 
     if (cancelRequested) throw new Error('cancelled');
 
@@ -78,7 +83,7 @@ export async function runAuthenticityAnalysis(input: {
             jobId,
             phase: 'searching',
             progress: 35,
-            message: 'Searching sources…',
+            message: i18nMessage('authenticity.job.searchingSources'),
             report: null,
             error: null,
         });
@@ -98,12 +103,12 @@ export async function runAuthenticityAnalysis(input: {
 
     let vettedReferences = filterReferencesToAllowlist(references, allowedUrls, settings.extraAllowedDomains);
 
-    if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim()) {
+    if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim() && settings.llmModel.trim()) {
         await updateJob({
             jobId,
             phase: 'fetching',
             progress: 55,
-            message: 'Fetching and verifying snippets…',
+            message: i18nMessage('authenticity.job.fetchingSnippets'),
             report: null,
             error: null,
         });
@@ -119,7 +124,7 @@ export async function runAuthenticityAnalysis(input: {
             jobId,
             phase: 'synthesizing',
             progress: 75,
-            message: 'Comparing claims to sources…',
+            message: i18nMessage('authenticity.job.comparingClaims'),
             report: null,
             error: null,
         });
@@ -138,6 +143,7 @@ export async function runAuthenticityAnalysis(input: {
             references: vettedReferences,
             assessments,
             t0Notes,
+            t1Notes,
             limitations: buildLimitations(input.scope, searchOnly, vettedReferences.length),
             searchOnly: false,
             createdAt: Date.now(),
@@ -160,6 +166,7 @@ export async function runAuthenticityAnalysis(input: {
         references: vettedReferences,
         assessments,
         t0Notes,
+        t1Notes,
         limitations: buildLimitations(input.scope, true, vettedReferences.length),
         searchOnly: true,
         createdAt: Date.now(),
@@ -172,14 +179,18 @@ export async function runAuthenticityAnalysis(input: {
 
 function buildLimitations(scope: AnalysisScope, searchOnly: boolean, sourceCount: number): string {
     const parts = [
-        'Advisory only — not a fact-check verdict.',
-        searchOnly ? 'Search-only mode — no LLM synthesis.' : 'LLM synthesis may be incomplete.',
-        sourceCount === 0 ? 'No sources retrieved — do not infer truth from silence.' : `${sourceCount} source(s) listed.`,
+        i18nMessage('authenticity.limitations.advisory'),
+        searchOnly
+            ? i18nMessage('authenticity.limitations.searchOnly')
+            : i18nMessage('authenticity.limitations.synthesisIncomplete'),
+        sourceCount === 0
+            ? i18nMessage('authenticity.limitations.noSources')
+            : i18nMessage('authenticity.limitations.sourcesListed'),
     ];
     if (scope.kind === 'full_page' && scope.warnDenseSite) {
-        parts.push('Dense site — full-page scope may miss thread context.');
+        parts.push(i18nMessage('authenticity.limitations.denseSite'));
     }
-    return parts.join(' ');
+    return parts.join('|');
 }
 
 async function finalizeReport(report: AuthenticityReport, jobId: string): Promise<void> {
@@ -189,7 +200,7 @@ async function finalizeReport(report: AuthenticityReport, jobId: string): Promis
         jobId,
         phase: 'complete',
         progress: 100,
-        message: 'Report ready',
+        message: i18nMessage('authenticity.job.reportReady'),
         report,
         error: null,
     });

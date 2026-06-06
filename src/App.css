@@ -1,3 +1,49 @@
+/* Popup — single document scroll (no nested container overflow) */
+html.sl-popup,
+html.sl-popup body {
+  margin: 0;
+  padding: 0;
+  display: block;
+  min-height: 0;
+  height: auto;
+  overflow-x: hidden;
+  background-color: #f9fafb;
+  color: #1f2937;
+  font-family: 'Inter', sans-serif;
+}
+
+html.sl-popup body {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #94a3b8 #f3f4f6;
+}
+
+html.sl-popup ::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.sl-popup ::-webkit-scrollbar-track {
+  background: #f3f4f6;
+}
+
+html.sl-popup ::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 999px;
+}
+
+html.sl-popup ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+html.sl-popup .container {
+  width: 300px;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
+  background-color: #f9fafb;
+  color: #1f2937;
+}
+
 .container {
   width: 300px;
   padding: 20px;
@@ -11,6 +57,8 @@
   width: min(1080px, 94vw);
   margin: 0 auto;
   text-align: left;
+  max-height: none;
+  overflow: visible;
 }
 
 /* Legacy wizard classes — superseded by DashboardShell + dashboard.css */
@@ -255,6 +303,20 @@ input:checked + .slider:before {
   font-weight: 500;
 }
 
+.browsing-mode-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: center;
+}
+
+.browsing-mode-buttons .preset-btn {
+  flex: 1 1 30%;
+  min-width: 4.5rem;
+  padding: 0.45rem 0.35rem;
+  font-size: 0.75rem;
+}
+
 .threshold-display {
   text-align: center;
   padding-top: 8px;
@@ -286,10 +348,146 @@ input:checked + .slider:before {
 }
 
 .stat-row .value {
-  color: #111827;
-  font-weight: 500;
   font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
 }
+
+.diagnostics-details {
+  text-align: left;
+  margin-bottom: 16px;
+}
+
+.diagnostics-details summary {
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  list-style: none;
+  user-select: none;
+}
+
+.diagnostics-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.diagnostics-details summary::before {
+  content: '▸ ';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.diagnostics-details[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.diagnostics-panel {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.diagnostics-status {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.diagnostics-status.is-scanning {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.diagnostics-status.is-plateau {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.diagnostics-status.is-idle {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.diagnostics-status.is-disabled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.diagnostics-unavailable {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin: 0;
+  text-align: center;
+}
+
+.sl-popup-page-status {
+  text-align: center;
+}
+
+.sl-popup-page-status-heading {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.sl-popup-page-status-message {
+  margin: 0 0 0.65rem;
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.sl-popup-page-status--whitelisted .sl-popup-page-status-message,
+.sl-popup-page-status--filtered .sl-popup-page-status-message {
+  color: #0f766e;
+}
+
+.sl-popup-page-status--focusOff .sl-popup-page-status-message,
+.sl-popup-page-status--unsupported .sl-popup-page-status-message {
+  color: #6b7280;
+}
+
+.sl-popup-page-stats {
+  margin-bottom: 0.5rem;
+}
+
+.sl-popup-page-status-hint {
+  font-size: 0.7rem;
+  margin: 0 0 0.5rem;
+}
+
+.sl-popup-pause-site {
+  width: 100%;
+  margin-top: 0.35rem;
+  text-align: center;
+}
+
+.sl-popup-manage-whitelist {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #0d9488;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.sl-popup-manage-whitelist:hover {
+  color: #0f766e;
+}
+
+.sl-popup-pause-notice {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: #059669;
+}
+
 
 .threshold-display .label {
   font-size: 0.875rem;

@@ -27,14 +27,10 @@ import {
     setModEnabled,
     subscribeToEnabledModChanges,
 } from '../core/mods/mod-enablement-store';
-import { loadBuiltinMods } from '../mods/load-builtin-mods';
+import { getLocalizedModFields } from '../i18n/mod-catalog';
+import { useLocale } from '../i18n/LocaleContext';
 
-const KIND_ORDER: readonly ModKind[] = ['adapter', 'detector', 'action'];
-const KIND_LABELS: Readonly<Record<ModKind, string>> = {
-    adapter: 'Site adapters',
-    detector: 'Detectors',
-    action: 'Filter styles',
-};
+const PLUGIN_SECTION_KINDS: readonly ModKind[] = ['hint', 'detector', 'action'];
 
 type ModRowProps = {
     readonly mod: ModDescriptor;
@@ -44,75 +40,92 @@ type ModRowProps = {
     readonly installed: boolean;
     readonly onToggle: (modId: string, next: boolean) => void;
     readonly onUninstall: (modId: string) => void;
+    readonly bundledBadge: string;
+    readonly installedBadge: string;
+    readonly alwaysOnBadge: string;
+    readonly notInProfileNote: string;
+    readonly uninstallLabel: string;
 };
 
-function ModRow({ mod, enabled, unlocked, bundled, installed, onToggle, onUninstall }: ModRowProps) {
-    const locked = isRequiredMod(mod.id) || !unlocked;
+function ModRow({
+    mod,
+    enabled,
+    unlocked,
+    bundled,
+    installed,
+    onToggle,
+    onUninstall,
+    bundledBadge,
+    installedBadge,
+    alwaysOnBadge,
+    notInProfileNote,
+    uninstallLabel,
+    t,
+}: ModRowProps & { readonly t: (key: string, v?: Record<string, string | number>) => string }) {
+    const required = isRequiredMod(mod.id);
+    const locked = required || !unlocked;
+    const localized = getLocalizedModFields(mod, t);
 
     return (
-        <div
-            className={`pack-option installable ${enabled ? 'selected' : ''}`}
-            style={{ flexDirection: 'column', alignItems: 'stretch', gap: '0.35rem' }}
-        >
-            <div className="stat-row" style={{ alignItems: 'flex-start' }}>
-                <div style={{ flex: 1 }}>
-                    <span className="pack-name">{mod.name}</span>
-                    <span className="pack-langs" style={{ marginLeft: '0.5rem' }}>{mod.kind}</span>
-                    {bundled && <span className="badge" style={{ marginLeft: '0.35rem' }}>bundled</span>}
-                    {installed && !bundled && (
-                        <span className="badge" style={{ marginLeft: '0.35rem' }}>installed</span>
-                    )}
+        <div className={`sl-mod-card${enabled ? ' is-enabled' : ''}`}>
+            <div className="sl-mod-card-header">
+                <span className="pack-name">{localized.name}</span>
+                <div className="sl-mod-badges">
+                    {bundled ? <span className="sl-status-badge sl-status-badge--bundled">{bundledBadge}</span> : null}
+                    {installed && !bundled ? (
+                        <span className="sl-status-badge sl-status-badge--installed">{installedBadge}</span>
+                    ) : null}
+                    {required && unlocked ? (
+                        <span className="sl-status-badge sl-status-badge--required">{alwaysOnBadge}</span>
+                    ) : null}
                 </div>
-                <label
-                    className="switch"
-                    style={{ flexShrink: 0, marginBottom: 0, transform: 'scale(0.75)', transformOrigin: 'right center' }}
-                >
-                    <input
-                        type="checkbox"
-                        checked={enabled}
-                        disabled={locked}
-                        onChange={(e) => onToggle(mod.id, e.target.checked)}
-                    />
-                    <span className="slider" />
-                </label>
+                {!required ? (
+                    <label className="switch sl-mod-toggle">
+                        <input
+                            type="checkbox"
+                            checked={enabled}
+                            disabled={locked}
+                            onChange={(e) => onToggle(mod.id, e.target.checked)}
+                        />
+                        <span className="slider" />
+                    </label>
+                ) : null}
             </div>
-            <p className="muted" style={{ margin: 0, fontSize: '0.8rem' }}>{mod.description}</p>
-            <div className="stat-row" style={{ fontSize: '0.75rem' }}>
-                <span className="label">{mod.permissionsSummary}</span>
-                <span className="value">{mod.sizeLabel}</span>
+            <p className="sl-mod-description">{localized.description}</p>
+            <div className="sl-mod-meta">
+                <span>{localized.permissionsSummary}</span>
+                <span className="sl-mod-meta-sep">·</span>
+                <span>{localized.sizeLabel}</span>
             </div>
-            {!unlocked && (
-                <span className="muted" style={{ fontSize: '0.75rem' }}>
-                    Install a signed package to unlock (core build) or use `pnpm build:full`.
-                </span>
-            )}
-            {locked && unlocked && (
-                <span className="muted" style={{ fontSize: '0.75rem' }}>Required for baseline filtering</span>
-            )}
-            {installed && !bundled && (
-                <button className="debug-toggle" onClick={() => onUninstall(mod.id)} style={{ alignSelf: 'flex-start' }}>
-                    Uninstall package
+            {!unlocked ? <p className="sl-mod-footnote">{notInProfileNote}</p> : null}
+            {installed && !bundled ? (
+                <button className="sl-btn-text" type="button" onClick={() => onUninstall(mod.id)}>
+                    {uninstallLabel}
                 </button>
-            )}
+            ) : null}
         </div>
     );
 }
 
-function formatProgress(progress: ModInstallProgress | null): string {
+function formatProgress(progress: ModInstallProgress | null, t: (key: string, v?: Record<string, string | number>) => string): string {
     if (!progress) return '';
-    if (progress.phase === 'verify') return 'Verifying signature…';
+    if (progress.phase === 'verify') return t('plugins.progress.verify');
     if (progress.phase === 'download') {
         const pct =
             progress.bytesTotal > 0
                 ? Math.round((progress.bytesLoaded / progress.bytesTotal) * 100)
                 : 0;
-        return `Downloading ${progress.filePath ?? 'assets'}… ${pct}%`;
+        return t('plugins.progress.download', {
+            file: progress.filePath ?? t('plugins.progress.downloadDefaultFile'),
+            percent: pct,
+        });
     }
-    if (progress.phase === 'complete') return 'Install complete.';
-    return progress.message ?? 'Install failed.';
+    if (progress.phase === 'complete') return t('plugins.progress.complete');
+    return progress.message ?? t('plugins.progress.failed');
 }
 
 export default function PluginLibraryPanel() {
+    const { t } = useLocale();
     const profile = getBuildProfile();
     const [enabledIds, setEnabledIds] = useState<readonly string[]>([]);
     const [installedIds, setInstalledIds] = useState<readonly string[]>([]);
@@ -131,7 +144,22 @@ export default function PluginLibraryPanel() {
     }, [refresh]);
 
     const onToggle = (modId: string, next: boolean): void => {
-        void setModEnabled(modId, next);
+        if (!isModUnlocked(modId, profile)) {
+            setInstallError(next ? t('plugins.errors.notInCoreBuild') : null);
+            return;
+        }
+        void setModEnabled(modId, next).then(() => refresh());
+    };
+
+    const enableMods = (mods: readonly ModDescriptor[]): void => {
+        void (async () => {
+            for (const mod of mods) {
+                if (isModUnlocked(mod.id, profile) && !isRequiredMod(mod.id)) {
+                    await setModEnabled(mod.id, true);
+                }
+            }
+            refresh();
+        })();
     };
 
     const finishInstall = async (result: InstallModResult): Promise<void> => {
@@ -141,7 +169,6 @@ export default function PluginLibraryPanel() {
             return;
         }
         setInstallError(null);
-        await loadBuiltinMods();
         await setModEnabled(result.modId, true);
         refresh();
         setInstallProgress(null);
@@ -160,7 +187,7 @@ export default function PluginLibraryPanel() {
                 const result = await installModPackageFromJson(raw, setInstallProgress);
                 await finishInstall(result);
             } catch {
-                setInstallError('Invalid package file.');
+                setInstallError(t('plugins.errors.invalidPackage'));
                 setInstallProgress(null);
             }
         };
@@ -168,18 +195,27 @@ export default function PluginLibraryPanel() {
     };
 
     const installFromUrl = (): void => {
-        const url = window.prompt('Mod package manifest URL (.signallens-mod.json):');
+        const url = window.prompt(t('plugins.errors.urlPrompt'));
         if (!url?.trim()) return;
         setInstallError(null);
         void (async () => {
             try {
-                const response = await fetch(url.trim());
+                const controller = new AbortController();
+                const timeoutId = window.setTimeout(() => controller.abort(), 30_000);
+                const response = await fetch(url.trim(), { signal: controller.signal });
+                window.clearTimeout(timeoutId);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 const raw = (await response.json()) as unknown;
                 const result = await installModPackageFromJson(raw, setInstallProgress);
                 await finishInstall(result);
             } catch (error) {
-                setInstallError(error instanceof Error ? error.message : 'Download failed');
+                const message =
+                    error instanceof Error && error.name === 'AbortError'
+                        ? t('plugins.errors.downloadTimeout')
+                        : error instanceof Error
+                          ? error.message
+                          : t('plugins.errors.downloadFailed');
+                setInstallError(message);
                 setInstallProgress(null);
             }
         })();
@@ -189,67 +225,148 @@ export default function PluginLibraryPanel() {
         void (async () => {
             await setModEnabled(modId, false);
             await uninstallModPackage(modId);
-            await loadBuiltinMods();
             refresh();
         })();
     };
 
-    const modsByKind = KIND_ORDER.map((kind) => ({
+    const modsByKind = PLUGIN_SECTION_KINDS.map((kind) => ({
         kind,
+        label: t(`plugins.sections.${kind}`),
+        description: t(`plugins.sectionDescriptions.${kind}`),
         mods: MOD_CATALOG.filter((mod) => mod.kind === kind),
-    }));
+    })).filter((section) => section.mods.length > 0);
+
+    const lockedMods = MOD_CATALOG.filter((mod) => !isModUnlocked(mod.id, profile));
+    const advancedCount = lockedMods.length;
 
     const lockedCount = MOD_CATALOG.filter(
         (mod) => !isModUnlocked(mod.id, profile) && mod.profiles.includes('full')
     ).length;
 
+    const modRowLabels = {
+        bundledBadge: t('plugins.badges.bundled'),
+        installedBadge: t('plugins.badges.installed'),
+        alwaysOnBadge: t('plugins.badges.alwaysOn'),
+        notInProfileNote: t('plugins.notInProfile'),
+        uninstallLabel: t('plugins.uninstallPackage'),
+    };
+
     return (
-        <div className="card policy-card">
-            <h3>Plugin Library</h3>
+        <div className="card policy-card sl-plugins-library">
+            <h3>{t('plugins.heading')}</h3>
             <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-                Enable bundled mods or install signed packages to unlock full-build mods without rebuilding.
-                {!isFullBuild() && lockedCount > 0
-                    ? ` ${lockedCount} mod(s) can be unlocked via signed packages.`
-                    : ''}
+                {t('plugins.description')}
+                {!isFullBuild() && lockedCount > 0 ? t('plugins.unlockCount', { count: lockedCount }) : ''}
             </p>
-            <div className="preset-buttons" style={{ marginBottom: '0.75rem' }}>
-                <button className="preset-btn" onClick={installFromFile}>
-                    Install package…
-                </button>
-                <button className="preset-btn" onClick={installFromUrl}>
-                    Install from URL
-                </button>
-            </div>
-            {installProgress && (
-                <p className="muted" style={{ fontSize: '0.85rem' }}>{formatProgress(installProgress)}</p>
-            )}
-            {installError && (
-                <p className="muted" style={{ fontSize: '0.85rem', color: '#b33' }}>{installError}</p>
-            )}
-            {installedIds.length > 0 && (
-                <p className="muted" style={{ fontSize: '0.8rem' }}>
-                    Installed packages: {getInstalledMods().map((r) => r.name).join(', ')}
+
+            {modsByKind.map(({ kind, label, description, mods }) => {
+                const visibleMods = mods.filter((mod) => isModUnlocked(mod.id, profile));
+                if (visibleMods.length === 0) {
+                    return null;
+                }
+                const enabledInSection = visibleMods.filter((mod) => enabledIds.includes(mod.id)).length;
+                const optionalMods = visibleMods.filter((mod) => !isRequiredMod(mod.id));
+
+                return (
+                    <section key={kind} className="sl-mod-section">
+                        <div className="sl-mod-section-header">
+                            <div>
+                                <h4 className="sl-subsection-title">
+                                    {label}
+                                    <span className="sl-section-count">
+                                        {t('plugins.sectionEnabled', {
+                                            enabled: enabledInSection,
+                                            total: visibleMods.length,
+                                        })}
+                                    </span>
+                                </h4>
+                                <p className="muted sl-section-desc">{description}</p>
+                            </div>
+                            {kind === 'hint' && optionalMods.length > 0 ? (
+                                <button
+                                    type="button"
+                                    className="sl-btn-text"
+                                    onClick={() => enableMods(optionalMods)}
+                                >
+                                    {t('plugins.enableAllHints')}
+                                </button>
+                            ) : null}
+                        </div>
+                        <div className="sl-mod-list">
+                            {visibleMods.map((mod) => (
+                                <ModRow
+                                    key={mod.id}
+                                    mod={mod}
+                                    enabled={enabledIds.includes(mod.id)}
+                                    unlocked={isModUnlocked(mod.id, profile)}
+                                    bundled={isModAvailableInProfile(mod.id, profile)}
+                                    installed={isModInstalled(mod.id) || isModInstalledUnlock(mod.id)}
+                                    onToggle={onToggle}
+                                    onUninstall={onUninstall}
+                                    t={t}
+                                    {...modRowLabels}
+                                />
+                            ))}
+                        </div>
+                    </section>
+                );
+            })}
+
+            <details className="sl-install-details sl-plugins-advanced">
+                <summary>
+                    {advancedCount > 0
+                        ? t('plugins.advancedSectionSummary', { count: advancedCount })
+                        : t('plugins.advancedInstall')}
+                </summary>
+
+                {lockedMods.length > 0 ? (
+                    <section className="sl-mod-section sl-mod-section--advanced">
+                        <h4 className="sl-subsection-title">{t('plugins.advancedLockedHeading')}</h4>
+                        <p className="muted sl-section-desc">{t('plugins.advancedLockedDescription')}</p>
+                        <div className="sl-mod-list">
+                            {lockedMods.map((mod) => (
+                                <ModRow
+                                    key={mod.id}
+                                    mod={mod}
+                                    enabled={enabledIds.includes(mod.id)}
+                                    unlocked={false}
+                                    bundled={isModAvailableInProfile(mod.id, profile)}
+                                    installed={isModInstalled(mod.id) || isModInstalledUnlock(mod.id)}
+                                    onToggle={onToggle}
+                                    onUninstall={onUninstall}
+                                    t={t}
+                                    {...modRowLabels}
+                                />
+                            ))}
+                        </div>
+                    </section>
+                ) : null}
+
+                <p className="muted" style={{ fontSize: '0.85rem', marginTop: lockedMods.length > 0 ? '1rem' : '0.5rem' }}>
+                    {t('plugins.advancedInstallDescription')}
                 </p>
-            )}
-            {modsByKind.map(({ kind, mods }) => (
-                <section key={kind} style={{ marginTop: '1rem' }}>
-                    <h4 style={{ margin: '0 0 0.5rem', fontSize: '0.95rem' }}>{KIND_LABELS[kind]}</h4>
-                    <div className="pack-list">
-                        {mods.map((mod) => (
-                            <ModRow
-                                key={mod.id}
-                                mod={mod}
-                                enabled={enabledIds.includes(mod.id)}
-                                unlocked={isModUnlocked(mod.id, profile)}
-                                bundled={isModAvailableInProfile(mod.id, profile)}
-                                installed={isModInstalled(mod.id) || isModInstalledUnlock(mod.id)}
-                                onToggle={onToggle}
-                                onUninstall={onUninstall}
-                            />
-                        ))}
-                    </div>
-                </section>
-            ))}
+                <div className="preset-buttons" style={{ marginTop: '0.5rem' }}>
+                    <button type="button" className="preset-btn" onClick={installFromFile}>
+                        {t('plugins.installPackage')}
+                    </button>
+                    <button type="button" className="preset-btn" onClick={installFromUrl}>
+                        {t('plugins.installFromUrl')}
+                    </button>
+                </div>
+                {installProgress ? (
+                    <p className="muted" style={{ fontSize: '0.85rem' }}>{formatProgress(installProgress, t)}</p>
+                ) : null}
+                {installError ? (
+                    <p className="sl-form-error">{installError}</p>
+                ) : null}
+                {installedIds.length > 0 ? (
+                    <p className="muted" style={{ fontSize: '0.8rem' }}>
+                        {t('plugins.installedPackages', {
+                            names: getInstalledMods().map((r) => r.name).join(', '),
+                        })}
+                    </p>
+                ) : null}
+            </details>
         </div>
     );
 }

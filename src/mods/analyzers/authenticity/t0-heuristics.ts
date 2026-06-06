@@ -1,3 +1,4 @@
+import { i18nMessage } from '../../../i18n/localize';
 import type { Claim } from './types';
 
 const STATISTIC_PATTERN = /\b\d+(\.\d+)?%|\b\d{1,3}(,\d{3})+\b|\$\d+/;
@@ -6,16 +7,16 @@ const FACTUAL_CUE_PATTERN = /\b(study|report|according to|data shows|official|pe
 export function runT0Heuristics(text: string, claims: readonly Claim[]): readonly string[] {
     const notes: string[] = [];
     if (text.trim().length < 40) {
-        notes.push('Selection is very short — analysis may be limited.');
+        notes.push(i18nMessage('authenticity.notes.selectionShort'));
     }
     if (STATISTIC_PATTERN.test(text)) {
-        notes.push('Contains numbers or statistics — worth checking primary sources.');
+        notes.push(i18nMessage('authenticity.notes.hasStatistics'));
     }
     if (FACTUAL_CUE_PATTERN.test(text) && !/\bhttp/i.test(text)) {
-        notes.push('Makes factual-sounding statements without links in the selection.');
+        notes.push(i18nMessage('authenticity.notes.factualWithoutLinks'));
     }
     if (claims.length === 0) {
-        notes.push('No checkworthy factual claims detected — report may be sparse.');
+        notes.push(i18nMessage('authenticity.notes.noClaims'));
     }
     return notes;
 }

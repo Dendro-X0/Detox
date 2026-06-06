@@ -1,7 +1,23 @@
 # Experimental: Page authenticity & misinformation assist
 
-> **Status:** Idea / exploration — not scheduled for implementation  
-> **Category:** Assistive analysis (distinct from noise filtering)
+> **Status:** Prototype shipped (Phase G) · **v2 shipped** (T1, full-page scope, side panel picker) · **Pre–v3.0.0:** script-first retrieval hardening ([`version-roadmap.md`](../planning/version-roadmap.md) Phase 4)  
+> **Category:** Assistive analysis (distinct from noise filtering)  
+> **Implementation:** `src/mods/analyzers/authenticity/`, `sidepanel.html`, Options → Plugins tab
+
+## Implementation snapshot
+
+| Area | Location |
+|------|----------|
+| Settings + quota | `src/mods/analyzers/authenticity/settings-store.ts`, `AuthenticitySettingsPanel` |
+| Pipeline T0–T3 | `src/mods/analyzers/authenticity/pipeline.ts` |
+| T1 checkworthiness | `src/mods/analyzers/authenticity/t1-checkworthiness.ts` |
+| Page context (scanner) | `src/mods/analyzers/authenticity/page-context.ts`, `src/authenticity/page-extract.ts` |
+| Side panel scope UI | `src/dashboard/AuthenticitySidePanel.tsx`, `src/authenticity/tab-scope.ts` |
+| Context menu + background | `src/background-authenticity.ts` |
+| Side panel UI | `src/authenticity/` |
+| LLM model auto-detect | `src/core/llm/openai-models-adapter.ts`, `LlmModelSelector` |
+
+Dev testing: [`../guides/development.md`](../guides/development.md#testing-authenticity-assist).
 
 ## One-line pitch
 
@@ -24,6 +40,67 @@ Use AI to help a user **evaluate claims on the page they are viewing** — socia
 | **Wrong answer cost** | User reveals block | User may over-trust flags — mitigated by auditable trail |
 
 The core should **not** own truth. Authenticity belongs in an **optional mod** with strict opt-in, clear uncertainty, and no silent auto-hiding based on “misinformation” scores.
+
+---
+
+## Data acquisition: scripts first, models second
+
+**Target for v3.0.0:** gather evidence with **automated scripts and APIs**; use **AI only for analysis and cross-referencing** against a standardized framework. This balances speed, cost, and auditability.
+
+### What we access
+
+| In scope | Out of scope |
+|----------|--------------|
+| Public web pages reachable via search APIs or direct fetch | Private accounts, DMs, closed groups |
+| Structured public feeds (e.g. ClaimReview, Wikipedia API) | Internal databases, non-indexed content |
+| Snippets extracted from URLs returned by retrieval | URLs invented or “remembered” by the model |
+| User’s **selected** on-page text as the claim source | Full social feeds without explicit user action |
+
+The system **rapidly aggregates multiple public data sources** and compares them to the user’s selection. It does **not** claim access to material that is not publicly available on the web.
+
+### Pipeline split (non-negotiable for v3.0.0)
+
+```mermaid
+flowchart LR
+  subgraph gather [Gather — scripts & APIs, no LLM]
+    Q[Search queries]
+    API[Search / feed APIs]
+    Fetch[Fetch + extract snippets]
+    Norm[Normalize, dedup, cache]
+  end
+  subgraph analyze [Analyze — AI tiers]
+    T1[T1 checkworthiness]
+    T3[T3 compare claim vs snippets]
+    Frame[Standard epistemic framework]
+  end
+  Sel[User selection] --> Q
+  Q --> API --> Fetch --> Norm
+  Norm --> T3
+  Sel --> T1
+  T3 --> Frame
+```
+
+| Stage | Engine | Token cost | Responsibility |
+|-------|--------|------------|----------------|
+| **Query planning** | Rules or small model | Low | Turn selection into search queries (no URLs in output) |
+| **Retrieval** | Search API scripts | API quota only | Return real result URLs and titles |
+| **Fetch & extract** | HTTP fetch + DOM/readability scripts | None | Pull public page text; strip boilerplate |
+| **Snippet verify** | String match / overlap scripts | None | Confirm excerpts exist in fetched body |
+| **Claim typing** | T0 heuristics / T1 local model | Low–medium | Factual vs opinion; checkworthy score |
+| **Cross-reference** | T3 LLM | Medium | Compare claim to **verified snippets only**; JSON schema output |
+| **Report** | Template + validated refs | None | Human-auditable trail |
+
+**LLMs never fetch pages, never emit unconstrained URLs, and never substitute for retrieval.** If scripts find nothing, the report states that honestly.
+
+### Standardized analysis framework
+
+All T3 output maps to a fixed epistemic schema (not free-form verdicts):
+
+- `unsupported` · `disputed` · `partially_supported` · `unknown`
+- Per-source `stance`: `supports` · `contradicts` · `neutral` · `unknown`
+- Mandatory `limitations` field (paywall, single source, stale fetch, opinion not checkable)
+
+This keeps reports comparable across sites and model versions.
 
 ---
 
@@ -249,12 +326,12 @@ Design for **minimum viable intelligence per user action** — tiered pipeline, 
 
 | Tier | Engine | Cost | When |
 |------|--------|------|------|
-| **T0** | Local heuristics | Free | Always: “Contains statistic?”, “No links in factual claim?”, word count |
+| **T0** | Local heuristics (scripts) | Free | Always: “Contains statistic?”, “No links in factual claim?”, word count |
 | **T1** | Small local model / ONNX | Low | Optional: claim type classification, “checkworthy?” score |
-| **T2** | Search API only | Medium | User confirms “Search for sources” — no LLM yet |
-| **T3** | LLM synthesis | High | Only after T2 returns snippets; small context window |
+| **T2** | Search + fetch scripts only | Medium | User confirms “Search for sources” — **no LLM**; scripts gather public snippets |
+| **T3** | LLM cross-reference | High | Only after T2 scripts return verified snippets; compares against standard framework |
 
-User sees estimated cost before T2/T3 (“~2 search queries, ~1 API call”).
+**T2 is the gather phase.** T3 never runs without script-produced, snippet-verified evidence. User sees estimated cost before T2/T3 (“~2 search queries, ~1 API call”).
 
 ### 3. Caching
 
@@ -395,4 +472,4 @@ Implement as a **separate mod** (`mods/analyzers/authenticity/` or similar), not
 | **Complexity** | High: extraction, retrieval, synthesis, UX, privacy, hallucination |
 | **Suggested next step** | Spike 0 outside the extension; then Side panel shell (Spike 1) if quality is acceptable |
 
-See also: [`../product-roadmap.md`](../product-roadmap.md) for shipping order (dashboard + wizard before heavy experimental mods).
+See also: [`../planning/product-roadmap.md`](../planning/product-roadmap.md) for shipping order (dashboard + wizard before heavy experimental mods).

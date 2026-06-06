@@ -1,5 +1,7 @@
 import fs from 'node:fs/promises';
 import { test, expect } from './extension-fixtures';
+import { CONTENT_PERF_REQUEST, CONTENT_PERF_RESPONSE } from '../src/core/ipc/content-messages';
+import { E2E_FIXTURE_URL } from './helpers/extension-test-utils';
 
 interface PerformanceMetrics {
     readonly firstClassificationTime: number | null;
@@ -38,20 +40,20 @@ async function queryContentScriptMetrics(): Promise<{
             reject(new Error('Timeout waiting for content script response'));
         }, 5000);
         const listener = (event: MessageEvent) => {
-            if (event.data?.type === 'detoxPerfResponse') {
+            if (event.data?.type === CONTENT_PERF_RESPONSE) {
                 clearTimeout(timeout);
                 window.removeEventListener('message', listener);
                 resolve(event.data.payload as { metrics: PerformanceMetrics; profileSummary: ProfileSummary });
             }
         };
         window.addEventListener('message', listener);
-        window.postMessage({ type: 'detoxGetPerfMetrics' }, '*');
+        window.postMessage({ type: CONTENT_PERF_REQUEST }, '*');
     });
 }
 
 test('perf regression snapshot (synthetic content)', async ({ context }) => {
     const page = await context.newPage();
-    await page.goto('https://example.com', { waitUntil: 'domcontentloaded' });
+    await page.goto(E2E_FIXTURE_URL, { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
         const root = document.createElement('main');
         root.id = 'detox-perf-root';

@@ -10,11 +10,11 @@ async function hashKey(parts: readonly string[]): Promise<string> {
 }
 
 export async function getCachedReport(scopeText: string, url: string): Promise<AuthenticityReport | null> {
-    const key = CACHE_PREFIX + (await hashKey([scopeText, url, 'v1']));
+    const key = CACHE_PREFIX + (await hashKey([scopeText, url, 'v2']));
     return (await sessionGet<AuthenticityReport>(key)) ?? null;
 }
 
 export async function setCachedReport(scopeText: string, url: string, report: AuthenticityReport): Promise<void> {
-    const key = CACHE_PREFIX + (await hashKey([scopeText, url, 'v1']));
+    const key = CACHE_PREFIX + (await hashKey([scopeText, url, 'v2']));
     await sessionSet(key, report);
 }

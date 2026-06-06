@@ -1,40 +1,43 @@
 import type { EnforcementActionId } from '../core/types/enforcement';
 import type { PolicyPreset } from '../core/types/policy';
+import type { BotherCategory } from '../core/types/bother-keywords';
+import type { BrowsingModeId } from '../core/modes/browsing-modes';
+import type { LocaleId } from '../i18n/types';
+import type { SiteWhitelistPresetId } from '../core/rules/site-whitelist-presets';
 
-export type BotherCategory =
-    | 'outrage'
-    | 'spam'
-    | 'hostile'
-    | 'engagement-bait'
-    | 'low-effort';
+export type { BotherCategory } from '../core/types/bother-keywords';
+export { BOTHER_KEYWORD_MAP } from '../core/types/bother-keywords';
 
-export type PreferredSite = 'reddit' | 'youtube' | 'quora' | 'generic';
+export type PreferredSite = 'reddit' | 'youtube';
 
-export type OnboardingDraft = {
+export type PresetModeOnboardingDraft = {
+    readonly setupPath: 'preset-mode';
+    readonly browsingModeId: BrowsingModeId;
+    readonly localeId: LocaleId;
+    readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];
+};
+
+export type CustomOnboardingDraft = {
+    readonly setupPath: 'custom';
+    readonly localeId: LocaleId;
     readonly bothers: readonly BotherCategory[];
     readonly actionId: EnforcementActionId;
-    readonly sites: readonly PreferredSite[];
     readonly preset: PolicyPreset;
+    readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];
 };
+
+export type OnboardingDraft = PresetModeOnboardingDraft | CustomOnboardingDraft;
 
 export type OnboardingStorageRecord = {
     readonly onboardingComplete?: boolean;
+    readonly preferredLocale?: LocaleId;
     readonly userKeywords?: readonly string[];
     readonly preferredSites?: readonly PreferredSite[];
     readonly enabledModIds?: readonly string[];
 };
 
-export const BOTHER_KEYWORD_MAP: Readonly<Record<BotherCategory, readonly string[]>> = {
-    outrage: ['outrage', 'rant', 'furious', 'disgusting'],
-    spam: ['buy now', 'click here', 'sponsored', 'limited offer', 'subscribe now'],
-    hostile: ['kill', 'kys', 'idiot', 'moron', 'stupid'],
-    'engagement-bait': ["you won't believe", 'shocking', 'gone wrong', 'what happens next'],
-    'low-effort': ['lol', 'lmao', 'this.', 'same', 'underrated comment'],
-};
-
+/** @deprecated Site adapters are optional hints; kept for storage compatibility. */
 export const SITE_MOD_MAP: Readonly<Record<PreferredSite, string>> = {
     reddit: 'adapter-reddit',
     youtube: 'adapter-youtube',
-    quora: 'adapter-quora',
-    generic: 'adapter-generic',
 };

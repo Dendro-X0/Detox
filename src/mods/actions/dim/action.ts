@@ -2,6 +2,7 @@ import type { EnforcementAction } from '../../../core/types/enforcement';
 import {
     attachRevealHandler,
     clearBlockedState,
+    ENFORCEMENT_DATASET,
     markElementBlocked,
     restoreOriginalStyles,
     storeOriginalStyles,
@@ -16,6 +17,10 @@ export const dimAction: EnforcementAction = {
     id: DIM_ACTION_ID,
     displayName: 'Dim',
     apply(element, verdict, context) {
+        if (element.dataset[ENFORCEMENT_DATASET.userRevealed] === 'true') {
+            return { success: true };
+        }
+
         const validationError = validateEnforcementTarget(element, context);
         if (validationError) return validationError;
 

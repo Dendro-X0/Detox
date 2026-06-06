@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Acceptance — infinite scroll</title>
+</head>
+<body>
+  <main>
+    <h1>Feed simulation</h1>
+    <div id="feed">
+      <article class="feed-item">
+        <p data-fixture-unit="feed-01">
+          Initial viewport item one describes a calm update about regional transit schedules
+          and weekend maintenance windows that affect commuter routes across the metro area.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-02">
+          Initial viewport item two summarizes a community garden grant program accepting
+          applications from neighborhood associations through the end of the fiscal quarter.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-03">
+          Initial viewport item three explains how the library extended evening hours for
+          students preparing for certification exams during the spring examination period.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-04">
+          Initial viewport item four covers a small business workshop on inventory forecasting
+          for seasonal retailers who experience predictable demand spikes each holiday cycle.
+        </p>
+      </article>
+    </div>
+    <template id="lazy-batch">
+      <article class="feed-item">
+        <p data-fixture-unit="feed-05">
+          Lazy loaded item five reports on a municipal composting pilot that diverted organic
+          waste from landfills while lowering collection costs for participating districts.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-06">
+          Lazy loaded item six highlights a youth coding club that mentors high school students
+          building portfolio projects with accessible tooling and peer review sessions.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-07">
+          Lazy loaded item seven describes a river cleanup volunteer day that removed debris
+          after spring flooding and restored trail access for weekend hikers and birders.
+        </p>
+      </article>
+      <article class="feed-item">
+        <p data-fixture-unit="feed-08">
+          Lazy loaded item eight announces expanded clinic hours for flu vaccinations at
+          community health centers with walk-in availability on weekday evenings this month.
+        </p>
+      </article>
+    </template>
+  </main>
+</body>
+</html>

@@ -1,30 +1,27 @@
 /// <reference types="chrome" />
 
-const FLAG_CLASS = 'signallens-auth-flag';
+import { enforcementAttrSelector } from '../core/enforcement/element-state';
+import { runtimeTranslate } from '../i18n/runtime-locale';
 
 function statusLabel(status: string): string {
-    switch (status) {
-        case 'unsupported':
-            return 'Sources not found';
-        case 'disputed':
-            return 'Disputed — verify';
-        case 'partially_supported':
-            return 'Partially supported';
-        default:
-            return 'Worth verifying';
-    }
+    const key = `content.authenticity.status.${status}`;
+    const translated = runtimeTranslate(key);
+    if (translated !== key) return translated;
+    return runtimeTranslate('content.authenticity.status.default');
 }
+
+const FLAG_CLASS = 'signallens-auth-flag';
 
 function findBlockElement(blockId?: string): HTMLElement | null {
     if (blockId) {
-        const byId = document.querySelector<HTMLElement>(`[data-detox-id="${blockId}"]`);
+        const byId = document.querySelector<HTMLElement>(enforcementAttrSelector('blockId', blockId));
         if (byId) return byId;
     }
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return null;
     const node = selection.getRangeAt(0).commonAncestorContainer;
     const element = node instanceof HTMLElement ? node : node.parentElement;
-    return element?.closest<HTMLElement>('article, [data-detox-id], p, div') ?? null;
+    return element?.closest<HTMLElement>(`article, ${enforcementAttrSelector('blockId')}, p, div`) ?? null;
 }
 
 export function showAdvisoryFlag(blockId: string | undefined, status: string): void {
@@ -37,7 +34,7 @@ export function showAdvisoryFlag(blockId: string | undefined, status: string): v
     const badge = document.createElement('span');
     badge.className = FLAG_CLASS;
     badge.textContent = statusLabel(status);
-    badge.title = 'SignalLens authenticity assist (advisory only). Click to dismiss.';
+    badge.title = runtimeTranslate('content.authenticity.badgeTitle');
     badge.setAttribute('role', 'note');
     Object.assign(badge.style, {
         display: 'inline-block',

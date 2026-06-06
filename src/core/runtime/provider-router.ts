@@ -13,8 +13,11 @@ import {
     ONNX_DETECTOR_ID,
     PRIMARY_PROVIDER_IDS,
     REMOTE_API_DETECTOR_ID,
+    SUPPLEMENTARY_DETECTOR_IDS,
 } from './constants';
 import { ensureLocalPackProviders } from './provider-loader';
+import { mergeClassifyResults } from './merge-classify-results';
+import { isDetectorModEnabled } from '../../mods/mod-manifest';
 
 export type ClassifyBatchOptions = {
     readonly threshold: number;
@@ -77,11 +80,36 @@ export class ProviderRouter {
             detectorId: options.detectorId ?? activePrimary.detectorId,
         });
 
+        const mergedWithSupplements = await this.applySupplementaryDetectors(
+            items,
+            primaryResults,
+            options.threshold
+        );
+
         if (!routing.escalationEnabled || !routing.remoteApi.enabled) {
-            return primaryResults;
+            return mergedWithSupplements;
         }
 
-        return this.escalateUncertainItems(items, primaryResults, options.threshold, routing);
+        return this.escalateUncertainItems(items, mergedWithSupplements, options.threshold, routing);
+    }
+
+    private async applySupplementaryDetectors(
+        items: readonly ClassifyItemInput[],
+        primaryResults: readonly ClassifyItemResult[],
+        threshold: number
+    ): Promise<readonly ClassifyItemResult[]> {
+        let merged = primaryResults;
+
+        for (const detectorId of SUPPLEMENTARY_DETECTOR_IDS) {
+            if (!isDetectorModEnabled(detectorId)) continue;
+            const provider = getProvider(detectorId);
+            if (!provider) continue;
+
+            const supplemental = await provider.classifyBatch(items, { threshold, detectorId });
+            merged = mergeClassifyResults(merged, supplemental);
+        }
+
+        return merged;
     }
 
     private async escalateUncertainItems(

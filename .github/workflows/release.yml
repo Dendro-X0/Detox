@@ -1,0 +1,60 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm test:scanner
+
+      - name: Build Chrome core
+        run: pnpm build:core
+
+      - name: Verify Chrome store build
+        run: node scripts/verify-store-build.mjs dist
+
+      - name: Package Chrome core
+        run: node scripts/package-release.mjs --dir dist --label signallens-chrome-core
+
+      - name: Build Firefox core
+        run: pnpm build:core:firefox
+
+      - name: Verify Firefox store build
+        run: node scripts/verify-store-build.mjs dist-firefox
+
+      - name: Package Firefox core
+        run: node scripts/package-release.mjs --dir dist-firefox --label signallens-firefox-core
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          CHROME_ZIP=$(ls releases/signallens-chrome-core-v*.zip | head -n 1)
+          FIREFOX_ZIP=$(ls releases/signallens-firefox-core-v*.zip | head -n 1)
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "SignalLens ${GITHUB_REF_NAME#v}" \
+            --notes-file store/RELEASE-NOTES-TEMPLATE.md \
+            "$CHROME_ZIP" "$FIREFOX_ZIP"

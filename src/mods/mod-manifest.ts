@@ -1,6 +1,6 @@
 import type { BuildProfile } from '../build-profile';
 
-export type ModKind = 'adapter' | 'detector' | 'action';
+export type ModKind = 'hint' | 'detector' | 'action';
 
 export type ModDescriptor = {
     readonly id: string;
@@ -13,7 +13,7 @@ export type ModDescriptor = {
     readonly sizeLabel: string;
     /** Profiles that include this mod in the build. `'core'` mods ship in every build. */
     readonly profiles: readonly BuildProfile[];
-    /** Runtime registry id (adapter site id, detector id, or action id). */
+    /** Runtime registry id (hint pack id, detector id, or action id). */
     readonly runtimeId: string;
     /** Cannot be disabled in the plugin library. */
     readonly required?: boolean;
@@ -21,7 +21,6 @@ export type ModDescriptor = {
 
 /** Mods required for baseline filtering on any profile. */
 export const REQUIRED_MOD_IDS = [
-    'adapter-generic',
     'detector-heuristic-keywords',
     'action-dim',
 ] as const;
@@ -31,49 +30,26 @@ export const REQUIRED_MOD_IDS = [
  */
 export const MOD_CATALOG: readonly ModDescriptor[] = [
     {
-        id: 'adapter-generic',
-        kind: 'adapter',
-        name: 'Generic fallback',
-        version: '1.0.0',
-        description: 'Extracts posts and comments on sites without a dedicated adapter.',
-        permissionsSummary: 'Reads page DOM on matched origins.',
-        sizeLabel: 'Included',
-        profiles: ['core', 'full'],
-        runtimeId: 'generic',
-        required: true,
-    },
-    {
         id: 'adapter-reddit',
-        kind: 'adapter',
-        name: 'Reddit',
+        kind: 'hint',
+        name: 'Reddit hints',
         version: '1.0.0',
-        description: 'Targets Reddit feed posts and comment threads.',
-        permissionsSummary: 'Reads reddit.com DOM structure.',
-        sizeLabel: '~12 KB',
-        profiles: ['full'],
+        description: 'Optional ignore/boost selectors for reddit.com precision tuning.',
+        permissionsSummary: 'Adjusts universal scanner regions on Reddit.',
+        sizeLabel: '~2 KB',
+        profiles: ['core', 'full'],
         runtimeId: 'reddit',
     },
     {
         id: 'adapter-youtube',
-        kind: 'adapter',
-        name: 'YouTube',
+        kind: 'hint',
+        name: 'YouTube hints',
         version: '1.0.0',
-        description: 'Targets YouTube comments and related feed items.',
-        permissionsSummary: 'Reads youtube.com DOM structure.',
-        sizeLabel: '~11 KB',
-        profiles: ['full'],
+        description: 'Optional ignore/boost selectors for youtube.com precision tuning.',
+        permissionsSummary: 'Adjusts universal scanner regions on YouTube.',
+        sizeLabel: '~2 KB',
+        profiles: ['core', 'full'],
         runtimeId: 'youtube',
-    },
-    {
-        id: 'adapter-quora',
-        kind: 'adapter',
-        name: 'Quora',
-        version: '1.0.0',
-        description: 'Targets Quora answers and discussion threads.',
-        permissionsSummary: 'Reads quora.com DOM structure.',
-        sizeLabel: '~10 KB',
-        profiles: ['full'],
-        runtimeId: 'quora',
     },
     {
         id: 'detector-heuristic-keywords',
@@ -86,6 +62,17 @@ export const MOD_CATALOG: readonly ModDescriptor[] = [
         profiles: ['core', 'full'],
         runtimeId: 'heuristic-keywords',
         required: true,
+    },
+    {
+        id: 'detector-noise-patterns',
+        kind: 'detector',
+        name: 'Noise patterns',
+        version: '1.0.0',
+        description: 'Detects promos, outrage bait, and engagement-bait phrasing (works with your keyword list).',
+        permissionsSummary: 'No network; pattern matching on extracted text.',
+        sizeLabel: 'Included',
+        profiles: ['core', 'full'],
+        runtimeId: 'noise-patterns',
     },
     {
         id: 'detector-remote-api',
@@ -199,10 +186,15 @@ export function isActionModEnabled(runtimeActionId: string): boolean {
     return isModEnabledInCache(modId);
 }
 
-export function isAdapterModEnabled(runtimeAdapterId: string): boolean {
-    const modId = modIdForRuntime('adapter', runtimeAdapterId);
+export function isHintModEnabled(runtimeHintId: string): boolean {
+    const modId = modIdForRuntime('hint', runtimeHintId);
     if (!modId) return true;
     return isModEnabledInCache(modId);
+}
+
+/** @deprecated Use {@link isHintModEnabled}. Kept for signed unlock package mod ids. */
+export function isAdapterModEnabled(runtimeAdapterId: string): boolean {
+    return isHintModEnabled(runtimeAdapterId);
 }
 
 /** Avoid circular import with enablement store — set by store on load. */

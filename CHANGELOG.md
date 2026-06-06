@@ -7,15 +7,98 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
+- **v2.2.0 store prep tooling**
+  - [`store/store-meta.json`](store/store-meta.json) — canonical privacy policy URL + repo metadata
+  - Options Privacy tab link via [`src/config/store-links.ts`](src/config/store-links.ts)
+  - Mod signing scripts: `signing:generate`, `signing:apply-anchor`, `signing:resign`, `store:sync-meta`
+  - [`store/SCREENSHOTS.md`](store/SCREENSHOTS.md) capture guide; updated [`v2.2-store-prep.md`](docs/planning/v2.2-store-prep.md)
+
+## [2.1.2] - 2026-06-01
+
+### Added
+- **Wizard-first configuration**
+  - [`docs/planning/wizard-first-checklist.md`](docs/planning/wizard-first-checklist.md) — step → storage mapping, essential vs advanced dashboard surfaces
+  - [`src/onboarding/wizard-coverage.ts`](src/onboarding/wizard-coverage.ts) + `tests/onboarding/wizard-first-coverage.spec.ts`
+  - Wizard done step: **Start browsing** (primary), **Fine-tune in dashboard**, **Try on Reddit**
+  - Install wizard (`?wizard=1`) closes options tab after **Start browsing**; setup-again stays on dashboard
+  - Overview quick links: Filtering + Rules essential; Plugins + Privacy under Advanced collapse
+  - Rules: per-site thresholds collapsed; Plugins: authenticity settings collapsed
+  - Filtering: language pack section collapsed (full build)
+- **Version roadmap**
+  - [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md) — v2.0 → **v3.0.0** initial public release; pre-launch refinement of scanning, filtering, and authenticity
+  - Authenticity spec: script-first public data gather → AI cross-reference ([`authenticity-analysis.md`](docs/experimental/authenticity-analysis.md))
+- **Filtering / heuristics**
+  - Weighted keyword scoring; expanded keyword map; text-gate tuning
+  - Dedicated Filtering tab; site whitelist presets; popup page status + pause on site
+  - Overview status strip; plugins advanced collapse; wizard work-apps whitelist step
+  - `tests/core/**` in Vitest; static core-filtering E2E fixture
+
+### Fixed
+- Chrome background `classifyBatch` now forwards policy **threshold** to inference runtime (was defaulting to 0.9)
+- E2E helper `waitForClassifications` passes IPC message types into page context correctly
+- Core filtering E2E imports Playwright fixtures
+
+### Previously (2.0.x foundation)
+- **Wizard language preference**
+  - New **Language** setup step with JSON locale templates (`src/i18n/locales/en.json`)
+  - `preferredLocale` persisted in extension storage; guide in `docs/guides/i18n.md`
+  - Options dashboard, popup, browsing modes, rules, plugins, authenticity, filtering cards, and side panel wired to locale templates
+  - Mod catalog labels and authenticity pipeline progress copy use `i18n:` message keys
+  - **German (`de`)** locale template with `pnpm locale:de` regeneration script
+  - Content-script filtered block tooltips and authenticity badge use `runtime-locale.ts`
+- **Wizard and dashboard UX**
+  - Onboarding centers on **browsing modes** (Focus / Research / Unwind) with optional custom path; removed legacy “sites” step
+  - Quick start (Focus), done-step handoff, localized wizard progress, and prefill when running setup again
+  - Wizard polish: setup review card, Reddit try-it handoff, topic/mode validation, filter previews, setup-again prefill, Enter to continue
+- **Dashboard UX**
+  - Tab intros, activity stats, and quick links on Overview; localized system status
+  - Plugins: section descriptions, enabled counts, neutral badges, optional install collapsed, enable-all site hints
+  - Rules keyword summary; authenticity open-panel button; developer tools in collapsible Privacy section
+  - Overview **Getting started** card; debug tools moved to Privacy; demo model-pack install UI removed
+- **Filtering**
+  - Safer default keyword lists (topic presets, not hostile-only builtins)
+  - Word-boundary matching for short keywords; minimum text length before classification
+- **Firefox QA**
+  - Core profile now strips Hugging Face / ORT permissions from Firefox MV2 manifest
+  - First-run onboarding wizard on Firefox install (parity with Chrome)
+  - `browser_specific_settings.gecko.id` for AMO builds
+  - `pnpm test:firefox` + manual checklist in `docs/guides/firefox-qa.md`
+- **Distribution / store prep**
+  - `pnpm release:chrome` and `pnpm release:firefox` — build, verify, zip to `releases/`
+  - Store listing drafts, privacy policy, and release checklist under `store/`
+  - GitHub Release workflow on `v*` tags
+  - Guide: [`docs/guides/store-release.md`](docs/guides/store-release.md)
+- **Authenticity v2**
+  - T1 local checkworthiness ranking before search/LLM tiers
+  - Full-page scope via universal scanner + DOM fallback (`PageContext`)
+  - Side panel scope picker (selection vs full page) with dense-site warning
+  - Settings: T1 toggle and allow full-page scope
+- **Phase 11 — Content-type detector mods**
+  - Optional `detector-noise-patterns` mod (promo, outrage bait, engagement bait)
+  - Provider router merges supplementary detectors with primary results
+  - Focus and Unwind browsing modes enable the noise-pattern detector; Research does not
+- **Phase 10 — Browsing modes**
+  - Built-in Focus, Research, and Unwind modes (one tap updates threshold, keywords, filter style, hint mods)
+  - Popup and dashboard mode switchers; `activeBrowsingModeId` in storage
+  - Content script rescans when mode settings change
+- **Phase 9 — Operational hardening**
+  - GitHub Actions CI: scanner unit tests, typecheck, core + acceptance E2E, perf regression snapshot
+  - Anchor-attribute fingerprint stability (`collectAnchorKey`) for SPA/DOM host swaps
+  - Reddit acceptance fixture with `shreddit-comment` anchor attributes
+  - `test:ci` script for local CI parity
 - Popup UI: Language Pack selector panel (auto-select + manual override persisted as `preferredPackId`).
 - Firefox MV2 build pipeline:
   - `pnpm dev:firefox`
   - `pnpm build:firefox`
   - `vite.config.firefox.ts` (custom manifest emission; CRXJS is MV3-only)
-- Documentation: `docs/firefox-build.md`.
+- Documentation: `docs/guides/firefox-build.md`.
 
 ### Changed
+- Fingerprints prefer semantic anchor attributes over volatile structural `id` values when inner DOM is replaced.
 - Firefox MV2 manifest now points at built JS entry points (`src/background-firefox.js`, `src/content.js`).
+
+### Removed
+- Unused `src/incremental-scanner.ts` (superseded by universal scanner coordinator).
 
 ### Fixed
 - Popup language detection now has a content-script handler (`detectLanguage`).

@@ -1,5 +1,5 @@
 /// <reference types="chrome" />
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import './App.css';
 import type { CoreIpcMessage } from './core/ipc/messages';
 import type { InferenceRoutingSettings, PrimaryProviderMode } from './core/types/routing';
@@ -8,21 +8,44 @@ import type { EnforcementActionId, EnforcementActionSettings } from './core/type
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
 import { isFullBuild } from './build-profile';
 import { getBuildProfile } from './build-profile';
+import { PRIVACY_POLICY_URL } from './config/store-links';
 import DashboardShell from './dashboard/DashboardShell';
+import BrowsingModesPanel from './dashboard/BrowsingModesPanel';
+import DashboardQuickLinks from './dashboard/DashboardQuickLinks';
+import DashboardTabIntro from './dashboard/DashboardTabIntro';
+import GettingStartedPanel from './dashboard/GettingStartedPanel';
+import LanguageSettingsPanel from './dashboard/LanguageSettingsPanel';
+import FilteringSettingsPanel from './dashboard/FilteringSettingsPanel';
+import OverviewActivityPanel from './dashboard/OverviewActivityPanel';
+import OverviewStatusStrip from './dashboard/OverviewStatusStrip';
+import { detectorLabel, runtimeStateLabel } from './dashboard/runtime-labels';
+import { loadActiveBrowsingModeId, type BrowsingModeId } from './core/modes/browsing-modes';
+import { markSettingsCustomized } from './core/modes/browsing-modes';
+import { useSettingsTab } from './dashboard/useSettingsTab';
+import { getSettingsTabLabels } from './i18n/settings-tabs';
+import { useLocale } from './i18n/LocaleContext';
 import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
 import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
 import UserRulesPanel from './dashboard/UserRulesPanel';
+import SiteWhitelistPanel from './dashboard/SiteWhitelistPanel';
 import type { AuthenticitySettings } from './mods/analyzers/authenticity/settings';
 import { loadInstalledMods, type InstalledModRecord } from './core/mods/installed-mod-store';
-import { isModEnabled, isModUnlocked, loadEnabledModIds, saveEnabledModIds } from './core/mods/mod-enablement-store';
+import { loadEnabledModIds, saveEnabledModIds } from './core/mods/mod-enablement-store';
 import { loadUserRules, saveUserRules } from './core/rules/user-rules-store';
 import type { UserRulesSettings } from './core/types/user-rules';
 import type { ModelPack } from './types/model-pack';
 import { scanModelPacks, selectModelPack } from './v2/core/language-pack-manager';
+import { sessionGet, subscribeSessionChanges } from './core/storage/extension-session';
+import { getRollupSnapshot, type PeriodScanStats } from './core/storage/scan-stats-store';
 
 type Stats = {
   readonly scanned: number;
   readonly toxic: number;
+};
+
+type RollupStats = {
+  readonly today: PeriodScanStats;
+  readonly last7Days: PeriodScanStats;
 };
 
 type BlockedItem = {
@@ -43,14 +66,6 @@ type LanguagePackState = {
   readonly detectedConfidence: number;
   readonly selectedPackId: string | null;
   readonly autoSelected: boolean;
-};
-
-type InstallablePack = {
-  readonly id: string;
-  readonly name: string;
-  readonly languages: readonly string[];
-  readonly sizeMb: number;
-  readonly installed: boolean;
 };
 
 type PolicyPreset = 'conservative' | 'balanced' | 'strict';
@@ -88,36 +103,8 @@ const PRESET_THRESHOLDS: Record<PolicyPreset, number> = {
   strict: 0.3,
 };
 
-const INSTALLABLE_PACKS: readonly InstallablePack[] = [
-  { id: 'toxicity-multi-xlm-r', name: 'Multilingual XLM-R', languages: ['*'], sizeMb: 85, installed: true },
-  { id: 'toxicity-en', name: 'English BERT', languages: ['en'], sizeMb: 45, installed: false },
-  { id: 'toxicity-de', name: 'German BERT', languages: ['de'], sizeMb: 45, installed: false },
-];
-
-const FILTER_STYLE_OPTIONS: readonly { readonly id: EnforcementActionId; readonly label: string; readonly fullOnly?: boolean }[] = [
-  { id: 'dim', label: 'Dim' },
-  { id: 'blur', label: 'Blur', fullOnly: true },
-  { id: 'collapse', label: 'Collapse', fullOnly: true },
-];
-
-function actionModId(actionId: EnforcementActionId): string {
-  return `action-${actionId}`;
-}
-
-function getVisibleFilterStyles(): readonly { readonly id: EnforcementActionId; readonly label: string }[] {
-  const profile = getBuildProfile();
-  return FILTER_STYLE_OPTIONS.filter(
-    (option) => isModUnlocked(actionModId(option.id), profile) && isModEnabled(actionModId(option.id))
-  );
-}
-
-function getPresetLabel(preset: PolicyPreset): string {
-  const labels: Record<PolicyPreset, string> = {
-    conservative: 'Conservative (fewer blocks)',
-    balanced: 'Balanced',
-    strict: 'Strict (more blocks)',
-  };
-  return labels[preset];
+function getPresetLabel(preset: PolicyPreset, t: (key: string) => string): string {
+  return t(`wizard.sensitivityPresets.${preset}.label`);
 }
 
 function formatTime(ts: number): string {
@@ -130,8 +117,16 @@ type AppProps = {
 };
 
 function App({ onRestartWizard }: AppProps) {
+  const { t } = useLocale();
+  const settingsTabs = useMemo(() => getSettingsTabLabels(t), [t]);
+  const [settingsTab, setSettingsTab] = useSettingsTab();
+  const [activeBrowsingModeId, setActiveBrowsingModeId] = useState<BrowsingModeId | null>(null);
   const [enabled, setEnabled] = useState(false);
   const [stats, setStats] = useState<Stats>({ scanned: 0, toxic: 0 });
+  const [rollupStats, setRollupStats] = useState<RollupStats>({
+    today: { scanned: 0, filtered: 0 },
+    last7Days: { scanned: 0, filtered: 0 },
+  });
   const [runtimeStatus, setRuntimeStatus] = useState<RuntimeStatus>({
     state: 'unknown',
     lastError: null,
@@ -141,7 +136,6 @@ function App({ onRestartWizard }: AppProps) {
   });
   const [blockedItems, setBlockedItems] = useState<readonly BlockedItem[]>([]);
   const [policy, setPolicy] = useState<PolicySettings>({ preset: 'balanced', threshold: 0.5, perSite: {} });
-  const [debugMode, setDebugMode] = useState(false);
   const [perfMetrics, setPerfMetrics] = useState<PerformanceMetrics | null>(null);
   const [packState, setPackState] = useState<LanguagePackState>({
     availablePacks: [],
@@ -162,6 +156,7 @@ function App({ onRestartWizard }: AppProps) {
 
   const setActionId = (activeActionId: EnforcementActionId): void => {
     saveEnforcementAction({ activeActionId });
+    void markSettingsCustomized();
   };
 
   const saveRouting = (next: InferenceRoutingSettings): void => {
@@ -198,14 +193,25 @@ function App({ onRestartWizard }: AppProps) {
       }
     });
 
-    chrome.storage.session.get('blockedItems', (res: unknown) => {
-      const record = res as { blockedItems?: readonly BlockedItem[] };
-      setBlockedItems(record.blockedItems ?? []);
+    void sessionGet<readonly BlockedItem[]>('blockedItems').then((items) => {
+      setBlockedItems(items ?? []);
     });
+
+    const unsubscribeSession = subscribeSessionChanges((changes) => {
+      if (changes.blockedItems) {
+        setBlockedItems(changes.blockedItems.newValue as readonly BlockedItem[]);
+      }
+    });
+
+    void getRollupSnapshot().then(setRollupStats);
+    void loadActiveBrowsingModeId().then(setActiveBrowsingModeId);
 
     chrome.storage.onChanged.addListener((changes) => {
       if (changes.stats) {
         setStats(changes.stats.newValue as Stats);
+      }
+      if (changes.scanStatsRollup) {
+        void getRollupSnapshot().then(setRollupStats);
       }
       if (changes.policy) {
         setPolicy(changes.policy.newValue as PolicySettings);
@@ -216,11 +222,9 @@ function App({ onRestartWizard }: AppProps) {
       if (changes.enforcementAction) {
         setEnforcementAction(changes.enforcementAction.newValue as EnforcementActionSettings);
       }
-    });
-
-    chrome.storage.session.onChanged.addListener((changes) => {
-      if (changes.blockedItems) {
-        setBlockedItems(changes.blockedItems.newValue as readonly BlockedItem[]);
+      if (changes.activeBrowsingModeId) {
+        const next = changes.activeBrowsingModeId.newValue;
+        setActiveBrowsingModeId(typeof next === 'string' ? (next as BrowsingModeId) : null);
       }
     });
 
@@ -330,6 +334,7 @@ function App({ onRestartWizard }: AppProps) {
     void loadPackInfo();
 
     return () => {
+      unsubscribeSession();
       window.clearInterval(intervalId);
       window.clearInterval(perfIntervalId);
     };
@@ -341,10 +346,25 @@ function App({ onRestartWizard }: AppProps) {
     chrome.storage.local.set({ enabled: newState });
   };
 
+  const refreshSettingsFromStorage = (): void => {
+    chrome.storage.local.get(['policy', 'enforcementAction'], (res: unknown) => {
+      const record = res as {
+        readonly policy?: PolicySettings;
+        readonly enforcementAction?: EnforcementActionSettings;
+      };
+      if (record.policy) setPolicy(record.policy);
+      if (record.enforcementAction) {
+        setEnforcementAction({ ...DEFAULT_ENFORCEMENT_ACTION_SETTINGS, ...record.enforcementAction });
+      }
+    });
+    void loadActiveBrowsingModeId().then(setActiveBrowsingModeId);
+  };
+
   const setPreset = (preset: PolicyPreset) => {
     const newPolicy: PolicySettings = { ...policy, preset, threshold: PRESET_THRESHOLDS[preset] };
     setPolicy(newPolicy);
     chrome.storage.local.set({ policy: newPolicy });
+    void markSettingsCustomized();
   };
 
   const addSiteOverride = (): void => {
@@ -356,6 +376,7 @@ function App({ onRestartWizard }: AppProps) {
     };
     setPolicy(nextPolicy);
     chrome.storage.local.set({ policy: nextPolicy });
+    void markSettingsCustomized();
     setSiteRuleHost('');
   };
 
@@ -365,6 +386,7 @@ function App({ onRestartWizard }: AppProps) {
     const nextPolicy: PolicySettings = { ...policy, perSite: nextPerSite };
     setPolicy(nextPolicy);
     chrome.storage.local.set({ policy: nextPolicy });
+    void markSettingsCustomized();
   };
 
   const exportSettings = (): void => {
@@ -438,7 +460,7 @@ function App({ onRestartWizard }: AppProps) {
           await chrome.storage.local.set({ authenticitySettings: parsed.authenticitySettings });
         }
       } catch {
-        window.alert('Invalid settings file.');
+        window.alert(t('settings.advanced.invalidImport'));
       }
     };
     input.click();
@@ -447,18 +469,19 @@ function App({ onRestartWizard }: AppProps) {
   const isLoadingView = new URLSearchParams(window.location.search).has('loading');
   const isOptionsPage = window.location.pathname.endsWith('options.html');
   const activeProfile = getBuildProfile();
+
   if (isLoadingView) {
     const loadingBody = (
       <div className="loading-container">
         <div className="loading-spinner"></div>
-        <h2>SignalLens</h2>
-        <p className="loading-text">Preparing your focus view...</p>
-        <p className="loading-subtext">This may take a moment on large pages</p>
+        <h2>{t('common.appName')}</h2>
+        <p className="loading-text">{t('options.loadingFocusView')}</p>
+        <p className="loading-subtext">{t('options.loadingLargePages')}</p>
       </div>
     );
     if (isOptionsPage) {
       return (
-        <DashboardShell title="SignalLens" subtitle="Preparing your session…">
+        <DashboardShell title={t('common.appName')} subtitle={t('options.preparingSession')}>
           {loadingBody}
         </DashboardShell>
       );
@@ -466,404 +489,382 @@ function App({ onRestartWizard }: AppProps) {
     return <div className="container loading-container">{loadingBody}</div>;
   }
 
-  const dashboardContent = (
-    <div className={`container${isOptionsPage ? ' options-dashboard' : ''}`}>
-      {!isOptionsPage ? <h1>SignalLens</h1> : null}
+  const headerActions = isOptionsPage ? (
+    <div className="sl-header-controls">
+      <label className="sl-header-focus switch">
+        <input type="checkbox" checked={enabled} onChange={toggle} />
+        <span className="slider round" />
+      </label>
+      <span className="sl-header-focus-label">{enabled ? t('settings.header.focusOn') : t('settings.header.focusOff')}</span>
+      <div className="sl-header-stats">
+        <div className="sl-header-stat">
+          <span className="value">{rollupStats.today.scanned}</span>
+          <span className="label">{t('settings.header.today')}</span>
+        </div>
+        <div className="sl-header-stat">
+          <span className="value">{rollupStats.today.filtered}</span>
+          <span className="label">{t('settings.header.blockedToday')}</span>
+        </div>
+        <div className="sl-header-stat">
+          <span className="value">{rollupStats.last7Days.scanned}</span>
+          <span className="label">{t('settings.header.scanned7Day')}</span>
+        </div>
+      </div>
+    </div>
+  ) : null;
 
-      <div className={isOptionsPage ? 'sl-hero-row' : undefined}>
+  const runtimeStatusCard = (
+    <div className="card">
+      <h3>{t('settings.systemStatus.heading')}</h3>
+      <div className="sl-kv-grid">
+        <span className="label">{t('settings.systemStatus.runtime')}</span>
+        <span className="value">{runtimeStateLabel(runtimeStatus.state, t)}</span>
+        <span className="label">{t('settings.systemStatus.scanner')}</span>
+        <span className="value">{t('settings.systemStatus.scannerUniversal')}</span>
+        {isFullBuild() ? (
+          <>
+            <span className="label">{t('settings.systemStatus.pack')}</span>
+            <span className="value">{runtimeStatus.activePackId ?? t('common.none')}</span>
+            <span className="label">{t('settings.systemStatus.mode')}</span>
+            <span className="value">{runtimeStatus.primaryMode ?? routing.primaryMode}</span>
+            <span className="label">{t('settings.systemStatus.escalation')}</span>
+            <span className="value">{runtimeStatus.escalationEnabled ? t('settings.systemStatus.on') : t('settings.systemStatus.off')}</span>
+          </>
+        ) : (
+          <>
+            <span className="label">{t('settings.systemStatus.classifier')}</span>
+            <span className="value">{detectorLabel(runtimeStatus.activeDetectorId, t)}</span>
+          </>
+        )}
+        {runtimeStatus.lastError ? (
+          <>
+            <span className="label">{t('settings.systemStatus.lastError')}</span>
+            <span className="value">{runtimeStatus.lastError}</span>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const filteringSettingsPanel = (
+    <FilteringSettingsPanel
+      policy={policy}
+      setPreset={setPreset}
+      routing={routing}
+      saveRouting={saveRouting}
+      setPrimaryMode={setPrimaryMode}
+      enforcementAction={enforcementAction}
+      setActionId={setActionId}
+      activeBrowsingModeId={activeBrowsingModeId}
+      runtimeStatus={runtimeStatus}
+      packState={packState}
+      showPackSelector={showPackSelector}
+      setShowPackSelector={setShowPackSelector}
+      setPackState={setPackState}
+      onNavigateRules={() => setSettingsTab('rules')}
+    />
+  );
+
+  const perSiteRulesCard = (
+    <div className="card policy-card">
+      <h3>{t('settings.filtering.perSiteHeading')}</h3>
+      <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+        {t('settings.filtering.perSiteDescription')}
+      </p>
+      <div className="stat-row" style={{ gap: '0.5rem', alignItems: 'center' }}>
+        <input
+          type="text"
+          placeholder={t('settings.filtering.hostPlaceholder')}
+          value={siteRuleHost}
+          onChange={(e) => setSiteRuleHost(e.target.value)}
+          style={{ flex: 1, padding: '0.35rem' }}
+        />
+        <input
+          type="number"
+          min={0}
+          max={1}
+          step={0.05}
+          value={siteRuleThreshold}
+          onChange={(e) => setSiteRuleThreshold(Number(e.target.value))}
+          style={{ width: '80px', padding: '0.35rem' }}
+        />
+        <button className="preset-btn" onClick={addSiteOverride}>{t('settings.filtering.add')}</button>
+      </div>
+      <ul className="blocked-list" style={{ maxHeight: 'unset' }}>
+        {Object.entries(policy.perSite).length === 0 ? (
+          <li className="muted">{t('settings.filtering.noPerSiteOverrides')}</li>
+        ) : (
+          Object.entries(policy.perSite).map(([host, threshold]) => (
+            <li key={host} className="blocked-item">
+              <div className="blocked-header">
+                <span className="badge">{host}</span>
+                <span className="score">{(threshold * 100).toFixed(0)}%</span>
+              </div>
+              <button className="debug-toggle" onClick={() => removeSiteOverride(host)}>{t('settings.filtering.remove')}</button>
+            </li>
+          ))
+        )}
+      </ul>
+    </div>
+  );
+
+  const privacyCard = (
+    <div className="card policy-card">
+      <h3>{t('settings.privacy.heading')}</h3>
+      <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+        {t('settings.privacy.description')}
+      </p>
+      <div className="sl-kv-grid">
+        <span className="label">{t('settings.privacy.buildProfile')}</span>
+        <span className="value">{activeProfile}</span>
+        <span className="label">{t('settings.privacy.remoteApiConfigured')}</span>
+        <span className="value">{routing.remoteApi.endpointUrl ? t('common.yes') : t('common.no')}</span>
+      </div>
+      <p className="muted" style={{ marginBottom: 0, fontSize: '0.85rem' }}>
+        <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">
+          {t('settings.privacy.policyLink')}
+        </a>
+      </p>
+    </div>
+  );
+
+  const advancedCard = (
+    <div className="card policy-card">
+      <h3>{t('settings.advanced.heading')}</h3>
+      <div className="preset-buttons">
+        <button className="preset-btn" onClick={exportSettings}>{t('settings.advanced.exportSettings')}</button>
+        <button className="preset-btn" onClick={importSettings}>{t('settings.advanced.importSettings')}</button>
+        {onRestartWizard ? (
+          <button className="preset-btn" onClick={onRestartWizard}>{t('settings.advanced.setupAgain')}</button>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const debugSection = (
+    <details className="card sl-debug-details">
+      <summary>{t('settings.debug.toolsHeading')}</summary>
+      <div className="sl-debug-body">
+      <h3>{t('settings.debug.performanceHeading')}</h3>
+      {perfMetrics ? (
+        <div className="perf-metrics">
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.timeToFirstClassification')}</span>
+            <span className="value">
+              {perfMetrics.firstClassificationTime !== null
+                ? `${perfMetrics.firstClassificationTime.toFixed(0)}ms`
+                : t('settings.debug.pending')}
+            </span>
+          </div>
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.throughput')}</span>
+            <span className="value">{t('settings.debug.throughputValue', { value: perfMetrics.throughput.toFixed(1) })}</span>
+          </div>
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.avgBatchTime')}</span>
+            <span className="value">{t('settings.debug.avgBatchTimeValue', { value: perfMetrics.averageBatchTime.toFixed(1) })}</span>
+          </div>
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.totalClassified')}</span>
+            <span className="value">{perfMetrics.totalClassified}</span>
+          </div>
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.currentQueueDepth')}</span>
+            <span className="value">{perfMetrics.currentQueueDepth}</span>
+          </div>
+          <div className="stat-row">
+            <span className="label">{t('settings.debug.avgQueueDepth')}</span>
+            <span className="value">{perfMetrics.averageQueueDepth.toFixed(1)}</span>
+          </div>
+        </div>
+      ) : (
+        <p className="muted">{t('settings.debug.noPerformanceData')}</p>
+      )}
+
+      <h3>{t('settings.debug.recentBlockedHeading', { count: blockedItems.length })}</h3>
+      {blockedItems.length === 0 ? (
+        <p className="muted">{t('settings.debug.noItemsBlocked')}</p>
+      ) : (
+        <ul className="blocked-list sl-scroll-region">
+          {blockedItems.slice(0, 10).map((item) => (
+            <li key={item.id} className="blocked-item">
+              <div className="blocked-header">
+                <span className="badge">{item.labelId ?? item.label ?? t('settings.debug.noiseLabel')}</span>
+                <span className="score">{(item.score * 100).toFixed(0)}%</span>
+                <span className="time">{formatTime(item.timestamp)}</span>
+              </div>
+              <div className="preview" title={item.preview}>{item.preview}</div>
+              <div className="hostname">{item.hostname}</div>
+            </li>
+          ))}
+        </ul>
+      )}
+      </div>
+    </details>
+  );
+
+  const browsingModeSummary =
+    activeBrowsingModeId !== null
+      ? t(`browsingModes.${activeBrowsingModeId}.label`)
+      : t('browsingModes.customNote');
+
+  const filterStyleSummary = t(`wizard.filterStyles.${enforcementAction.activeActionId}`);
+
+  const overviewSummaryCard = (
+    <div className="card policy-card">
+      <h3>{t('settings.overview.currentSettings')}</h3>
+      <div className="sl-kv-grid">
+        <span className="label">{t('settings.overview.focusMode')}</span>
+        <span className="value">{enabled ? t('common.enabled') : t('common.disabled')}</span>
+        <span className="label">{t('settings.overview.browsingMode')}</span>
+        <span className="value">{browsingModeSummary}</span>
+        <span className="label">{t('settings.overview.sensitivity')}</span>
+        <span className="value">{getPresetLabel(policy.preset, t)}</span>
+        <span className="label">{t('settings.overview.filterStyle')}</span>
+        <span className="value">{filterStyleSummary}</span>
+        <span className="label">{t('settings.overview.perSiteOverrides')}</span>
+        <span className="value">{Object.keys(policy.perSite).length}</span>
+      </div>
+    </div>
+  );
+
+  const optionsTabPanel = (
+    <div className="container options-dashboard">
+      <div role="tabpanel" id={`settings-panel-${settingsTab}`} className="sl-tab-panel">
+        {settingsTab === 'overview' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.overview')}
+              description={t('settings.overview.tabIntro')}
+            />
+            <OverviewStatusStrip
+              enabled={enabled}
+              activeBrowsingModeId={activeBrowsingModeId}
+              onNavigate={setSettingsTab}
+            />
+            <div className="sl-span-full">
+              <GettingStartedPanel />
+            </div>
+            <OverviewActivityPanel />
+            <div className="sl-span-full">
+              <BrowsingModesPanel
+                onModeApplied={refreshSettingsFromStorage}
+                onCustomized={refreshSettingsFromStorage}
+              />
+            </div>
+            <DashboardQuickLinks onNavigate={setSettingsTab} />
+            <LanguageSettingsPanel />
+            {overviewSummaryCard}
+            {runtimeStatusCard}
+          </div>
+        ) : null}
+
+        {settingsTab === 'filtering' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.filtering')}
+              description={t('settings.filtering.tabIntro')}
+            />
+            <div className="sl-span-full">{filteringSettingsPanel}</div>
+          </div>
+        ) : null}
+
+        {settingsTab === 'rules' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.rules')}
+              description={t('rules.tabIntro')}
+            />
+            <div className="sl-span-full"><SiteWhitelistPanel /></div>
+            <div className="sl-span-full"><UserRulesPanel /></div>
+            <details className="sl-install-details sl-span-full">
+              <summary>{t('rules.advanced.perSiteSummary')}</summary>
+              {perSiteRulesCard}
+            </details>
+          </div>
+        ) : null}
+
+        {settingsTab === 'plugins' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.plugins')}
+              description={t('plugins.tabIntro')}
+            />
+            <div className="sl-span-full"><PluginLibraryPanel /></div>
+            <details className="sl-install-details sl-span-full">
+              <summary>{t('plugins.advanced.authenticitySummary')}</summary>
+              <AuthenticitySettingsPanel />
+            </details>
+          </div>
+        ) : null}
+
+        {settingsTab === 'privacy' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.privacy')}
+              description={t('settings.privacy.tabIntro')}
+            />
+            {privacyCard}
+            <div className="sl-span-full">{advancedCard}</div>
+            <div className="sl-span-full">{debugSection}</div>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  const popupDashboard = (
+    <div className="container">
+      <h1>{t('common.appName')}</h1>
+
+      <div className="sl-hero-row">
         <div className="card">
           <label className="switch">
             <input type="checkbox" checked={enabled} onChange={toggle} />
             <span className="slider round"></span>
           </label>
-          <p>{enabled ? 'Focus Mode Enabled' : 'Focus Mode Disabled'}</p>
+          <p>{enabled ? t('popup.focusEnabled') : t('popup.focusDisabled')}</p>
         </div>
 
         <div className="card">
-          <div className={isOptionsPage ? 'sl-stats-inline' : 'stats'}>
+          <div className="stats">
             <div className="stat-item">
               <span className="value">{stats.scanned}</span>
-              <span className="label">Scanned</span>
+              <span className="label">{t('popup.scanned')}</span>
             </div>
             <div className="stat-item">
               <span className="value">{stats.toxic}</span>
-              <span className="label">Blocked</span>
+              <span className="label">{t('popup.filtered')}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className={isOptionsPage ? 'sl-dashboard-grid' : undefined}>
-      <div className="card policy-card">
-        <h3>Inference</h3>
-        <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-          {isFullBuild()
-            ? 'Heuristic mode works offline with no model files. Local pack uses bundled ONNX weights.'
-            : 'Heuristic mode — works offline with no model files.'}
-        </p>
-        {isFullBuild() ? (
-          <>
-            <div className="preset-buttons">
-              <button
-                className={`preset-btn ${routing.primaryMode === 'heuristic' ? 'active' : ''}`}
-                onClick={() => setPrimaryMode('heuristic')}
-              >
-                Heuristic (offline)
-              </button>
-              <button
-                className={`preset-btn ${routing.primaryMode === 'local-pack' ? 'active' : ''}`}
-                onClick={() => setPrimaryMode('local-pack')}
-              >
-                Local pack (ONNX)
-              </button>
-            </div>
-            <label className="stat-row" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.75rem' }}>
-              <input
-                type="checkbox"
-                checked={routing.escalationEnabled}
-                onChange={(e) => saveRouting({ ...routing, escalationEnabled: e.target.checked })}
-              />
-              <span className="label">Escalate uncertain items to remote API (opt-in)</span>
-            </label>
-            {routing.escalationEnabled ? (
-              <div className="pack-selector" style={{ marginTop: '0.75rem' }}>
-                <label className="stat-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <span className="label">API endpoint URL</span>
-                  <input
-                    type="url"
-                    placeholder="https://your-api.example/classify"
-                    value={routing.remoteApi.endpointUrl}
-                    onChange={(e) => saveRouting({
-                      ...routing,
-                      remoteApi: { ...routing.remoteApi, enabled: true, endpointUrl: e.target.value },
-                    })}
-                    style={{ width: '100%', padding: '0.35rem' }}
-                  />
-                </label>
-                <label className="stat-row" style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.5rem' }}>
-                  <span className="label">API key (optional)</span>
-                  <input
-                    type="password"
-                    placeholder="Bearer token"
-                    value={routing.remoteApi.apiKey}
-                    onChange={(e) => saveRouting({
-                      ...routing,
-                      remoteApi: { ...routing.remoteApi, enabled: true, apiKey: e.target.value },
-                    })}
-                    style={{ width: '100%', padding: '0.35rem' }}
-                  />
-                </label>
-                <p className="muted" style={{ fontSize: '0.8rem', marginBottom: 0 }}>
-                  Remote API: {runtimeStatus.remoteApiReady ? 'configured' : 'not configured'}
-                </p>
-              </div>
-            ) : null}
-          </>
-        ) : (
-          <div className="stat-row">
-            <span className="label">Mode:</span>
-            <span className="value">Heuristic (offline)</span>
-          </div>
-        )}
+      <div className="sl-dashboard-grid">
+      {filteringSettingsPanel}
+        {runtimeStatusCard}
       </div>
 
-      <div className="card policy-card">
-        <h3>Filter Sensitivity</h3>
-        <div className="preset-buttons">
-          {(['conservative', 'balanced', 'strict'] as PolicyPreset[]).map((p) => (
-            <button
-              key={p}
-              className={`preset-btn ${policy.preset === p ? 'active' : ''}`}
-              onClick={() => setPreset(p)}
-            >
-              {getPresetLabel(p)}
-            </button>
-          ))}
-        </div>
-        <div className="threshold-display">
-          <span className="label">Threshold: {(policy.threshold * 100).toFixed(0)}%</span>
-        </div>
-      </div>
-
-      <div className="card policy-card">
-        <h3>Filter Style</h3>
-        <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-          Choose how filtered content appears on the page. Click any filtered block to reveal it.
-        </p>
-        <div className="preset-buttons">
-          {getVisibleFilterStyles().map((action) => (
-            <button
-              key={action.id}
-              className={`preset-btn ${enforcementAction.activeActionId === action.id ? 'active' : ''}`}
-              onClick={() => setActionId(action.id)}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {isFullBuild() ? (
-      <div className="card pack-card">
-        <div className="pack-header">
-          <h3>Language Pack</h3>
-          <button 
-            className="pack-toggle-btn"
-            onClick={() => setShowPackSelector(!showPackSelector)}
-          >
-            {showPackSelector ? 'Hide' : 'Change'}
-          </button>
-        </div>
-        
-        <div className="pack-info">
-          <div className="stat-row">
-            <span className="label">Detected:</span>
-            <span className="value">{packState.detectedLanguage.toUpperCase()} 
-              ({(packState.detectedConfidence * 100).toFixed(0)}% confidence)
-            </span>
-          </div>
-          <div className="stat-row">
-            <span className="label">Active:</span>
-            <span className="value">
-              {packState.availablePacks.find(p => p.id === packState.selectedPackId)?.name ?? 
-               packState.selectedPackId ?? 
-               'Auto-selecting...'}
-              {packState.autoSelected && ' (auto)'}
-            </span>
-          </div>
-        </div>
-
-        {showPackSelector && (
-          <div className="pack-selector">
-            <h4>Installed Packs</h4>
-            <div className="pack-list">
-              {packState.availablePacks.map((pack) => (
-                <button
-                  key={pack.id}
-                  className={`pack-option ${packState.selectedPackId === pack.id ? 'active' : ''}`}
-                  onClick={() => {
-                    setPackState(prev => ({ ...prev, selectedPackId: pack.id, autoSelected: false }));
-                    saveRouting({ ...routing, primaryMode: 'local-pack' });
-                    chrome.storage.local.set({ preferredPackId: pack.id, preferredDetectorId: 'local-pack' });
-                  }}
-                >
-                  <span className="pack-name">{pack.name}</span>
-                  <span className="pack-langs">{pack.languages.join(', ')}</span>
-                </button>
-              ))}
-            </div>
-
-            <h4>Available to Install</h4>
-            <div className="pack-list installable">
-              {INSTALLABLE_PACKS.filter((p: InstallablePack) => !p.installed).map((pack: InstallablePack) => (
-                <div key={pack.id} className="pack-option installable">
-                  <span className="pack-name">{pack.name}</span>
-                  <span className="pack-size">{pack.sizeMb} MB</span>
-                  <button 
-                    className="install-btn"
-                    onClick={() => alert('Pack installation would start here. Not implemented in this demo.')}
-                  >
-                    Install
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-      ) : null}
-
-      <div className="card">
-        <div className="stat-item">
-          <span className="label">Runtime</span>
-          <span className="value">{runtimeStatus.state}</span>
-        </div>
-        {isFullBuild() ? (
-          <>
-        <div className="stat-item">
-          <span className="label">Pack</span>
-          <span className="value">{runtimeStatus.activePackId ?? 'none'}</span>
-        </div>
-        <div className="stat-item">
-          <span className="label">Mode</span>
-          <span className="value">{runtimeStatus.primaryMode ?? routing.primaryMode}</span>
-        </div>
-        <div className="stat-item">
-          <span className="label">Escalation</span>
-          <span className="value">{runtimeStatus.escalationEnabled ? 'on' : 'off'}</span>
-        </div>
-          </>
-        ) : (
-        <div className="stat-item">
-          <span className="label">Detector</span>
-          <span className="value">{runtimeStatus.activeDetectorId ?? 'heuristic-keywords'}</span>
-        </div>
-        )}
-        {runtimeStatus.lastError ? (
-          <div className="stat-item">
-            <span className="label">Last error</span>
-            <span className="label">{runtimeStatus.lastError}</span>
-          </div>
-        ) : null}
-      </div>
-      </div>
-
-      {isOptionsPage ? (
-        <section className="sl-section">
-          <h2 className="sl-section-title">Rules &amp; plugins</h2>
-          <div className="sl-dashboard-grid">
-          <div className="sl-span-full"><UserRulesPanel /></div>
-
-          <div className="card policy-card sl-span-full">
-            <h3>Per-Site Sensitivity Overrides</h3>
-            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-              Set custom filtering thresholds for specific hostnames.
-            </p>
-            <div className="stat-row" style={{ gap: '0.5rem', alignItems: 'center' }}>
-              <input
-                type="text"
-                placeholder="example.com"
-                value={siteRuleHost}
-                onChange={(e) => setSiteRuleHost(e.target.value)}
-                style={{ flex: 1, padding: '0.35rem' }}
-              />
-              <input
-                type="number"
-                min={0}
-                max={1}
-                step={0.05}
-                value={siteRuleThreshold}
-                onChange={(e) => setSiteRuleThreshold(Number(e.target.value))}
-                style={{ width: '80px', padding: '0.35rem' }}
-              />
-              <button className="preset-btn" onClick={addSiteOverride}>Add</button>
-            </div>
-            <ul className="blocked-list" style={{ maxHeight: 'unset' }}>
-              {Object.entries(policy.perSite).length === 0 ? (
-                <li className="muted">No per-site overrides yet.</li>
-              ) : (
-                Object.entries(policy.perSite).map(([host, threshold]) => (
-                  <li key={host} className="blocked-item">
-                    <div className="blocked-header">
-                      <span className="badge">{host}</span>
-                      <span className="score">{(threshold * 100).toFixed(0)}%</span>
-                    </div>
-                    <button className="debug-toggle" onClick={() => removeSiteOverride(host)}>Remove</button>
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-
-          <div className="sl-span-full"><PluginLibraryPanel /></div>
-
-          <div className="sl-span-full"><AuthenticitySettingsPanel /></div>
-
-          <div className="card policy-card">
-            <h3>Privacy</h3>
-            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-              Local-first by default. Remote API is optional and user-configured.
-            </p>
-            <div className="stat-row">
-              <span className="label">Build profile</span>
-              <span className="value">{activeProfile}</span>
-            </div>
-            <div className="stat-row">
-              <span className="label">Remote API configured</span>
-              <span className="value">{routing.remoteApi.endpointUrl ? 'yes' : 'no'}</span>
-            </div>
-          </div>
-
-          <div className="card policy-card sl-span-full">
-            <h3>Advanced</h3>
-            <div className="preset-buttons">
-              <button className="preset-btn" onClick={exportSettings}>Export Settings</button>
-              <button className="preset-btn" onClick={importSettings}>Import Settings</button>
-              {onRestartWizard ? (
-                <button className="preset-btn" onClick={onRestartWizard}>Set up again</button>
-              ) : null}
-            </div>
-          </div>
-          </div>
-        </section>
-      ) : null}
-
-      {debugMode ? (
-        <div className="card">
-          <h3>Performance Metrics</h3>
-          {perfMetrics ? (
-            <div className="perf-metrics">
-              <div className="stat-row">
-                <span className="label">Time to first classification:</span>
-                <span className="value">
-                  {perfMetrics.firstClassificationTime !== null
-                    ? `${perfMetrics.firstClassificationTime.toFixed(0)}ms`
-                    : 'Pending...'}
-                </span>
-              </div>
-              <div className="stat-row">
-                <span className="label">Throughput:</span>
-                <span className="value">{perfMetrics.throughput.toFixed(1)} items/sec</span>
-              </div>
-              <div className="stat-row">
-                <span className="label">Avg batch time:</span>
-                <span className="value">{perfMetrics.averageBatchTime.toFixed(1)}ms</span>
-              </div>
-              <div className="stat-row">
-                <span className="label">Total classified:</span>
-                <span className="value">{perfMetrics.totalClassified}</span>
-              </div>
-              <div className="stat-row">
-                <span className="label">Current queue depth:</span>
-                <span className="value">{perfMetrics.currentQueueDepth}</span>
-              </div>
-              <div className="stat-row">
-                <span className="label">Avg queue depth:</span>
-                <span className="value">{perfMetrics.averageQueueDepth.toFixed(1)}</span>
-              </div>
-            </div>
-          ) : (
-            <p className="muted">No performance data available.</p>
-          )}
-
-          <h3>Recent Blocked Items ({blockedItems.length})</h3>
-          {blockedItems.length === 0 ? (
-            <p className="muted">No items blocked yet.</p>
-          ) : (
-            <ul className="blocked-list">
-              {blockedItems.slice(0, 10).map((item) => (
-                <li key={item.id} className="blocked-item">
-                  <div className="blocked-header">
-                    <span className="badge">{item.labelId ?? item.label ?? 'noise'}</span>
-                    <span className="score">{(item.score * 100).toFixed(0)}%</span>
-                    <span className="time">{formatTime(item.timestamp)}</span>
-                  </div>
-                  <div className="preview" title={item.preview}>{item.preview}</div>
-                  <div className="hostname">{item.hostname}</div>
-                </li>
-              ))}
-            </ul>
-          )}
-          <button className="debug-toggle" onClick={() => setDebugMode(false)}>Hide Debug</button>
-        </div>
-      ) : (
-        <button className="debug-toggle" onClick={() => setDebugMode(true)}>Show Debug</button>
-      )}
+      {debugSection}
     </div>
   );
 
   if (isOptionsPage) {
     return (
       <DashboardShell
-        title="SignalLens"
-        subtitle="Manage filtering, plugins, and authenticity assist."
+        title={t('common.appName')}
+        subtitle={t('options.subtitle')}
+        headerActions={headerActions}
+        tabs={settingsTabs}
+        activeTab={settingsTab}
+        onTabChange={setSettingsTab}
       >
-        {dashboardContent}
+        {optionsTabPanel}
       </DashboardShell>
     );
   }
 
-  return dashboardContent;
+  return popupDashboard;
 }
 
 export default App;

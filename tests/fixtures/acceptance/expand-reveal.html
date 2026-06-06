@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Acceptance — expand reveal</title>
+</head>
+<body>
+  <main id="thread">
+    <div class="comment">
+      <p data-fixture-unit="visible-comment">
+        Top-level comment visible before any interaction on the thread.
+      </p>
+      <button id="expander" type="button" aria-expanded="false">Show more replies</button>
+      <div id="collapsed-replies"></div>
+    </div>
+  </main>
+  <template id="lazy-reply">
+    <p data-fixture-unit="revealed-reply">
+      Nested reply that only becomes discoverable after the user expands the thread branch.
+    </p>
+  </template>
+</body>
+</html>

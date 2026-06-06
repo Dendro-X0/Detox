@@ -4,6 +4,18 @@ function normalizeHost(hostname: string): string {
     return hostname.trim().toLowerCase().replace(/^www\./, '');
 }
 
+export function normalizeHostname(hostname: string): string {
+    return normalizeHost(hostname);
+}
+
+export function isHostnameAllowlisted(hostname: string, allowDomains: readonly string[]): boolean {
+    const host = normalizeHost(hostname);
+    return allowDomains.some((domain) => {
+        const normalized = normalizeHost(domain);
+        return host === normalized || host.endsWith(`.${normalized}`);
+    });
+}
+
 function normalizeKeywordList(values: readonly string[]): readonly string[] {
     const normalized = values
         .map((value) => value.trim().toLowerCase())
@@ -39,8 +51,7 @@ export function getUserRules(): UserRulesSettings {
 }
 
 export function isDomainAllowlisted(hostname: string): boolean {
-    const host = normalizeHost(hostname);
-    return currentRules.allowDomains.some((domain) => host === domain || host.endsWith(`.${domain}`));
+    return isHostnameAllowlisted(hostname, currentRules.allowDomains);
 }
 
 export function textMatchesAllowKeywords(text: string): boolean {

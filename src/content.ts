@@ -1,26 +1,44 @@
 /// <reference types="chrome" />
-import type { SiteAdapter } from './site-adapters/adapter-interface';
-import { getMatchingAdapter } from './site-adapters/adapter-interface';
 import { globalProfiler } from './v2/core/profiler';
 import { ClassificationPipeline } from './core/pipeline/classification-pipeline';
+import { revealContentUnit } from './core/enforcement/apply-unit-enforcement';
+import { ENFORCEMENT_DATASET, enforcementAttrSelector } from './core/enforcement/element-state';
+import { CONTENT_PERF_REQUEST, CONTENT_PERF_RESPONSE } from './core/ipc/content-messages';
+import { createScanCoordinator, type ScanCoordinator } from './core/scanner/scan-coordinator';
+import { resolveSiteHints, resolveActiveHintPackIds } from './core/scanner/hint-registry';
+import { deriveScanStatus, type ScanDiagnosticsSnapshot } from './core/scanner/scan-diagnostics';
+import { isModEnabled } from './core/mods/mod-enablement-store';
 import { installPolicyLoader } from './core/policy/policy-store';
-import { installUserRulesLoader, subscribeToUserRulesChanges } from './core/rules/user-rules-store';
+import { installUserRulesLoader, subscribeToUserRulesChanges, isDomainAllowlisted } from './core/rules/user-rules-store';
 import { installEnforcementActionLoader } from './core/registry/action-registry';
 import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
 import { subscribeToInstalledModChanges } from './core/mods/installed-mod-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
 import { getBuildProfile } from './build-profile';
 import { installAuthenticityContentBridge } from './authenticity/content-bridge';
+import { initRuntimeLocale, refreshFilteredElementTitles, subscribeRuntimeLocale } from './i18n/runtime-locale';
+import { extractPageContext, getSelectionSnapshot } from './authenticity/page-extract';
+import { sessionRemove } from './core/storage/extension-session';
+import { resetPageScanStats } from './core/storage/scan-stats-store';
 
 console.log(`[Core] Content script loading (profile: ${getBuildProfile()})`);
+
+void initRuntimeLocale().then(() => {
+    subscribeRuntimeLocale(() => {
+        refreshFilteredElementTitles();
+    });
+});
+
 installAuthenticityContentBridge();
 
 let isEnabled = true;
-let currentAdapter: SiteAdapter | null = null;
+let scanCoordinator: ScanCoordinator | null = null;
 let stopObserving: (() => void) | null = null;
 
 const NAVIGATION_POLL_INTERVAL_MS: number = 750;
 const NAVIGATION_DEBOUNCE_MS: number = 250;
+const SCROLL_RESCAN_DEBOUNCE_MS: number = 400;
+const SCROLL_RESCAN_MIN_DELTA_PX: number = 500;
 
 type EnabledStorageRecord = {
     readonly enabled?: boolean;
@@ -95,15 +113,37 @@ function getThroughput(): number {
 
 const pipeline = new ClassificationPipeline({
     isEnabled: () => isEnabled,
-    getAdapter: () => currentAdapter,
     onClassificationRecorded: recordClassification,
     onBatchProcessed: recordBatchProcessed,
     onQueueDepth: recordQueueDepth,
     profiler: globalProfiler,
 });
 
+function revealAllFilteredContent(): void {
+    document.querySelectorAll<HTMLElement>(enforcementAttrSelector('blocked', 'true')).forEach((el) => {
+        const id = el.dataset[ENFORCEMENT_DATASET.blockId];
+        revealContentUnit(id ?? '', el);
+    });
+}
+
+function stopScanner(): void {
+    if (stopObserving) {
+        stopObserving();
+        stopObserving = null;
+    }
+    scanCoordinator?.stop();
+    scanCoordinator = null;
+    pipeline.clearQueues();
+}
+
 subscribeToUserRulesChanges(() => {
     pipeline.clearCache();
+    if (isDomainAllowlisted(location.hostname)) {
+        revealAllFilteredContent();
+        stopScanner();
+    } else if (isEnabled) {
+        scheduleRescan();
+    }
 });
 
 function requestNavigationCheck(): void {
@@ -118,14 +158,26 @@ chrome.storage.onChanged.addListener((changes) => {
     if (changes.enabled) {
         isEnabled = changes.enabled.newValue as boolean;
         if (!isEnabled) {
-            document.querySelectorAll<HTMLElement>('[data-detox-blocked="true"]').forEach((el) => {
-                if (currentAdapter) {
-                    const id = el.dataset.detoxId;
-                    if (id) currentAdapter.revealBlock(id);
-                }
-            });
+            revealAllFilteredContent();
         } else {
-            void ensureModsLoaded().then(() => initAdapter());
+            void ensureModsLoaded().then(() => initScanner());
+        }
+    }
+
+    const modeSettingsChanged =
+        changes.activeBrowsingModeId ||
+        changes.policy ||
+        changes.userRules ||
+        changes.userKeywords ||
+        changes.enforcementAction ||
+        changes.enabledModIds;
+
+    if (modeSettingsChanged) {
+        pipeline.clearCache();
+        if (changes.enabledModIds || changes.activeBrowsingModeId) {
+            void onModsConfigurationChanged();
+        } else if (isEnabled) {
+            scheduleRescan();
         }
     }
 });
@@ -165,16 +217,12 @@ async function bootstrap(): Promise<void> {
     if (!isEnabled) return;
     resetPageState();
     console.log('[Core] Initializing content pipeline...');
-    chrome.storage.session.remove('blockedItems');
-    setTimeout(() => requestIdleCallback(initAdapter), 2000);
+    void sessionRemove('blockedItems');
+    setTimeout(() => requestIdleCallback(initScanner), 500);
 }
 
 function getPageKey(): string {
-    return `${location.origin}${location.pathname}`;
-}
-
-function resetStats(): void {
-    chrome.storage.local.set({ stats: { scanned: 0, toxic: 0 } });
+    return `${location.origin}${location.pathname}${location.search}`;
 }
 
 function resetPageState(): void {
@@ -182,19 +230,20 @@ function resetPageState(): void {
         stopObserving();
         stopObserving = null;
     }
-    currentAdapter?.destroy();
-    currentAdapter = null;
+    scanCoordinator?.stop();
+    scanCoordinator = null;
     pipeline.clearCache();
     pipeline.clearQueues();
-    resetStats();
+    void resetPageScanStats(getPageKey());
     resetPerfMetrics();
+    lastScrollRescanY = window.scrollY;
     lastPageKey = getPageKey();
 }
 
 function scheduleRescan(): void {
     if (!isEnabled) return;
     void ensureModsLoaded().then(() => {
-        setTimeout(() => requestIdleCallback(initAdapter), 500);
+        setTimeout(() => requestIdleCallback(initScanner), 500);
     });
 }
 
@@ -228,32 +277,99 @@ function installNavigationHooks(): void {
 
 installNavigationHooks();
 
-function initAdapter(): void {
+let scrollRescanTimerId: number | null = null;
+let lastScrollRescanY = 0;
+
+function requestProgressiveRescan(immediate = false): void {
+    if (!isEnabled) return;
+    scanCoordinator?.rescan();
+    if (pipeline.getQueueDepth() > 0) {
+        pipeline.kickProgressiveScan(immediate);
+    }
+}
+
+window.addEventListener('scroll', () => {
+    const delta = Math.abs(window.scrollY - lastScrollRescanY);
+    if (delta < SCROLL_RESCAN_MIN_DELTA_PX) return;
+    if (scrollRescanTimerId !== null) return;
+    scrollRescanTimerId = window.setTimeout(() => {
+        scrollRescanTimerId = null;
+        lastScrollRescanY = window.scrollY;
+        requestProgressiveRescan();
+    }, SCROLL_RESCAN_DEBOUNCE_MS);
+}, { passive: true });
+
+function initScanner(): void {
     if (!isEnabled) return;
 
-    if (currentAdapter) {
-        currentAdapter.destroy();
-        currentAdapter = null;
+    if (isDomainAllowlisted(location.hostname)) {
+        stopScanner();
+        revealAllFilteredContent();
+        console.log('[Core] Site whitelisted — scanner disabled on this page');
+        return;
     }
+
     if (stopObserving) {
         stopObserving();
         stopObserving = null;
     }
+    scanCoordinator?.stop();
+    scanCoordinator = null;
 
-    const adapter = getMatchingAdapter();
-    if (!adapter) {
-        console.log('[Core] No adapter found for this site');
-        return;
-    }
+    console.log('[Core] Using universal scanner');
 
-    currentAdapter = adapter;
-    console.log(`[Core] Using adapter: ${adapter.name}`);
-
-    stopObserving = adapter.observeChanges({
-        onBlocksAdded: (blocks) => pipeline.handleBlocksAdded(blocks),
-        onBlocksRemoved: (blockIds) => pipeline.handleBlocksRemoved(blockIds),
-        onBlocksUpdated: (blocks) => pipeline.handleBlocksAdded(blocks),
+    scanCoordinator = createScanCoordinator(document, {
+        onAdded: (units) => {
+            pipeline.handleUnitsAdded(units);
+            pipeline.kickProgressiveScan(true);
+        },
+        onUpdated: (units) => {
+            pipeline.handleUnitsUpdated(units);
+        },
+    }, {
+        getHints: () => resolveSiteHints(location.hostname, isModEnabled),
     });
+
+    scanCoordinator.start();
+    stopObserving = () => {
+        scanCoordinator?.stop();
+        scanCoordinator = null;
+    };
+
+    pipeline.kickProgressiveScan(true);
+}
+
+function collectScanDiagnostics(): ScanDiagnosticsSnapshot {
+    const nowMs = Date.now();
+    const progress = pipeline.getScanProgress();
+    const coordinator = scanCoordinator?.getDiagnostics() ?? null;
+
+    return {
+        discoveryMode: scanCoordinator ? 'universal' : 'none',
+        adapterId: null,
+        activeHintPacks: resolveActiveHintPackIds(location.hostname, isModEnabled),
+        pageKey: getPageKey(),
+        coordinator,
+        queue: {
+            pending: progress.pending,
+            done: progress.done,
+            total: progress.total,
+            depth: pipeline.getQueueDepth(),
+        },
+        performance: {
+            totalClassified: perfMetrics.totalClassified,
+            firstClassificationMs: perfMetrics.firstClassificationTime,
+        },
+        status: deriveScanStatus({
+            enabled: isEnabled,
+            pendingRescan: coordinator?.pendingRescan ?? false,
+            queuePending: progress.pending,
+            queueDepth: pipeline.getQueueDepth(),
+            lastScanAtMs: coordinator?.lastScanAtMs ?? null,
+            nowMs,
+        }),
+        collectedAtMs: nowMs,
+    };
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
@@ -275,6 +391,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         sendResponse({ language, confidence: 0.5 });
         return true;
     }
+    if (message.type === 'getScanDiagnostics') {
+        sendResponse(collectScanDiagnostics());
+        return true;
+    }
     if (message.type === 'getPerformanceMetrics') {
         sendResponse({
             firstClassificationTime: perfMetrics.firstClassificationTime,
@@ -291,11 +411,19 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         sendResponse(globalProfiler.getSummary());
         return true;
     }
+    if (message.type === 'authenticity:getPageContext') {
+        sendResponse(extractPageContext());
+        return true;
+    }
+    if (message.type === 'authenticity:getSelection') {
+        sendResponse(getSelectionSnapshot());
+        return true;
+    }
     return false;
 });
 
 window.addEventListener('message', (event) => {
-    if (event.data?.type === 'detoxGetPerfMetrics') {
+    if (event.data?.type === CONTENT_PERF_REQUEST) {
         const metrics = {
             firstClassificationTime: perfMetrics.firstClassificationTime,
             totalClassified: perfMetrics.totalClassified,
@@ -306,6 +434,6 @@ window.addEventListener('message', (event) => {
             currentQueueDepth: pipeline.getQueueDepth(),
         };
         const profileSummary = globalProfiler.getSummary();
-        window.postMessage({ type: 'detoxPerfResponse', payload: { metrics, profileSummary } }, '*');
+        window.postMessage({ type: CONTENT_PERF_RESPONSE, payload: { metrics, profileSummary } }, '*');
     }
 });

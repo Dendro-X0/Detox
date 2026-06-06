@@ -1,5 +1,5 @@
 import type { Verdict } from '../types/verdict';
-import type { EnforcementResult } from '../../site-adapters/adapter-interface';
+import type { EnforcementResult } from '../enforcement/enforcement-result';
 
 export type EnforcementContext = {
     readonly blockId?: string;

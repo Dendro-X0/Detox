@@ -1,7 +1,7 @@
 {
   "name": "detox-extension",
   "private": true,
-  "version": "2.0.1",
+  "version": "2.1.2",
   "type": "module",
   "scripts": {
     "dev": "node node_modules/vite/bin/vite.js",
@@ -18,8 +18,29 @@
     "build:firefox": "pnpm build:core:firefox",
     "lint": "node node_modules/eslint/bin/eslint.js .",
     "preview": "node node_modules/vite/bin/vite.js preview",
+    "test:scanner": "vitest run --config vitest.config.ts",
+    "test:scanner:s0": "vitest run --config vitest.config.ts -t \"S0\"",
+    "test:scanner:s4": "vitest run --config vitest.config.ts -t \"S4\"",
+    "test:scanner:s5": "vitest run --config vitest.config.ts -t \"S5\"",
+    "test:scanner:pipeline": "vitest run --config vitest.config.ts -t \"8.4 — pipeline\"",
+    "test:scanner:perf": "vitest run --config vitest.config.ts -t \"8.4 — scanner perf\"",
+    "test:core": "pnpm test:scanner && pnpm test:e2e:core",
+    "test:ci": "pnpm test:scanner && pnpm build:core && pnpm exec playwright install chromium && pnpm exec playwright test tests/core-filtering.spec.ts tests/scanner-acceptance-e2e.spec.ts",
+    "generate:fixtures": "node scripts/generate-acceptance-fixtures.mjs",
+    "locale:de": "node scripts/fill-de-overrides.mjs && node scripts/generate-de-locale.mjs",
     "test:e2e": "node node_modules/@playwright/test/cli.js test",
-    "test:perf": "node node_modules/@playwright/test/cli.js test tests/perf-regression.spec.ts"
+    "test:e2e:core": "pnpm build && node node_modules/@playwright/test/cli.js install chromium && node node_modules/@playwright/test/cli.js test tests/core-filtering.spec.ts",
+    "test:e2e:acceptance": "pnpm build && node node_modules/@playwright/test/cli.js install chromium && node node_modules/@playwright/test/cli.js test tests/scanner-acceptance-e2e.spec.ts",
+    "test:perf": "node node_modules/@playwright/test/cli.js test tests/perf-regression.spec.ts",
+    "release:verify": "node scripts/verify-store-build.mjs dist",
+    "release:verify:firefox": "node scripts/verify-store-build.mjs dist-firefox",
+    "release:chrome": "pnpm build:core && node scripts/verify-store-build.mjs dist && node scripts/package-release.mjs --dir dist --label signallens-chrome-core",
+    "release:firefox": "pnpm build:core:firefox && node scripts/verify-store-build.mjs dist-firefox && node scripts/package-release.mjs --dir dist-firefox --label signallens-firefox-core",
+    "signing:generate": "node scripts/generate-mod-signing-key.mjs",
+    "signing:apply-anchor": "node scripts/apply-mod-trust-anchor.mjs",
+    "signing:resign": "node scripts/resign-mod-packages.mjs",
+    "store:sync-meta": "node scripts/sync-store-meta.mjs",
+    "test:firefox": "pnpm build:core:firefox && vitest run --config vitest.config.ts tests/firefox"
   },
   "dependencies": {
     "@xenova/transformers": "^2.17.2",
@@ -41,10 +62,12 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "happy-dom": "^20.9.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
     "vite-plugin-top-level-await": "^1.6.0",
-    "vite-plugin-wasm": "^3.5.0"
+    "vite-plugin-wasm": "^3.5.0",
+    "vitest": "^4.1.8"
   }
 }

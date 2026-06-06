@@ -1,13 +1,25 @@
 import type { EnforcementContext } from '../types/enforcement';
-import type { EnforcementResult } from '../../site-adapters/adapter-interface';
+import type { EnforcementResult } from './enforcement-result';
 
 export const ENFORCEMENT_DATASET = {
-    blocked: 'detoxBlocked',
-    verdict: 'detoxVerdict',
-    blockId: 'detoxId',
-    actionId: 'detoxActionId',
-    originalStyles: 'detoxOriginalStyles',
+    blocked: 'slBlocked',
+    verdict: 'slVerdict',
+    blockId: 'slId',
+    actionId: 'slActionId',
+    originalStyles: 'slOriginalStyles',
+    userRevealed: 'slUserRevealed',
 } as const;
+
+export type EnforcementDatasetKey = keyof typeof ENFORCEMENT_DATASET;
+
+/** Build a `[data-sl-…]` selector for a dataset key (optional attribute value). */
+export function enforcementAttrSelector(key: EnforcementDatasetKey, value?: string): string {
+    const kebab = ENFORCEMENT_DATASET[key].replace(/([A-Z])/g, '-$1').toLowerCase();
+    const attr = `data-${kebab}`;
+    return value === undefined ? `[${attr}]` : `[${attr}="${value}"]`;
+}
+
+const revealHandlerByElement = new WeakMap<HTMLElement, (ev: MouseEvent) => void>();
 
 type StoredStyles = {
     readonly filter: string;
@@ -92,19 +104,35 @@ export function markElementBlocked(element: HTMLElement, actionId: string, block
 
 export function clearBlockedState(element: HTMLElement): void {
     element.title = '';
+    const handler = revealHandlerByElement.get(element);
+    if (handler) {
+        element.removeEventListener('click', handler, true);
+        revealHandlerByElement.delete(element);
+    }
     element.onclick = null;
     delete element.dataset[ENFORCEMENT_DATASET.blocked];
     delete element.dataset[ENFORCEMENT_DATASET.verdict];
     delete element.dataset[ENFORCEMENT_DATASET.actionId];
 }
 
+export function markElementUserRevealed(element: HTMLElement): void {
+    element.dataset[ENFORCEMENT_DATASET.userRevealed] = 'true';
+}
+
 export function attachRevealHandler(element: HTMLElement, reveal: () => void): void {
     element.style.cursor = 'pointer';
-    element.onclick = (ev) => {
+    const existing = revealHandlerByElement.get(element);
+    if (existing) {
+        element.removeEventListener('click', existing, true);
+    }
+    const handler = (ev: MouseEvent): void => {
         ev.preventDefault();
         ev.stopPropagation();
+        markElementUserRevealed(element);
         reveal();
     };
+    revealHandlerByElement.set(element, handler);
+    element.addEventListener('click', handler, true);
 }
 
 export function storeVerdict(element: HTMLElement, verdict: unknown): void {

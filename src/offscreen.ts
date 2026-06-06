@@ -1,4 +1,5 @@
 import type { CoreIpcMessage } from './core/ipc/messages';
+import { OFFSCREEN_PORT_NAME } from './core/runtime/constants';
 import { InferenceRuntimeHost } from './core/runtime/inference-runtime-host';
 import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
@@ -13,7 +14,6 @@ type OffscreenResponse = {
     readonly payload: CoreIpcMessage;
 };
 
-const OFFSCREEN_PORT_NAME = 'detox-offscreen';
 
 let runtimeHost: InferenceRuntimeHost | null = null;
 let bootstrapPromise: Promise<InferenceRuntimeHost> | null = null;
@@ -22,9 +22,9 @@ async function ensureRuntimeHost(): Promise<InferenceRuntimeHost> {
     if (runtimeHost) return runtimeHost;
     if (!bootstrapPromise) {
         bootstrapPromise = (async () => {
-            await loadBuiltinMods();
+            await loadBuiltinMods('inference');
             subscribeToEnabledModChanges(() => {
-                void loadBuiltinMods();
+                void loadBuiltinMods('inference');
             });
             runtimeHost = new InferenceRuntimeHost();
             return runtimeHost;

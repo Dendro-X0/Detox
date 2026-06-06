@@ -8,13 +8,40 @@ The public key in `src/core/mods/trust-anchor.ts` matches `dev-private.pem` in t
 
 **Do not ship this private key in production releases.** Replace both keys before publishing a store build.
 
-## Sign packages
+## Sign packages (development key)
 
 ```bash
 node scripts/sign-mod-package.mjs packages/mod-unlocks/src/adapter-reddit.payload.json
 ```
 
-Writes a signed manifest next to the payload (`adapter-reddit.signallens-mod.json`).
+Writes `packages/mod-unlocks/adapter-reddit.signallens-mod.json`.
+
+Optional production key:
+
+```bash
+node scripts/sign-mod-package.mjs packages/mod-unlocks/src/adapter-reddit.payload.json \
+  --private-key packages/signing/prod-private.pem
+```
+
+## Production key rotation (v2.2.0)
+
+Run locally — private key stays gitignored.
+
+```bash
+# 1. Generate prod keypair (packages/signing/prod-*.pem)
+node scripts/generate-mod-signing-key.mjs
+
+# 2. Update trust anchor in source
+node scripts/apply-mod-trust-anchor.mjs --pem packages/signing/prod-public.pem
+
+# 3. Re-sign bundled unlock manifests
+node scripts/resign-mod-packages.mjs --private-key packages/signing/prod-private.pem
+
+# 4. Verify store build no longer warns about dev key
+pnpm release:verify
+```
+
+Keep `prod-private.pem` offline or in CI secrets only.
 
 ## Install in the extension
 

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fixture — Reddit hints</title>
+</head>
+<body>
+  <main>
+    <article data-testid="post-container">
+      <p data-fixture-unit="post-body">
+        Original post on a synthetic reddit thread used to validate optional site hints that
+        ignore sidebar chrome and boost comment text slots without site-specific adapters.
+      </p>
+    </article>
+    <div data-testid="reddit-sidebar" class="widget-panel">
+      <p data-fixture-chrome="sidebar-promo">
+        Sidebar recommendation copy that resembles thread prose but should be ignored when
+        Reddit hint selectors are active during universal scanner discovery on reddit hosts.
+      </p>
+    </div>
+    <div class="reddit-comment" data-testid="comment">
+      <p data-fixture-unit="thread-comment">
+        Top-level reply with conventional paragraph markup that the scanner should always
+        discover whether or not Reddit hints are enabled for this offline acceptance page.
+      </p>
+    </div>
+    <div class="reddit-comment" data-testid="comment">
+      <div slot="text" data-fixture-unit="slot-comment">
+        Nested slot text without a paragraph tag must still be discovered when Reddit boost
+        selectors target comment hosts and pierce slot text containers during scanning.
+      </div>
+    </div>
+  </main>
+</body>
+</html>

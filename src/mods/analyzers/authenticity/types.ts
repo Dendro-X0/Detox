@@ -52,6 +52,7 @@ export type AuthenticityReport = {
     readonly references: readonly SourceReference[];
     readonly assessments: readonly AuthenticityAssessment[];
     readonly t0Notes: readonly string[];
+    readonly t1Notes: readonly string[];
     readonly limitations: string;
     readonly searchOnly: boolean;
     readonly createdAt: number;

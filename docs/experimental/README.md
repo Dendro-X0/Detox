@@ -1,6 +1,8 @@
 # Experimental features
 
-Ideas under exploration. **Not scheduled for core** until spikes prove feasibility and fit product principles.
+Features that ship **separately from core filtering** — advisory-only, opt-in, and grounded in retrieval rather than auto-blocking.
+
+→ Doc hub: [`../README.md`](../README.md) · Product phases: [`../planning/product-roadmap.md`](../planning/product-roadmap.md)
 
 ## Principles (all experimental work)
 
@@ -12,22 +14,25 @@ Ideas under exploration. **Not scheduled for core** until spikes prove feasibili
 
 ## Features
 
-| Feature | Status | Doc |
-|---------|--------|-----|
-| **Authenticity / claim assist** | Design spec complete; spikes not started | [`authenticity-analysis.md`](./authenticity-analysis.md) |
+| Feature | Status | Doc | Code |
+|---------|--------|-----|------|
+| **Authenticity / claim assist** | **Prototype shipped** (Phase G) | [`authenticity-analysis.md`](./authenticity-analysis.md) | `src/mods/analyzers/authenticity/` |
 
 ### Authenticity assist (summary)
 
-- User **selects** a post, comment, or passage (default).
-- Optional **full-page** analysis for blogs and papers only — discouraged on dense social feeds.
-- **Tiered pipeline:** local heuristics → optional local model → search → LLM compare on fetched snippets only.
+- User **selects** a post, comment, or passage (context menu).
+- **Tiered pipeline:** T0 local heuristics → T2 search → optional T3 LLM compare on fetched snippets only.
 - **Grounded citations:** LLM never emits URLs; snippet verification required.
-- **UI:** side panel report + dismissible advisory flag on selection.
+- **UI:** side panel report + settings in Options → Plugins tab.
+- **Search-only default:** zero LLM tokens until user enables T3 and configures an endpoint.
 
-Product phase: **G** in [`../product-roadmap.md`](../product-roadmap.md) (after dashboard + user rules).
+Product phase **G** is complete. The feature remains **experimental** — API surfaces, quotas, and UX will evolve.
+
+**Try it:** see [`../guides/development.md`](../guides/development.md#testing-authenticity-assist).
 
 ## Adding a new experimental spec
 
 1. Create `docs/experimental/<feature-name>.md` using authenticity doc as template.
-2. Link from this README and from [`../product-roadmap.md`](../product-roadmap.md) experimental table.
+2. Link from this README and from [`../planning/product-roadmap.md`](../planning/product-roadmap.md).
 3. State relationship to core (separate mod, shared adapters, etc.).
+4. Implement under `src/mods/analyzers/` or a new mod kind — **do not** wire into filter enforcement.

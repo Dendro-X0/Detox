@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fixture — nested comments</title>
+</head>
+<body>
+  <main>
+    <article data-fixture-unit="post-body">
+      <h2>Discussion thread</h2>
+      <p>
+        The original post asks whether remote work improves productivity for software teams
+        when async communication norms are documented clearly from the start.
+      </p>
+    </article>
+    <section aria-label="Comments">
+      <div class="comment" data-comment-id="c1">
+        <p data-fixture-unit="comment-1">
+          I have worked remotely for six years and find written decision logs more valuable
+          than daily video standups that could have been a short document instead.
+        </p>
+        <div class="reply">
+          <p data-fixture-unit="comment-1-reply">
+            Agreed on decision logs. We also keep a single source of truth wiki so newcomers
+            are not lost in chat history from months ago.
+          </p>
+        </div>
+      </div>
+      <div class="comment" data-comment-id="c2">
+        <p data-fixture-unit="comment-2">
+          Hybrid schedules work when teams overlap four hours for pairing and leave deep work
+          blocks protected on calendar for the rest of the day without meeting creep.
+        </p>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

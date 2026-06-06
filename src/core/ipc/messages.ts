@@ -43,5 +43,8 @@ export type CoreIpcMessage =
     | RuntimeStatusResponse
     | ErrorResponse;
 
-/** @deprecated Use CoreIpcMessage */
+/** @deprecated Use {@link CoreIpcMessage} */
 export type DetoxIpcMessage = CoreIpcMessage;
+
+/** @deprecated Use {@link CoreIpcMessage} */
+export type SignalLensIpcMessage = CoreIpcMessage;

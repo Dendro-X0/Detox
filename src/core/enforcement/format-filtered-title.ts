@@ -1,5 +1,9 @@
 import type { Verdict } from '../types/verdict';
+import { runtimeTranslate } from '../../i18n/runtime-locale';
 
 export function formatFilteredTitle(verdict: Verdict): string {
-    return `Filtered content (${verdict.labelId}: ${(verdict.score * 100).toFixed(1)}%) — Click to reveal`;
+    return runtimeTranslate('enforcement.filteredTitle', {
+        labelId: verdict.labelId,
+        percent: (verdict.score * 100).toFixed(1),
+    });
 }

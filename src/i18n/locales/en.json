@@ -1,0 +1,718 @@
+{
+  "meta": {
+    "localeId": "en",
+    "nativeName": "English",
+    "englishName": "English",
+    "direction": "ltr"
+  },
+  "common": {
+    "appName": "SignalLens",
+    "back": "Back",
+    "continue": "Continue",
+    "finishSetup": "Finish setup",
+    "saving": "Saving…",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "yes": "yes",
+    "no": "no",
+    "none": "none"
+  },
+  "options": {
+    "loadingSubtitle": "Loading your dashboard…",
+    "subtitle": "Manage filtering, plugins, and authenticity assist.",
+    "preparingSession": "Preparing your session…",
+    "loadingFocusView": "Preparing your focus view...",
+    "loadingLargePages": "This may take a moment on large pages"
+  },
+  "popup": {
+    "setupPrompt": "Finish setup to personalize what gets filtered.",
+    "startWizard": "Start setup wizard",
+    "focusEnabled": "Focus Mode Enabled",
+    "focusDisabled": "Focus Mode Disabled",
+    "browsingMode": "Browsing mode",
+    "customSetup": "Custom setup",
+    "thisPage": "This page",
+    "scanned": "Scanned",
+    "filtered": "Filtered",
+    "scanningProgress": "{{discovered}} blocks found · scanning in progress",
+    "noMatchesYet": "Nothing matched your block keywords yet. Add topics under Rules in the dashboard.",
+    "diagnosticsSummary": "Scan diagnostics",
+    "diagnosticsUnavailable": "Open a normal web page (not chrome:// or the extension UI) to view live scanner stats.",
+    "discovery": "Discovery",
+    "discoveryUniversal": "Universal scanner",
+    "discoveryInactive": "Not active",
+    "hintPacks": "Hint packs",
+    "discovered": "Discovered",
+    "queue": "Queue",
+    "queuePendingDone": "{{pending}} pending · {{done}} done",
+    "fingerprints": "Fingerprints",
+    "domSnapshot": "DOM snapshot",
+    "domSnapshotUnits": "{{count}} units",
+    "lastRescan": "Last rescan",
+    "scanCycles": "Scan cycles",
+    "lastDiff": "Last diff",
+    "lastDiffValues": "+{{added}} / ~{{updated}}",
+    "firstClassify": "First classify",
+    "firstClassifyMs": "{{ms}}ms",
+    "today": "Today",
+    "last7Days": "Last 7 days",
+    "runtime": "Runtime",
+    "scanner": "Scanner",
+    "scannerUniversal": "Universal",
+    "classifier": "Classifier",
+    "lastError": "Last error",
+    "openDashboard": "Open Dashboard",
+    "pageStatus": {
+      "unsupported": "Not available on this page type.",
+      "focusOff": "Focus mode is off — filtering paused everywhere.",
+      "whitelisted": "Scanning skipped on {{host}} (whitelisted).",
+      "scanning": "Scanning this page…",
+      "filtered": "{{count}} items filtered — click any match to reveal.",
+      "noMatches": "Scanned — nothing matched your rules yet.",
+      "idle": "Ready to scan this page."
+    },
+    "pauseThisSite": "Pause filtering on this site",
+    "pauseThisSiteSaving": "Saving…",
+    "pauseThisSiteDone": "{{host}} added to whitelist.",
+    "manageWhitelist": "Manage site whitelist"
+  },
+  "settings": {
+    "tabs": {
+      "overview": "Overview",
+      "filtering": "Filtering",
+      "rules": "Rules",
+      "plugins": "Plugins",
+      "privacy": "Privacy"
+    },
+    "language": {
+      "heading": "Interface language",
+      "description": "Choose the language for SignalLens menus and setup. Additional translations will ship as locale templates are added.",
+      "saved": "Preference saved — new strings apply immediately."
+    },
+    "header": {
+      "focusOn": "Focus on",
+      "focusOff": "Focus off",
+      "today": "Today",
+      "blockedToday": "Blocked today",
+      "scanned7Day": "7-day scanned"
+    },
+    "overview": {
+      "tabIntro": "Your control center — pick a browsing mode, see activity, and jump to detailed settings.",
+      "currentSettings": "Current Settings",
+      "focusMode": "Focus mode",
+      "browsingMode": "Browsing mode",
+      "sensitivity": "Sensitivity",
+      "filterStyle": "Filter style",
+      "perSiteOverrides": "Per-site overrides",
+      "activityHeading": "Browsing activity",
+      "activityEmpty": "No pages scanned yet. Visit a site with posts or comments while focus mode is on.",
+      "activityScannedToday": "Scanned today",
+      "activityFilteredToday": "Filtered today",
+      "activityScanned7d": "Scanned (7 days)",
+      "activityFiltered7d": "Filtered (7 days)",
+      "statusStrip": {
+        "focusOn": "Focus on",
+        "focusOff": "Focus off",
+        "mode": "Mode",
+        "modeCustom": "Custom",
+        "whitelist": "{{count}} whitelisted",
+        "filteredToday": "{{count}} filtered today"
+      },
+      "quickLinksHeading": "Configure",
+      "quickLinksEssentialHeading": "Fine-tune (optional)",
+      "quickLinksEssentialHint": "Most people stay on the wizard defaults. Open these only if you want to adjust sensitivity, keywords, or whitelisted work sites.",
+      "quickLinksAdvancedHeading": "Advanced",
+      "quickLinksAdvancedHint": "Plugins, authenticity assist, export/import, and developer tools.",
+      "quickLinks": {
+        "filtering": "Sensitivity, filter style, and inference",
+        "rules": "Keywords, allowlists, and per-site thresholds",
+        "plugins": "Detectors, site hints, and authenticity assist",
+        "privacy": "Export, import, and developer tools"
+      },
+      "gettingStarted": {
+        "heading": "Getting started",
+        "description": "SignalLens runs on every normal web page. Visit a site with feeds or comments to see filtering in action.",
+        "tipBrowse": "Open a page with posts or comments — filtering starts automatically when focus mode is on.",
+        "tipReveal": "Click any dimmed or blurred block to reveal it. Nothing is permanently hidden.",
+        "tipRules": "Adjust topics and keywords under Rules, or switch browsing mode above.",
+        "tipAuthenticity": "Optional: enable authenticity assist under Plugins for advisory source checks (side panel)."
+      }
+    },
+    "advanced": {
+      "heading": "Advanced",
+      "exportSettings": "Export Settings",
+      "importSettings": "Import Settings",
+      "setupAgain": "Set up again",
+      "invalidImport": "Could not read that settings file. Check the JSON format and try again."
+    },
+    "privacy": {
+      "tabIntro": "Understand what leaves your device, export your setup, and access optional developer diagnostics.",
+      "heading": "Privacy",
+      "description": "Local-first by default. Remote API is optional and user-configured.",
+      "buildProfile": "Build profile",
+      "remoteApiConfigured": "Remote API configured",
+      "policyLink": "Privacy policy (GitHub)"
+    },
+    "systemStatus": {
+      "heading": "System Status",
+      "runtime": "Runtime",
+      "scanner": "Scanner",
+      "scannerUniversal": "Universal",
+      "pack": "Pack",
+      "mode": "Mode",
+      "escalation": "Escalation",
+      "classifier": "Classifier",
+      "lastError": "Last error",
+      "on": "on",
+      "off": "off",
+      "states": {
+        "ready": "Ready",
+        "idle": "Idle",
+        "loading": "Loading",
+        "error": "Error",
+        "unknown": "Unknown"
+      },
+      "detectorHeuristic": "Heuristic keywords"
+    },
+    "filtering": {
+      "tabIntro": "Control how aggressively content is classified and how matches appear on the page.",
+      "summaryHeading": "Current filtering",
+      "summaryInference": "Inference",
+      "summarySensitivity": "Sensitivity",
+      "summaryStyle": "Filter style",
+      "summaryClassifier": "Active classifier",
+      "browsingModeNotice": "{{mode}} browsing mode is active. Changes here switch you to a custom setup.",
+      "classifyHeading": "Classify content",
+      "classifyDescription": "How SignalLens decides what counts as noise — inference mode, match threshold, and active detectors.",
+      "presentHeading": "Present matches",
+      "presentDescription": "How filtered blocks look on the page. Click any match to reveal it.",
+      "sensitivityDescription": "Higher sensitivity flags more content. Lower sensitivity reduces false positives.",
+      "detectorsHeading": "Active detectors",
+      "detectorsDescription": "Detectors run on extracted text from the universal scanner. Manage more under Plugins.",
+      "editKeywordsLink": "Edit block keywords under Rules →",
+      "heuristicDescription": "Keyword lists and patterns — works offline, no model download.",
+      "localPackDescription": "Bundled ONNX model for semantic scoring. Requires local pack files.",
+      "remoteApiHeading": "Remote API escalation (optional)",
+      "languagePackDescription": "Used when local pack inference is selected. Auto-matches page language when possible.",
+      "inferenceHeading": "Inference",
+      "inferenceCore": "Heuristic mode — works offline with no model files.",
+      "inferenceFull": "Heuristic mode works offline with no model files. Local pack uses bundled ONNX weights.",
+      "heuristicOffline": "Heuristic (offline)",
+      "localPackOnnx": "Local pack (ONNX)",
+      "escalationLabel": "Escalate uncertain items to remote API (opt-in)",
+      "apiEndpointUrl": "API endpoint URL",
+      "apiEndpointPlaceholder": "https://your-api.example/classify",
+      "apiKeyOptional": "API key (optional)",
+      "apiKeyPlaceholder": "Bearer token",
+      "remoteApiStatus": "Remote API: {{status}}",
+      "remoteApiConfigured": "configured",
+      "remoteApiNotConfigured": "not configured",
+      "modeLabel": "Mode:",
+      "sensitivityHeading": "Filter Sensitivity",
+      "threshold": "Threshold: {{percent}}%",
+      "filterStyleHeading": "Filter Style",
+      "filterStyleDescription": "Choose how filtered content appears on the page. Click any filtered block to reveal it.",
+      "languagePackHeading": "Language Pack",
+      "advancedPackSummary": "Advanced: language pack and ONNX routing",
+      "hide": "Hide",
+      "change": "Change",
+      "detected": "Detected:",
+      "detectedConfidence": "{{language}} ({{percent}}% confidence)",
+      "active": "Active:",
+      "autoSelecting": "Auto-selecting...",
+      "autoSuffix": " (auto)",
+      "installedPacks": "Installed Packs",
+      "availableToInstall": "Available to Install",
+      "install": "Install",
+      "installDemoAlert": "Pack installation would start here. Not implemented in this demo.",
+      "perSiteHeading": "Per-Site Sensitivity Overrides",
+      "perSiteDescription": "Set custom filtering thresholds for specific hostnames.",
+      "hostPlaceholder": "example.com",
+      "add": "Add",
+      "noPerSiteOverrides": "No per-site overrides yet.",
+      "remove": "Remove"
+    },
+    "debug": {
+      "toolsHeading": "Developer tools",
+      "performanceHeading": "Performance Metrics",
+      "timeToFirstClassification": "Time to first classification:",
+      "pending": "Pending...",
+      "throughput": "Throughput:",
+      "throughputValue": "{{value}} items/sec",
+      "avgBatchTime": "Avg batch time:",
+      "avgBatchTimeValue": "{{value}}ms",
+      "totalClassified": "Total classified:",
+      "currentQueueDepth": "Current queue depth:",
+      "avgQueueDepth": "Avg queue depth:",
+      "noPerformanceData": "No performance data available.",
+      "recentBlockedHeading": "Recent Blocked Items ({{count}})",
+      "noItemsBlocked": "No items blocked yet.",
+      "noiseLabel": "noise"
+    }
+  },
+  "rules": {
+    "tabIntro": "Pause filtering on specific sites, then fine-tune keywords and per-site thresholds.",
+    "advanced": {
+      "perSiteSummary": "Advanced: per-site sensitivity overrides"
+    },
+    "heading": "Your Filtering Rules",
+    "description": "Customize what gets filtered. Wizard choices seed these lists; you can refine them anytime.",
+    "summary": {
+      "block": "{{count}} block keywords",
+      "allow": "{{count}} allow keywords",
+      "domains": "{{count}} allowed domains"
+    },
+    "topicPresets": {
+      "outrage": "Outrage",
+      "spam": "Spam",
+      "hostile": "Hostile",
+      "engagement-bait": "Engagement bait",
+      "low-effort": "Low effort"
+    },
+    "blockKeywords": {
+      "title": "Block keywords",
+      "description": "Content containing these phrases is more likely to be filtered.",
+      "placeholder": "e.g. sponsored, clickbait"
+    },
+    "allowKeywords": {
+      "title": "Allow keywords",
+      "description": "Content with these phrases is never filtered, even if it matches block rules.",
+      "placeholder": "e.g. important, breaking news"
+    },
+    "allowDomains": {
+      "title": "Allowed domains",
+      "description": "Filtering is paused on these sites (useful for work tools or email).",
+      "placeholder": "e.g. mail.google.com"
+    },
+    "add": "Add",
+    "remove": "Remove",
+    "noEntries": "No entries yet.",
+    "saved": "Rules saved."
+  },
+  "whitelist": {
+    "heading": "Site whitelist",
+    "description": "SignalLens will not scan or filter pages on these sites. Use this for work tools, spreadsheets, and apps where overlays would get in the way.",
+    "count": "{{count}} sites whitelisted",
+    "presetsHeading": "Suggested sites",
+    "presetsDescription": "Turn on a group to skip scanning on common productivity and media apps.",
+    "presetDomainCount": "{{count}} domains",
+    "customHeading": "Custom sites",
+    "customDescription": "Add any hostname (e.g. app.example.com). Matching subdomains are included automatically.",
+    "placeholder": "e.g. mail.google.com",
+    "noCustomSites": "No custom sites yet.",
+    "presets": {
+      "google-workspace": {
+        "label": "Google Workspace",
+        "hint": "Docs, Sheets, Drive, Gmail, Calendar, and Meet"
+      },
+      "online-spreadsheets": {
+        "label": "Online spreadsheets",
+        "hint": "Microsoft Excel online, OneDrive, Airtable, and Coda"
+      },
+      "music-lyrics": {
+        "label": "Music streaming",
+        "hint": "Web players where synced lyrics would be filtered"
+      }
+    }
+  },
+  "plugins": {
+    "tabIntro": "The universal scanner runs on every page. Enable optional site hints and detectors below.",
+    "advanced": {
+      "authenticitySummary": "Advanced: authenticity assist (experimental)"
+    },
+    "heading": "Plugin library",
+    "description": "SignalLens discovers content with a universal scanner on every page. Site hints tune precision on specific hosts — no separate adapters required.",
+    "unlockCount": " {{count}} mod(s) can be unlocked via signed packages.",
+    "advancedInstall": "Install signed packages",
+    "advancedInstallDescription": "For contributors and power users. Most people only need the bundled mods above.",
+    "advancedSectionSummary": "Advanced ({{count}})",
+    "advancedLockedHeading": "Full build mods",
+    "advancedLockedDescription": "These mods ship in the full build or via signed unlock packages. The core build works without them.",
+    "installPackage": "Install package…",
+    "installFromUrl": "Install from URL",
+    "installedPackages": "Installed packages: {{names}}",
+    "sectionEnabled": "{{enabled}} / {{total}} on",
+    "enableAllHints": "Enable all site hints",
+    "sections": {
+      "hint": "Site hints",
+      "detector": "Detectors",
+      "action": "Filter styles"
+    },
+    "sectionDescriptions": {
+      "hint": "Optional. Improves region detection on Reddit and YouTube — filtering still works everywhere without these.",
+      "detector": "How text is classified. Heuristic keywords use your block lists; noise patterns add promo and bait phrasing.",
+      "action": "How matched blocks look on the page (dim, blur, or collapse). Also editable under Filtering."
+    },
+    "badges": {
+      "bundled": "Bundled",
+      "installed": "Installed",
+      "alwaysOn": "Always on"
+    },
+    "notInProfile": "Not in this build profile. Rebuild with `pnpm build:full` or install an unlock package (see `packages/mod-unlocks/`).",
+    "requiredBaseline": "Required for baseline filtering",
+    "uninstallPackage": "Uninstall package",
+    "progress": {
+      "verify": "Verifying signature…",
+      "download": "Downloading {{file}}… {{percent}}%",
+      "downloadDefaultFile": "assets",
+      "complete": "Install complete.",
+      "failed": "Install failed."
+    },
+    "errors": {
+      "notInCoreBuild": "This plugin is not included in the core build. Run `pnpm build:full` or install a signed unlock package from packages/mod-unlocks/.",
+      "invalidPackage": "Invalid package file.",
+      "urlPrompt": "Mod package manifest URL (.signallens-mod.json):",
+      "downloadTimeout": "Download timed out after 30s.",
+      "downloadFailed": "Download failed"
+    }
+  },
+  "authenticity": {
+    "heading": "Authenticity assist (experimental)",
+    "description": "Selection-first research helper. Flags are advisory only — content is never hidden. Default: search-only (zero LLM tokens).",
+    "openSidePanel": "Open report panel",
+    "enable": "Enable authenticity assist",
+    "dailyQuotaUsed": "Daily quota used",
+    "dailyQuotaCap": "Daily quota cap",
+    "tiersHeading": "Tiers",
+    "tierT0": "T0 — local heuristics (free)",
+    "tierT1": "T1 — local checkworthiness ranking (free)",
+    "tierT2": "T2 — search API",
+    "tierT3": "T3 — LLM compare snippets (user endpoint)",
+    "searchOnlyDefault": "Search-only by default (recommended)",
+    "scopeHeading": "Scope",
+    "allowFullPage": "Allow full-page analysis in side panel (discouraged on social feeds)",
+    "searchHeading": "Search",
+    "provider": "Provider",
+    "searchProviders": {
+      "wikipedia": "Wikipedia (free, demo)",
+      "brave": "Brave Search API",
+      "custom": "Custom search endpoint",
+      "none": "None"
+    },
+    "braveApiKey": "Brave API key",
+    "braveApiKeyPlaceholder": "Brave API key",
+    "customSearchUrl": "Custom search URL",
+    "customSearchPlaceholder": "https://api.example.com/search?q={query}",
+    "llmHeading": "LLM (T3)",
+    "llmEndpoint": "Chat completions URL",
+    "llmEndpointPlaceholder": "https://api.openai.com/v1/chat/completions",
+    "llmApiKey": "API key (optional)",
+    "llmApiKeyPlaceholder": "API key (optional)",
+    "limitsHint": "Max {{claims}} claims · {{results}} results per query. URLs must come from search results — the model cannot add links.",
+    "job": {
+      "cachedReport": "Loaded cached report",
+      "extractingClaims": "Extracting claims…",
+      "searchingSources": "Searching sources…",
+      "fetchingSnippets": "Fetching and verifying snippets…",
+      "comparingClaims": "Comparing claims to sources…",
+      "reportReady": "Report ready"
+    },
+    "notes": {
+      "selectionShort": "Selection is very short — analysis may be limited.",
+      "hasStatistics": "Contains numbers or statistics — worth checking primary sources.",
+      "factualWithoutLinks": "Makes factual-sounding statements without links in the selection.",
+      "noClaims": "No checkworthy factual claims detected — report may be sparse.",
+      "t1NoClaims": "T1: no claims to rank.",
+      "t1Ranking": "T1 local ranking kept {{kept}} of {{total}} candidate claim(s).",
+      "t1Fallback": "No claim met the checkworthiness threshold — analyzing the strongest candidate only."
+    },
+    "limitations": {
+      "advisory": "Advisory only — not a fact-check verdict.",
+      "searchOnly": "Search-only mode — no LLM synthesis.",
+      "synthesisIncomplete": "LLM synthesis may be incomplete.",
+      "noSources": "No sources retrieved — do not infer truth from silence.",
+      "sourcesListed": "{{count}} source(s) listed.",
+      "denseSite": "Dense site — full-page scope may miss thread context."
+    },
+    "assessments": {
+      "sourcesFound": "Sources found — open links below to verify this claim yourself.",
+      "noSources": "No corroborating sources found in search results.",
+      "searchOnlyLimitation": "Search-only mode — no automated synthesis.",
+      "llmUnavailable": "LLM comparison unavailable — review sources manually.",
+      "verifyYourself": "Automated comparison; verify sources yourself."
+    }
+  },
+  "sidepanel": {
+    "heading": "Authenticity assist",
+    "reportHeading": "Authenticity report",
+    "disabledHint": "Feature is off. Enable it in Options → Plugins → Authenticity assist.",
+    "openSettings": "Open settings",
+    "advisory": "Advisory only — never blocks content.",
+    "reportTabNote": " (Report opens in a dedicated tab on this browser.)",
+    "scopeHeading": "Analysis scope",
+    "scopeSelection": "Selection",
+    "scopeFullPage": "Full page",
+    "scopeKind": {
+      "selection": "selection",
+      "full_page": "full page"
+    },
+    "selectedPreview": "Selected: {{text}}",
+    "selectTextHint": "Highlight text on the page, then run analysis.",
+    "denseSiteWarning": "Dense site — full-page may miss thread context and use more quota.",
+    "runAnalysis": "Run analysis",
+    "starting": "Starting…",
+    "cancel": "Cancel",
+    "noReport": "No report yet. Choose a scope and run analysis.",
+    "reportMeta": "{{title}} · {{scope}} · {{mode}}",
+    "searchOnly": "Search only",
+    "synthesis": "Synthesis",
+    "claim": "Claim",
+    "searched": "Searched: {{query}}",
+    "noSources": "No sources listed.",
+    "snippetVerified": "Snippet verified",
+    "snippetUnverified": "Snippet unverified",
+    "epistemic": {
+      "unsupported": "Sources not found",
+      "disputed": "Disputed",
+      "partially_supported": "Partially supported",
+      "default": "Unknown / verify"
+    },
+    "errors": {
+      "noActiveTab": "No active tab. Open a normal web page and try again.",
+      "httpOnly": "Authenticity assist works on http(s) pages only.",
+      "selectTextFirst": "Select text on the page first (or switch to full-page scope).",
+      "fullPageDisabled": "Full-page analysis is disabled in settings.",
+      "extractFailed": "Could not extract page text. Try reloading the tab."
+    }
+  },
+  "llm": {
+    "model": "Model",
+    "selectModel": "Select a model…",
+    "modelPlaceholder": "Model id (e.g. gpt-4o-mini)",
+    "loading": "Loading…",
+    "refresh": "Refresh",
+    "configureUrl": "Configure a chat completions URL to load models.",
+    "fetching": "Fetching models from your API…",
+    "modelsFound": "{{count}} model(s) found",
+    "modelsFoundCustom": "{{count}} model(s) found — current selection is custom.",
+    "customSuffix": " (custom)"
+  },
+  "scan": {
+    "status": {
+      "scanning": "Scanning",
+      "plateau": "Plateau (idle)",
+      "idle": "Idle",
+      "disabled": "Disabled"
+    },
+    "relative": {
+      "never": "never",
+      "justNow": "just now",
+      "secondsAgo": "{{seconds}}s ago",
+      "minutesAgo": "{{minutes}}m ago",
+      "hoursAgo": "{{hours}}h ago"
+    }
+  },
+  "enforcement": {
+    "filteredTitle": "Filtered content ({{labelId}}: {{percent}}%) — Click to reveal"
+  },
+  "content": {
+    "authenticity": {
+      "badgeTitle": "SignalLens authenticity assist (advisory only). Click to dismiss.",
+      "status": {
+        "unsupported": "Sources not found",
+        "disputed": "Disputed — verify",
+        "partially_supported": "Partially supported",
+        "default": "Worth verifying"
+      }
+    }
+  },
+  "mods": {
+    "adapter-reddit": {
+      "name": "Reddit hints",
+      "description": "Optional ignore/boost selectors for reddit.com precision tuning.",
+      "permissionsSummary": "Adjusts universal scanner regions on Reddit.",
+      "sizeLabel": "~2 KB"
+    },
+    "adapter-youtube": {
+      "name": "YouTube hints",
+      "description": "Optional ignore/boost selectors for youtube.com precision tuning.",
+      "permissionsSummary": "Adjusts universal scanner regions on YouTube.",
+      "sizeLabel": "~2 KB"
+    },
+    "detector-heuristic-keywords": {
+      "name": "Heuristic keywords",
+      "description": "Local keyword matching using your block and topic lists.",
+      "permissionsSummary": "No network; runs on extracted text only.",
+      "sizeLabel": "Included"
+    },
+    "detector-noise-patterns": {
+      "name": "Noise patterns",
+      "description": "Detects promos, outrage bait, and engagement-bait phrasing (works with your keyword list).",
+      "permissionsSummary": "No network; pattern matching on extracted text.",
+      "sizeLabel": "Included"
+    },
+    "detector-remote-api": {
+      "name": "Remote API",
+      "description": "Optional cloud classifier when you configure an endpoint.",
+      "permissionsSummary": "Sends extracted text to your configured API URL.",
+      "sizeLabel": "~4 KB"
+    },
+    "detector-local-pack": {
+      "name": "Local ONNX pack",
+      "description": "On-device model pack for stronger classification.",
+      "permissionsSummary": "Loads bundled ONNX weights from extension storage.",
+      "sizeLabel": "~2–8 MB"
+    },
+    "detector-onnx-pack": {
+      "name": "ONNX pack (legacy alias)",
+      "description": "Legacy detector id kept for compatibility with older settings.",
+      "permissionsSummary": "Same ONNX session as local pack.",
+      "sizeLabel": "Shared with local pack"
+    },
+    "action-dim": {
+      "name": "Dim",
+      "description": "Softens matched content with lower opacity and grayscale.",
+      "permissionsSummary": "Updates inline styles on matched elements.",
+      "sizeLabel": "Included"
+    },
+    "action-blur": {
+      "name": "Blur",
+      "description": "Blurs matched content until you choose to reveal it.",
+      "permissionsSummary": "Updates inline styles on matched elements.",
+      "sizeLabel": "~3 KB"
+    },
+    "action-collapse": {
+      "name": "Collapse",
+      "description": "Collapses matched blocks behind a compact summary row.",
+      "permissionsSummary": "Updates inline styles on matched elements.",
+      "sizeLabel": "~3 KB"
+    }
+  },
+  "browsingModes": {
+    "heading": "Browsing mode",
+    "description": "One tap updates sensitivity, keywords, filter style, and site hint packs.",
+    "customNote": "Custom — sensitivity and rules were edited manually.",
+    "markCustom": "Mark as custom setup",
+    "focus": {
+      "label": "Focus",
+      "description": "Balanced filtering for everyday browsing — outrage, spam, and bait."
+    },
+    "research": {
+      "label": "Research",
+      "description": "Conservative threshold with light keyword rules — fewer false positives."
+    },
+    "unwind": {
+      "label": "Unwind",
+      "description": "Strict filtering across common noise categories."
+    }
+  },
+  "wizard": {
+    "progress": {
+      "stepOf": "Step {{current}} of {{total}}"
+    },
+    "stepLabels": {
+      "welcome": "Welcome",
+      "language": "Language",
+      "mode": "Browsing mode",
+      "topics": "Topics",
+      "style": "Style",
+      "sensitivity": "Sensitivity",
+      "whitelist": "Work apps",
+      "done": "Ready"
+    },
+    "shell": {
+      "title": "Welcome to SignalLens",
+      "subtitle": "Pick a browsing mode and start filtering in under a minute."
+    },
+    "welcome": {
+      "heading": "Your personal browsing layer",
+      "body1": "SignalLens helps you reduce low-value content while you browse. You stay in control — filtered items can always be revealed.",
+      "body2": "Default mode is local and offline-friendly. No account required.",
+      "quickStart": "Quick start (Focus)",
+      "quickStartHint": "Quick start applies the Focus browsing mode. You can change mode or rules anytime in the dashboard.",
+      "setupAgainNote": "Your previous choices are pre-selected. Adjust anything, then finish to apply."
+    },
+    "mode": {
+      "heading": "Choose a browsing mode",
+      "description": "Modes bundle sensitivity, topics, filter style, and site hints. Pick one to start, or customize your own rules.",
+      "customLabel": "Customize my own",
+      "customHint": "Pick topics, filter style, and sensitivity step by step.",
+      "recommended": "Recommended",
+      "pickOne": "Select a browsing mode or choose custom setup to continue."
+    },
+    "done": {
+      "heading": "You're ready to browse",
+      "summaryPreset": "{{mode}} mode is active. Visit any page with posts or comments to see filtering.",
+      "summaryCustom": "Your custom rules are active. Visit any page with posts or comments to see filtering.",
+      "reviewHeading": "Your setup",
+      "reviewMode": "Browsing mode",
+      "reviewTopics": "Topics",
+      "reviewStyle": "Filter style",
+      "reviewSensitivity": "Sensitivity",
+      "reviewLanguage": "Language",
+      "reviewWhitelist": "Site whitelist",
+      "whitelistCount": "{{count}} groups enabled",
+      "topicsCount": "{{count}} selected",
+      "tipBrowse": "Open a normal website (not chrome:// pages) with a feed or comments.",
+      "tipReveal": "Click filtered content to reveal it — nothing stays hidden permanently.",
+      "tipFineTuneLater": "Optional: open the dashboard later to fine-tune filtering, plugins, or privacy.",
+      "tipDashboard": "Use the dashboard to refine rules, plugins, and privacy settings.",
+      "tipModes": "Switch browsing mode anytime from Overview or the toolbar popup.",
+      "startBrowsing": "Start browsing",
+      "fineTuneDashboard": "Fine-tune in dashboard",
+      "openDashboard": "Open dashboard",
+      "trySamplePage": "Try on Reddit"
+    },
+    "language": {
+      "heading": "Interface language",
+      "description": "Choose the language for SignalLens menus and setup. Additional translations will ship as locale templates are added.",
+      "browserDetected": "Suggested from your browser: {{language}}",
+      "useSuggested": "Use {{language}}"
+    },
+    "topics": {
+      "heading": "What bothers you?",
+      "description": "We'll use these topics as keyword signals in heuristic mode.",
+      "pickAtLeastOne": "Select at least one topic to continue."
+    },
+    "botherCategories": {
+      "outrage": "Outrage and drama",
+      "spam": "Spam and promotions",
+      "hostile": "Hostile or insulting language",
+      "engagement-bait": "Engagement bait headlines",
+      "low-effort": "Low-effort comments"
+    },
+    "style": {
+      "heading": "Filter style",
+      "description": "Choose how matched content appears. You can change this later in settings.",
+      "coreBuildNote": "This build includes dim only. Blur and collapse are available in the full build.",
+      "previewLabel": "Preview"
+    },
+    "filterStyles": {
+      "dim": "Dim matched content",
+      "blur": "Blur matched content",
+      "collapse": "Collapse matched content"
+    },
+    "sites": {
+      "heading": "Sites you browse",
+      "description": "Select where you want optimized extraction behavior."
+    },
+    "siteLabels": {
+      "reddit": "Reddit",
+      "youtube": "YouTube"
+    },
+    "sensitivity": {
+      "heading": "Sensitivity",
+      "description": "How aggressively should SignalLens flag content that matches your rules?"
+    },
+    "whitelist": {
+      "heading": "Skip filtering on work apps?",
+      "description": "Optional. SignalLens won't scan or filter pages on these sites — useful for email, documents, and spreadsheets.",
+      "skipHint": "You can skip this step or change whitelist sites anytime under Rules in the dashboard.",
+      "noneSelected": "None"
+    },
+    "sensitivityPresets": {
+      "conservative": {
+        "label": "Conservative",
+        "hint": "Fewer matches"
+      },
+      "balanced": {
+        "label": "Balanced",
+        "hint": "Recommended default"
+      },
+      "strict": {
+        "label": "Strict",
+        "hint": "More matches"
+      }
+    }
+  }
+}

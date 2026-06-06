@@ -1,0 +1,718 @@
+{
+  "meta": {
+    "localeId": "de",
+    "nativeName": "Deutsch",
+    "englishName": "German",
+    "direction": "ltr"
+  },
+  "common": {
+    "appName": "SignalLens",
+    "back": "Zurück",
+    "continue": "Weiter",
+    "finishSetup": "Einrichtung abschließen",
+    "saving": "Speichern…",
+    "enabled": "Aktiviert",
+    "disabled": "Deaktiviert",
+    "yes": "ja",
+    "no": "nein",
+    "none": "keine"
+  },
+  "options": {
+    "loadingSubtitle": "Dashboard wird geladen…",
+    "subtitle": "Filterung, Plugins und Authentizitäts-Assistent verwalten.",
+    "preparingSession": "Sitzung wird vorbereitet…",
+    "loadingFocusView": "Fokus-Ansicht wird vorbereitet…",
+    "loadingLargePages": "Bei großen Seiten kann dies einen Moment dauern."
+  },
+  "popup": {
+    "setupPrompt": "Schließen Sie die Einrichtung ab, um die Filterung anzupassen.",
+    "startWizard": "Einrichtungsassistent starten",
+    "focusEnabled": "Fokusmodus aktiviert",
+    "focusDisabled": "Fokusmodus deaktiviert",
+    "browsingMode": "Surfmodus",
+    "customSetup": "Benutzerdefiniert",
+    "thisPage": "Diese Seite",
+    "scanned": "Gescannt",
+    "filtered": "Gefiltert",
+    "scanningProgress": "{{discovered}} Blöcke gefunden · Scan läuft",
+    "noMatchesYet": "Noch keine Treffer für Ihre Blockier-Schlüsselwörter. Fügen Sie Themen unter Regeln im Dashboard hinzu.",
+    "diagnosticsSummary": "Scan-Diagnose",
+    "diagnosticsUnavailable": "Öffnen Sie eine normale Webseite (kein chrome:// oder Erweiterungs-UI), um Live-Scanner-Statistiken zu sehen.",
+    "discovery": "Erkennung",
+    "discoveryUniversal": "Universal-Scanner",
+    "discoveryInactive": "Nicht aktiv",
+    "hintPacks": "Hinweispakete",
+    "discovered": "Entdeckt",
+    "queue": "Warteschlange",
+    "queuePendingDone": "{{pending}} ausstehend · {{done}} erledigt",
+    "fingerprints": "Fingerabdrücke",
+    "domSnapshot": "DOM-Snapshot",
+    "domSnapshotUnits": "{{count}} Einheiten",
+    "lastRescan": "Letzter Rescan",
+    "scanCycles": "Scan-Zyklen",
+    "lastDiff": "Letzte Diff",
+    "lastDiffValues": "+{{added}} / ~{{updated}}",
+    "firstClassify": "Erste Klassifikation",
+    "firstClassifyMs": "{{ms}} ms",
+    "today": "Heute",
+    "last7Days": "Letzte 7 Tage",
+    "runtime": "Laufzeit",
+    "scanner": "Scanner",
+    "scannerUniversal": "Universal",
+    "classifier": "Klassifikator",
+    "lastError": "Letzter Fehler",
+    "openDashboard": "Dashboard öffnen",
+    "pageStatus": {
+      "unsupported": "Auf diesem Seitentyp nicht verfügbar.",
+      "focusOff": "Fokusmodus aus — Filterung überall pausiert.",
+      "whitelisted": "Scanning auf {{host}} übersprungen (Whitelist).",
+      "scanning": "Diese Seite wird gescannt…",
+      "filtered": "{{count}} Elemente gefiltert — zum Einblenden klicken.",
+      "noMatches": "Gescannt — noch keine Treffer für Ihre Regeln.",
+      "idle": "Bereit, diese Seite zu scannen."
+    },
+    "pauseThisSite": "Filterung auf dieser Seite pausieren",
+    "pauseThisSiteSaving": "Speichern…",
+    "pauseThisSiteDone": "{{host}} zur Whitelist hinzugefügt.",
+    "manageWhitelist": "Seiten-Whitelist verwalten"
+  },
+  "settings": {
+    "tabs": {
+      "overview": "Übersicht",
+      "filtering": "Filterung",
+      "rules": "Regeln",
+      "plugins": "Plugins",
+      "privacy": "Datenschutz"
+    },
+    "language": {
+      "heading": "Oberflächensprache",
+      "description": "Wählen Sie die Sprache für SignalLens-Menüs und Einrichtung. Weitere Übersetzungen folgen mit neuen Sprachvorlagen.",
+      "saved": "Einstellung gespeichert — neue Texte gelten sofort."
+    },
+    "header": {
+      "focusOn": "Fokus an",
+      "focusOff": "Fokus aus",
+      "today": "Heute",
+      "blockedToday": "Heute blockiert",
+      "scanned7Day": "7-Tage gescannt"
+    },
+    "overview": {
+      "tabIntro": "Ihre Schaltzentrale — Surfmodus wählen, Aktivität sehen und zu Details springen.",
+      "currentSettings": "Aktuelle Einstellungen",
+      "focusMode": "Fokusmodus",
+      "browsingMode": "Surfmodus",
+      "sensitivity": "Empfindlichkeit",
+      "filterStyle": "Filterstil",
+      "perSiteOverrides": "Pro-Seite-Überschreibungen",
+      "activityHeading": "Surf-Aktivität",
+      "activityEmpty": "Noch keine Seiten gescannt. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren bei aktivem Fokusmodus.",
+      "activityScannedToday": "Heute gescannt",
+      "activityFilteredToday": "Heute gefiltert",
+      "activityScanned7d": "Gescannt (7 Tage)",
+      "activityFiltered7d": "Gefiltert (7 Tage)",
+      "statusStrip": {
+        "focusOn": "Fokus an",
+        "focusOff": "Fokus aus",
+        "mode": "Modus",
+        "modeCustom": "Benutzerdefiniert",
+        "whitelist": "{{count}} auf Whitelist",
+        "filteredToday": "{{count}} heute gefiltert"
+      },
+      "quickLinksHeading": "Konfigurieren",
+      "quickLinksEssentialHeading": "Feintuning (optional)",
+      "quickLinksEssentialHint": "Die meisten bleiben bei den Assistenten-Standards. Nur öffnen, wenn Sie Empfindlichkeit, Schlüsselwörter oder Whitelist anpassen möchten.",
+      "quickLinksAdvancedHeading": "Erweitert",
+      "quickLinksAdvancedHint": "Plugins, Authentizitäts-Assistent, Export/Import und Entwicklerwerkzeuge.",
+      "quickLinks": {
+        "filtering": "Empfindlichkeit, Filterstil und Inferenz",
+        "rules": "Schlüsselwörter, Allowlisten und Seiten-Schwellen",
+        "plugins": "Detektoren, Seiten-Hinweise und Authentizität",
+        "privacy": "Export, Import und Entwicklerwerkzeuge"
+      },
+      "gettingStarted": {
+        "heading": "Erste Schritte",
+        "description": "SignalLens läuft auf jeder normalen Webseite. Besuchen Sie eine Seite mit Feeds oder Kommentaren, um die Filterung zu erleben.",
+        "tipBrowse": "Öffnen Sie eine Seite mit Beiträgen oder Kommentaren — die Filterung startet automatisch, wenn der Fokusmodus an ist.",
+        "tipReveal": "Klicken Sie auf abgedunkelte oder verwischte Blöcke, um sie einzublenden. Nichts wird dauerhaft ausgeblendet.",
+        "tipRules": "Passen Sie Themen und Schlüsselwörter unter Regeln an oder wechseln Sie den Surfmodus oben.",
+        "tipAuthenticity": "Optional: Authentizitäts-Assistent unter Plugins für beratende Quellenprüfungen (Seitenleiste)."
+      }
+    },
+    "advanced": {
+      "heading": "Erweitert",
+      "exportSettings": "Einstellungen exportieren",
+      "importSettings": "Einstellungen importieren",
+      "setupAgain": "Erneut einrichten",
+      "invalidImport": "Die Einstellungsdatei konnte nicht gelesen werden. Prüfen Sie das JSON-Format und versuchen Sie es erneut."
+    },
+    "privacy": {
+      "tabIntro": "Verstehen Sie, was Ihr Gerät verlässt, exportieren Sie Ihre Einrichtung und nutzen Sie optionale Diagnose-Tools.",
+      "heading": "Datenschutz",
+      "description": "Standardmäßig lokal. Remote-API ist optional und benutzerkonfiguriert.",
+      "buildProfile": "Build-Profil",
+      "remoteApiConfigured": "Remote-API konfiguriert",
+      "policyLink": "Datenschutzerklärung (GitHub)"
+    },
+    "systemStatus": {
+      "heading": "Systemstatus",
+      "runtime": "Laufzeit",
+      "scanner": "Scanner",
+      "scannerUniversal": "Universal",
+      "pack": "Paket",
+      "mode": "Modus",
+      "escalation": "Eskalation",
+      "classifier": "Klassifikator",
+      "lastError": "Letzter Fehler",
+      "on": "an",
+      "off": "aus",
+      "states": {
+        "ready": "Bereit",
+        "idle": "Leerlauf",
+        "loading": "Lädt",
+        "error": "Fehler",
+        "unknown": "Unbekannt"
+      },
+      "detectorHeuristic": "Heuristische Schlüsselwörter"
+    },
+    "filtering": {
+      "tabIntro": "Steuern Sie, wie aggressiv Inhalte klassifiziert werden und wie Treffer auf der Seite erscheinen.",
+      "summaryHeading": "Aktuelle Filterung",
+      "summaryInference": "Inferenz",
+      "summarySensitivity": "Empfindlichkeit",
+      "summaryStyle": "Filterstil",
+      "summaryClassifier": "Aktiver Klassifikator",
+      "browsingModeNotice": "{{mode}}-Surfmodus ist aktiv. Änderungen hier wechseln zu benutzerdefiniert.",
+      "classifyHeading": "Inhalte klassifizieren",
+      "classifyDescription": "Wie SignalLens Rauschen erkennt — Inferenzmodus, Schwellwert und aktive Detektoren.",
+      "presentHeading": "Treffer darstellen",
+      "presentDescription": "Wie gefilterte Blöcke auf der Seite aussehen. Klicken zum Einblenden.",
+      "sensitivityDescription": "Höhere Empfindlichkeit markiert mehr Inhalte. Niedrigere reduziert Fehlalarme.",
+      "detectorsHeading": "Aktive Detektoren",
+      "detectorsDescription": "Detektoren laufen auf extrahiertem Text. Weitere unter Plugins verwalten.",
+      "editKeywordsLink": "Block-Schlüsselwörter unter Regeln bearbeiten →",
+      "heuristicDescription": "Schlüsselwortlisten und Muster — offline, ohne Modell-Download.",
+      "localPackDescription": "Gebündeltes ONNX-Modell für semantische Bewertung. Benötigt lokale Pack-Dateien.",
+      "remoteApiHeading": "Remote-API-Eskalation (optional)",
+      "languagePackDescription": "Wird bei lokalem Pack-Inferenzmodus genutzt. Sprache der Seite wird wenn möglich automatisch erkannt.",
+      "inferenceHeading": "Inferenz",
+      "inferenceCore": "Heuristischer Modus — funktioniert offline ohne Modelldateien.",
+      "inferenceFull": "Heuristischer Modus funktioniert offline ohne Modelldateien. Lokales Paket nutzt gebündelte ONNX-Gewichte.",
+      "heuristicOffline": "Heuristisch (offline)",
+      "localPackOnnx": "Lokales Paket (ONNX)",
+      "escalationLabel": "Unsichere Elemente an Remote-API eskalieren (opt-in)",
+      "apiEndpointUrl": "API-Endpunkt-URL",
+      "apiEndpointPlaceholder": "https://ihre-api.example/classify",
+      "apiKeyOptional": "API-Schlüssel (optional)",
+      "apiKeyPlaceholder": "Bearer-Token",
+      "remoteApiStatus": "Remote-API: {{status}}",
+      "remoteApiConfigured": "konfiguriert",
+      "remoteApiNotConfigured": "nicht konfiguriert",
+      "modeLabel": "Modus:",
+      "sensitivityHeading": "Filter-Empfindlichkeit",
+      "threshold": "Schwellwert: {{percent}} %",
+      "filterStyleHeading": "Filterstil",
+      "filterStyleDescription": "Wählen Sie, wie gefilterte Inhalte auf der Seite erscheinen. Klicken Sie auf einen gefilterten Block, um ihn einzublenden.",
+      "languagePackHeading": "Sprachpaket",
+      "advancedPackSummary": "Erweitert: Sprachpaket und ONNX-Routing",
+      "hide": "Ausblenden",
+      "change": "Ändern",
+      "detected": "Erkannt:",
+      "detectedConfidence": "{{language}} ({{percent}} % Konfidenz)",
+      "active": "Aktiv:",
+      "autoSelecting": "Automatische Auswahl…",
+      "autoSuffix": " (auto)",
+      "installedPacks": "Installierte Pakete",
+      "availableToInstall": "Verfügbar zur Installation",
+      "install": "Installieren",
+      "installDemoAlert": "Paketinstallation würde hier starten. In dieser Demo nicht implementiert.",
+      "perSiteHeading": "Pro-Seite-Empfindlichkeits-Überschreibungen",
+      "perSiteDescription": "Eigene Filterschwellen für bestimmte Hostnamen festlegen.",
+      "hostPlaceholder": "beispiel.de",
+      "add": "Hinzufügen",
+      "noPerSiteOverrides": "Noch keine Pro-Seite-Überschreibungen.",
+      "remove": "Entfernen"
+    },
+    "debug": {
+      "toolsHeading": "Entwicklerwerkzeuge",
+      "performanceHeading": "Leistungsmetriken",
+      "timeToFirstClassification": "Zeit bis zur ersten Klassifikation:",
+      "pending": "Ausstehend…",
+      "throughput": "Durchsatz:",
+      "throughputValue": "{{value}} Elemente/s",
+      "avgBatchTime": "Ø Batch-Zeit:",
+      "avgBatchTimeValue": "{{value}} ms",
+      "totalClassified": "Gesamt klassifiziert:",
+      "currentQueueDepth": "Aktuelle Warteschlangentiefe:",
+      "avgQueueDepth": "Ø Warteschlangentiefe:",
+      "noPerformanceData": "Keine Leistungsdaten verfügbar.",
+      "recentBlockedHeading": "Zuletzt blockierte Elemente ({{count}})",
+      "noItemsBlocked": "Noch keine Elemente blockiert.",
+      "noiseLabel": "Rauschen"
+    }
+  },
+  "rules": {
+    "tabIntro": "Filterung auf bestimmten Seiten pausieren, dann Schlüsselwörter und Seiten-Schwellen feinabstimmen.",
+    "advanced": {
+      "perSiteSummary": "Erweitert: Empfindlichkeit pro Website"
+    },
+    "heading": "Ihre Filterregeln",
+    "description": "Passen Sie an, was gefiltert wird. Assistenten-Auswahl füllt diese Listen; Sie können sie jederzeit verfeinern.",
+    "summary": {
+      "block": "{{count}} Block-Schlüsselwörter",
+      "allow": "{{count}} Allow-Schlüsselwörter",
+      "domains": "{{count}} erlaubte Domains"
+    },
+    "topicPresets": {
+      "outrage": "Empörung",
+      "spam": "Spam",
+      "hostile": "Feindselig",
+      "engagement-bait": "Engagement-Köder",
+      "low-effort": "Wenig Aufwand"
+    },
+    "blockKeywords": {
+      "title": "Blockier-Schlüsselwörter",
+      "description": "Inhalte mit diesen Formulierungen werden eher gefiltert.",
+      "placeholder": "z. B. gesponsert, Clickbait"
+    },
+    "allowKeywords": {
+      "title": "Erlaubte Schlüsselwörter",
+      "description": "Inhalte mit diesen Formulierungen werden nie gefiltert, auch wenn Blockregeln zutreffen.",
+      "placeholder": "z. B. wichtig, Eilmeldung"
+    },
+    "allowDomains": {
+      "title": "Erlaubte Domains",
+      "description": "Filterung ist auf diesen Seiten pausiert (nützlich für Arbeits-Tools oder E-Mail).",
+      "placeholder": "z. B. mail.google.com"
+    },
+    "add": "Hinzufügen",
+    "remove": "Entfernen",
+    "noEntries": "Noch keine Einträge.",
+    "saved": "Regeln gespeichert."
+  },
+  "whitelist": {
+    "heading": "Seiten-Whitelist",
+    "description": "SignalLens scannt und filtert diese Seiten nicht. Nützlich für Arbeits-Tools, Tabellen und Apps, in denen Overlays stören würden.",
+    "count": "{{count}} Seiten auf der Whitelist",
+    "presetsHeading": "Vorgeschlagene Seiten",
+    "presetsDescription": "Gruppe aktivieren, um Scanning in gängigen Produktivitäts- und Medien-Apps zu überspringen.",
+    "presetDomainCount": "{{count}} Domains",
+    "customHeading": "Eigene Seiten",
+    "customDescription": "Hostname hinzufügen (z. B. app.beispiel.de). Passende Subdomains werden automatisch einbezogen.",
+    "placeholder": "z. B. mail.google.com",
+    "noCustomSites": "Noch keine eigenen Seiten.",
+    "presets": {
+      "google-workspace": {
+        "label": "Google Workspace",
+        "hint": "Docs, Sheets, Drive, Gmail, Calendar und Meet"
+      },
+      "online-spreadsheets": {
+        "label": "Online-Tabellen",
+        "hint": "Microsoft Excel online, OneDrive, Airtable und Coda"
+      },
+      "music-lyrics": {
+        "label": "Musik-Streaming",
+        "hint": "Web-Player, in denen synchronisierte Songtexte gefiltert würden"
+      }
+    }
+  },
+  "plugins": {
+    "tabIntro": "Der Universal-Scanner läuft auf jeder Seite. Optionale Seiten-Hinweise und Detektoren unten aktivieren.",
+    "advanced": {
+      "authenticitySummary": "Erweitert: Authentizitäts-Assistent (experimentell)"
+    },
+    "heading": "Plugin-Bibliothek",
+    "description": "SignalLens erkennt Inhalte mit einem Universal-Scanner auf jeder Seite. Aktivieren Sie unten Site-Hinweise für mehr Präzision auf bestimmten Hosts — keine separaten Adapter nötig.",
+    "unlockCount": " {{count}} Mod(s) können über signierte Pakete freigeschaltet werden.",
+    "advancedInstall": "Signierte Pakete installieren",
+    "advancedInstallDescription": "Für Mitwirkende und Power-User. Die meisten Nutzer benötigen nur die gebündelten Mods oben.",
+    "advancedSectionSummary": "Erweitert ({{count}})",
+    "advancedLockedHeading": "Vollversion-Mods",
+    "advancedLockedDescription": "Diese Mods sind in der Vollversion oder über signierte Unlock-Pakete verfügbar. Die Core-Version funktioniert ohne sie.",
+    "installPackage": "Paket installieren…",
+    "installFromUrl": "Von URL installieren",
+    "installedPackages": "Installierte Pakete: {{names}}",
+    "sectionEnabled": "{{enabled}} / {{total}} an",
+    "enableAllHints": "Alle Seiten-Hinweise aktivieren",
+    "sections": {
+      "hint": "Site-Hinweise",
+      "detector": "Detektoren",
+      "action": "Filterstile"
+    },
+    "sectionDescriptions": {
+      "hint": "Optional. Verbessert die Erkennung auf Reddit und YouTube — Filterung funktioniert überall auch ohne diese.",
+      "detector": "Wie Text klassifiziert wird. Heuristische Schlüsselwörter nutzen Ihre Block-Listen; Rausch-Muster ergänzen Werbe- und Köder-Phrasen.",
+      "action": "Wie Treffer auf der Seite aussehen. Auch unter Filterung änderbar."
+    },
+    "badges": {
+      "bundled": "gebündelt",
+      "installed": "installiert",
+      "alwaysOn": "Immer an"
+    },
+    "notInProfile": "Nicht in diesem Build-Profil. Neu bauen mit `pnpm build:full` oder Unlock-Paket installieren (siehe `packages/mod-unlocks/`).",
+    "requiredBaseline": "Erforderlich für Basis-Filterung",
+    "uninstallPackage": "Paket deinstallieren",
+    "progress": {
+      "verify": "Signatur wird geprüft…",
+      "download": "{{file}} wird heruntergeladen… {{percent}} %",
+      "downloadDefaultFile": "Assets",
+      "complete": "Installation abgeschlossen.",
+      "failed": "Installation fehlgeschlagen."
+    },
+    "errors": {
+      "notInCoreBuild": "Dieses Plugin ist nicht im Core-Build enthalten. Führen Sie `pnpm build:full` aus oder installieren Sie ein signiertes Unlock-Paket aus packages/mod-unlocks/.",
+      "invalidPackage": "Ungültige Paketdatei.",
+      "urlPrompt": "Mod-Paket-Manifest-URL (.signallens-mod.json):",
+      "downloadTimeout": "Download nach 30 s abgebrochen.",
+      "downloadFailed": "Download fehlgeschlagen"
+    }
+  },
+  "authenticity": {
+    "heading": "Authentizitäts-Assistent (experimentell)",
+    "description": "Auswahl-zuerst-Recherche-Helfer. Markierungen sind nur Hinweise — Inhalte werden nie ausgeblendet. Standard: nur Suche (null LLM-Tokens).",
+    "openSidePanel": "Berichtspanel öffnen",
+    "enable": "Authentizitäts-Assistent aktivieren",
+    "dailyQuotaUsed": "Tägliches Kontingent genutzt",
+    "dailyQuotaCap": "Tägliches Kontingent-Limit",
+    "tiersHeading": "Stufen",
+    "tierT0": "T0 — lokale Heuristiken (kostenlos)",
+    "tierT1": "T1 — lokale Checkworthiness-Rangfolge (kostenlos)",
+    "tierT2": "T2 — Such-API",
+    "tierT3": "T3 — LLM vergleicht Snippets (Benutzer-Endpunkt)",
+    "searchOnlyDefault": "Standardmäßig nur Suche (empfohlen)",
+    "scopeHeading": "Umfang",
+    "allowFullPage": "Ganzseiten-Analyse im Seitenpanel erlauben (auf Social Feeds nicht empfohlen)",
+    "searchHeading": "Suche",
+    "provider": "Anbieter",
+    "searchProviders": {
+      "wikipedia": "Wikipedia (kostenlos, Demo)",
+      "brave": "Brave Search API",
+      "custom": "Eigener Such-Endpunkt",
+      "none": "Keine"
+    },
+    "braveApiKey": "Brave-API-Schlüssel",
+    "braveApiKeyPlaceholder": "Brave-API-Schlüssel",
+    "customSearchUrl": "Eigene Such-URL",
+    "customSearchPlaceholder": "https://api.example.com/search?q={query}",
+    "llmHeading": "LLM (T3)",
+    "llmEndpoint": "Chat-Completions-URL",
+    "llmEndpointPlaceholder": "https://api.openai.com/v1/chat/completions",
+    "llmApiKey": "API-Schlüssel (optional)",
+    "llmApiKeyPlaceholder": "API-Schlüssel (optional)",
+    "limitsHint": "Max. {{claims}} Behauptungen · {{results}} Ergebnisse pro Abfrage. URLs müssen aus Suchergebnissen stammen — das Modell darf keine Links hinzufügen.",
+    "job": {
+      "cachedReport": "Gecachten Bericht geladen",
+      "extractingClaims": "Behauptungen werden extrahiert…",
+      "searchingSources": "Quellen werden gesucht…",
+      "fetchingSnippets": "Snippets werden abgerufen und geprüft…",
+      "comparingClaims": "Behauptungen werden mit Quellen verglichen…",
+      "reportReady": "Bericht bereit"
+    },
+    "notes": {
+      "selectionShort": "Auswahl ist sehr kurz — Analyse kann eingeschränkt sein.",
+      "hasStatistics": "Enthält Zahlen oder Statistiken — primäre Quellen prüfen.",
+      "factualWithoutLinks": "Klingt faktisch, ohne Links in der Auswahl.",
+      "noClaims": "Keine überprüfbaren Behauptungen erkannt — Bericht kann dünn ausfallen.",
+      "t1NoClaims": "T1: keine Behauptungen zum Rangieren.",
+      "t1Ranking": "T1 lokale Rangfolge behielt {{kept}} von {{total}} Kandidaten.",
+      "t1Fallback": "Keine Behauptung erreichte den Schwellwert — nur der stärkste Kandidat wird analysiert."
+    },
+    "limitations": {
+      "advisory": "Nur Hinweis — kein Faktencheck-Urteil.",
+      "searchOnly": "Nur-Suche-Modus — keine LLM-Synthese.",
+      "synthesisIncomplete": "LLM-Synthese kann unvollständig sein.",
+      "noSources": "Keine Quellen abgerufen — leite keine Wahrheit aus Stille ab.",
+      "sourcesListed": "{{count}} Quelle(n) aufgeführt.",
+      "denseSite": "Dichte Seite — Ganzseiten-Umfang kann Thread-Kontext verpassen."
+    },
+    "assessments": {
+      "sourcesFound": "Quellen gefunden — Links unten öffnen, um die Behauptung selbst zu prüfen.",
+      "noSources": "Keine bestätigenden Quellen in Suchergebnissen.",
+      "searchOnlyLimitation": "Nur-Suche-Modus — keine automatische Synthese.",
+      "llmUnavailable": "LLM-Vergleich nicht verfügbar — Quellen manuell prüfen.",
+      "verifyYourself": "Automatisierter Vergleich — Quellen selbst verifizieren."
+    }
+  },
+  "sidepanel": {
+    "heading": "Authentizitäts-Assistent",
+    "reportHeading": "Authentizitätsbericht",
+    "disabledHint": "Funktion ist aus. Aktivieren unter Optionen → Plugins → Authentizitäts-Assistent.",
+    "openSettings": "Einstellungen öffnen",
+    "advisory": "Nur Hinweis — blockiert nie Inhalte.",
+    "reportTabNote": " (Bericht öffnet in diesem Browser in einem eigenen Tab.)",
+    "scopeHeading": "Analyse-Umfang",
+    "scopeSelection": "Auswahl",
+    "scopeFullPage": "Ganze Seite",
+    "scopeKind": {
+      "selection": "Auswahl",
+      "full_page": "Ganze Seite"
+    },
+    "selectedPreview": "Ausgewählt: {{text}}",
+    "selectTextHint": "Text auf der Seite markieren, dann Analyse starten.",
+    "denseSiteWarning": "Dichte Seite — Ganzseite kann Thread-Kontext verpassen und mehr Kontingent nutzen.",
+    "runAnalysis": "Analyse starten",
+    "starting": "Startet…",
+    "cancel": "Abbrechen",
+    "noReport": "Noch kein Bericht. Umfang wählen und Analyse starten.",
+    "reportMeta": "{{title}} · {{scope}} · {{mode}}",
+    "searchOnly": "Nur Suche",
+    "synthesis": "Synthese",
+    "claim": "Behauptung",
+    "searched": "Gesucht: {{query}}",
+    "noSources": "Keine Quellen aufgeführt.",
+    "snippetVerified": "Snippet verifiziert",
+    "snippetUnverified": "Snippet unverifiziert",
+    "epistemic": {
+      "unsupported": "Quellen nicht gefunden",
+      "disputed": "Umstritten",
+      "partially_supported": "Teilweise gestützt",
+      "default": "Unbekannt / prüfen"
+    },
+    "errors": {
+      "noActiveTab": "Kein aktiver Tab. Normale Webseite öffnen und erneut versuchen.",
+      "httpOnly": "Authentizitäts-Assistent funktioniert nur auf http(s)-Seiten.",
+      "selectTextFirst": "Zuerst Text auf der Seite auswählen (oder auf Ganzseiten-Umfang wechseln).",
+      "fullPageDisabled": "Ganzseiten-Analyse ist in den Einstellungen deaktiviert.",
+      "extractFailed": "Seitentext konnte nicht extrahiert werden. Tab neu laden."
+    }
+  },
+  "llm": {
+    "model": "Modell",
+    "selectModel": "Modell wählen…",
+    "modelPlaceholder": "Modell-ID (z. B. gpt-4o-mini)",
+    "loading": "Laden…",
+    "refresh": "Aktualisieren",
+    "configureUrl": "Chat-Completions-URL konfigurieren, um Modelle zu laden.",
+    "fetching": "Modelle von Ihrer API werden abgerufen…",
+    "modelsFound": "{{count}} Modell(e) gefunden",
+    "modelsFoundCustom": "{{count}} Modell(e) gefunden — aktuelle Auswahl ist benutzerdefiniert.",
+    "customSuffix": " (benutzerdefiniert)"
+  },
+  "scan": {
+    "status": {
+      "scanning": "Scannt",
+      "plateau": "Plateau (Leerlauf)",
+      "idle": "Leerlauf",
+      "disabled": "Deaktiviert"
+    },
+    "relative": {
+      "never": "nie",
+      "justNow": "gerade eben",
+      "secondsAgo": "vor {{seconds}} s",
+      "minutesAgo": "vor {{minutes}} min",
+      "hoursAgo": "vor {{hours}} h"
+    }
+  },
+  "enforcement": {
+    "filteredTitle": "Gefilterter Inhalt ({{labelId}}: {{percent}} %) — Zum Anzeigen klicken"
+  },
+  "content": {
+    "authenticity": {
+      "badgeTitle": "SignalLens Authentizitäts-Assistent (nur Hinweis). Klicken zum Schließen.",
+      "status": {
+        "unsupported": "Quellen nicht gefunden",
+        "disputed": "Umstritten — prüfen",
+        "partially_supported": "Teilweise gestützt",
+        "default": "Prüfenswert"
+      }
+    }
+  },
+  "mods": {
+    "adapter-reddit": {
+      "name": "Reddit-Hinweise",
+      "description": "Optionale Ignore/Boost-Selektoren für reddit.com-Präzision.",
+      "permissionsSummary": "Passt Universal-Scanner-Regionen auf Reddit an.",
+      "sizeLabel": "~2 KB"
+    },
+    "adapter-youtube": {
+      "name": "YouTube-Hinweise",
+      "description": "Optionale Ignore/Boost-Selektoren für youtube.com-Präzision.",
+      "permissionsSummary": "Passt Universal-Scanner-Regionen auf YouTube an.",
+      "sizeLabel": "~2 KB"
+    },
+    "detector-heuristic-keywords": {
+      "name": "Heuristische Schlüsselwörter",
+      "description": "Lokaler Schlüsselwort-Abgleich mit Ihren Block- und Themenlisten.",
+      "permissionsSummary": "Kein Netzwerk; läuft nur auf extrahiertem Text.",
+      "sizeLabel": "Enthalten"
+    },
+    "detector-noise-patterns": {
+      "name": "Rausch-Muster",
+      "description": "Erkennt Werbung, Empörungs- und Engagement-Köder (mit Ihrer Schlüsselwortliste).",
+      "permissionsSummary": "Kein Netzwerk; Musterabgleich auf extrahiertem Text.",
+      "sizeLabel": "Enthalten"
+    },
+    "detector-remote-api": {
+      "name": "Remote-API",
+      "description": "Optionaler Cloud-Klassifikator bei konfiguriertem Endpunkt.",
+      "permissionsSummary": "Sendet extrahierten Text an Ihre konfigurierte API-URL.",
+      "sizeLabel": "~4 KB"
+    },
+    "detector-local-pack": {
+      "name": "Lokales ONNX-Paket",
+      "description": "On-Device-Modellpaket für stärkere Klassifikation.",
+      "permissionsSummary": "Lädt gebündelte ONNX-Gewichte aus Erweiterungsspeicher.",
+      "sizeLabel": "~2–8 MB"
+    },
+    "detector-onnx-pack": {
+      "name": "ONNX-Paket (Legacy-Alias)",
+      "description": "Legacy-Detektor-ID für Kompatibilität mit älteren Einstellungen.",
+      "permissionsSummary": "Gleiche ONNX-Sitzung wie lokales Paket.",
+      "sizeLabel": "Geteilt mit lokalem Paket"
+    },
+    "action-dim": {
+      "name": "Abdunkeln",
+      "description": "Mildert übereinstimmende Inhalte mit geringerer Deckkraft und Graustufen.",
+      "permissionsSummary": "Aktualisiert Inline-Stile auf übereinstimmenden Elementen.",
+      "sizeLabel": "Enthalten"
+    },
+    "action-blur": {
+      "name": "Verwischen",
+      "description": "Verwischt übereinstimmende Inhalte, bis Sie sie einblenden.",
+      "permissionsSummary": "Aktualisiert Inline-Stile auf übereinstimmenden Elementen.",
+      "sizeLabel": "~3 KB"
+    },
+    "action-collapse": {
+      "name": "Einklappen",
+      "description": "Klappt übereinstimmende Blöcke hinter eine kompakte Zusammenfassungszeile ein.",
+      "permissionsSummary": "Aktualisiert Inline-Stile auf übereinstimmenden Elementen.",
+      "sizeLabel": "~3 KB"
+    }
+  },
+  "browsingModes": {
+    "heading": "Surfmodus",
+    "description": "Ein Tippen aktualisiert Empfindlichkeit, Schlüsselwörter, Filterstil und Site-Hinweispakete.",
+    "customNote": "Benutzerdefiniert — Empfindlichkeit und Regeln wurden manuell bearbeitet.",
+    "markCustom": "Als benutzerdefiniert markieren",
+    "focus": {
+      "label": "Fokus",
+      "description": "Ausgewogene Filterung für den Alltag — Empörung, Spam und Köder."
+    },
+    "research": {
+      "label": "Recherche",
+      "description": "Konservative Schwelle mit leichten Schlüsselwortregeln — weniger Fehlalarme."
+    },
+    "unwind": {
+      "label": "Entspannen",
+      "description": "Strenge Filterung über gängige Rausch-Kategorien."
+    }
+  },
+  "wizard": {
+    "progress": {
+      "stepOf": "Schritt {{current}} von {{total}}"
+    },
+    "stepLabels": {
+      "welcome": "Willkommen",
+      "language": "Sprache",
+      "mode": "Surfmodus",
+      "topics": "Themen",
+      "style": "Stil",
+      "sensitivity": "Empfindlichkeit",
+      "whitelist": "Arbeits-Apps",
+      "done": "Fertig"
+    },
+    "shell": {
+      "title": "Willkommen bei SignalLens",
+      "subtitle": "Wählen Sie einen Surfmodus und starten Sie die Filterung in unter einer Minute."
+    },
+    "welcome": {
+      "heading": "Ihre persönliche Surfebene",
+      "body1": "SignalLens hilft Ihnen, wenig wertvolle Inhalte beim Surfen zu reduzieren. Sie behalten die Kontrolle — gefilterte Elemente können jederzeit eingeblendet werden.",
+      "body2": "Standardmodus ist lokal und offline-freundlich. Kein Konto erforderlich.",
+      "quickStart": "Schnellstart (Fokus)",
+      "quickStartHint": "Schnellstart aktiviert den Fokus-Surfmodus. Modus und Regeln können Sie jederzeit im Dashboard ändern.",
+      "setupAgainNote": "Ihre bisherigen Auswahlen sind vorausgewählt. Passen Sie an und schließen Sie ab, um zu übernehmen."
+    },
+    "mode": {
+      "heading": "Surfmodus wählen",
+      "description": "Modi bündeln Empfindlichkeit, Themen, Filterstil und Seiten-Hinweise. Wählen Sie einen zum Start oder passen Sie alles an.",
+      "customLabel": "Eigene Einstellungen",
+      "customHint": "Themen, Filterstil und Empfindlichkeit Schritt für Schritt festlegen.",
+      "recommended": "Empfohlen",
+      "pickOne": "Wählen Sie einen Surfmodus oder „Eigene Einstellungen“, um fortzufahren."
+    },
+    "done": {
+      "heading": "Bereit zum Surfen",
+      "summaryPreset": "{{mode}}-Modus ist aktiv. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren, um die Filterung zu sehen.",
+      "summaryCustom": "Ihre eigenen Regeln sind aktiv. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren, um die Filterung zu sehen.",
+      "reviewHeading": "Ihre Einrichtung",
+      "reviewMode": "Surfmodus",
+      "reviewTopics": "Themen",
+      "reviewStyle": "Filterstil",
+      "reviewSensitivity": "Empfindlichkeit",
+      "reviewLanguage": "Sprache",
+      "reviewWhitelist": "Seiten-Whitelist",
+      "whitelistCount": "{{count}} Gruppen aktiv",
+      "topicsCount": "{{count}} ausgewählt",
+      "tipBrowse": "Öffnen Sie eine normale Website (keine chrome://-Seiten) mit Feed oder Kommentaren.",
+      "tipReveal": "Klicken Sie auf gefilterte Inhalte, um sie einzublenden — nichts bleibt dauerhaft verborgen.",
+      "tipFineTuneLater": "Optional: Dashboard später öffnen, um Filterung, Plugins oder Datenschutz fein abzustimmen.",
+      "tipDashboard": "Im Dashboard können Sie Regeln, Plugins und Datenschutz verfeinern.",
+      "tipModes": "Wechseln Sie den Surfmodus jederzeit unter Übersicht oder im Toolbar-Popup.",
+      "startBrowsing": "Surfen starten",
+      "fineTuneDashboard": "Im Dashboard feinabstimmen",
+      "openDashboard": "Dashboard öffnen",
+      "trySamplePage": "Auf Reddit ausprobieren"
+    },
+    "language": {
+      "heading": "Oberflächensprache",
+      "description": "Wählen Sie die Sprache für SignalLens-Menüs und Einrichtung. Weitere Übersetzungen folgen mit neuen Sprachvorlagen.",
+      "browserDetected": "Vom Browser vorgeschlagen: {{language}}",
+      "useSuggested": "{{language}} verwenden"
+    },
+    "topics": {
+      "heading": "Was stört Sie?",
+      "description": "Diese Themen nutzen wir als Schlüsselwort-Signale im heuristischen Modus.",
+      "pickAtLeastOne": "Wählen Sie mindestens ein Thema, um fortzufahren."
+    },
+    "botherCategories": {
+      "outrage": "Empörung und Drama",
+      "spam": "Spam und Werbung",
+      "hostile": "Feindselige oder beleidigende Sprache",
+      "engagement-bait": "Engagement-Köder-Schlagzeilen",
+      "low-effort": "Kommentare mit wenig Aufwand"
+    },
+    "style": {
+      "heading": "Filterstil",
+      "description": "Wählen Sie, wie übereinstimmende Inhalte erscheinen. Sie können dies später in den Einstellungen ändern.",
+      "coreBuildNote": "Diese Version enthält nur Abdunkeln. Verwischen und Einklappen gibt es in der Vollversion.",
+      "previewLabel": "Vorschau"
+    },
+    "filterStyles": {
+      "dim": "Übereinstimmende Inhalte abdunkeln",
+      "blur": "Übereinstimmende Inhalte verwischen",
+      "collapse": "Übereinstimmende Inhalte einklappen"
+    },
+    "sites": {
+      "heading": "Seiten, die Sie besuchen",
+      "description": "Wählen Sie, wo optimiertes Extraktionsverhalten gewünscht ist."
+    },
+    "siteLabels": {
+      "reddit": "Reddit",
+      "youtube": "YouTube"
+    },
+    "sensitivity": {
+      "heading": "Empfindlichkeit",
+      "description": "Wie aggressiv soll SignalLens Inhalte markieren, die Ihren Regeln entsprechen?"
+    },
+    "whitelist": {
+      "heading": "Filterung auf Arbeits-Apps überspringen?",
+      "description": "Optional. SignalLens scannt und filtert diese Seiten nicht — nützlich für E-Mail, Dokumente und Tabellen.",
+      "skipHint": "Sie können diesen Schritt überspringen oder die Whitelist jederzeit unter Regeln im Dashboard ändern.",
+      "noneSelected": "Keine"
+    },
+    "sensitivityPresets": {
+      "conservative": {
+        "label": "Konservativ",
+        "hint": "Weniger Treffer"
+      },
+      "balanced": {
+        "label": "Ausgewogen",
+        "hint": "Empfohlener Standard"
+      },
+      "strict": {
+        "label": "Streng",
+        "hint": "Mehr Treffer"
+      }
+    }
+  }
+}

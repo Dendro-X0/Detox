@@ -6,32 +6,12 @@
  */
 
 import type { CoreIpcMessage } from './core/ipc/messages';
-import { InferenceRuntimeHost } from './core/runtime/inference-runtime-host';
 import {
     installAuthenticityContextMenu,
     registerAuthenticityBackgroundHandlers,
 } from './background-authenticity';
-import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
-import { loadBuiltinMods } from './mods/load-builtin-mods';
-
-let runtimeHost: InferenceRuntimeHost | null = null;
-let bootstrapPromise: Promise<InferenceRuntimeHost> | null = null;
-
-async function ensureRuntimeHost(): Promise<InferenceRuntimeHost> {
-    if (runtimeHost) return runtimeHost;
-    if (!bootstrapPromise) {
-        bootstrapPromise = (async () => {
-            await loadBuiltinMods();
-            subscribeToEnabledModChanges(() => {
-                void loadBuiltinMods();
-            });
-            runtimeHost = new InferenceRuntimeHost();
-            void runtimeHost.ensureInitialized();
-            return runtimeHost;
-        })();
-    }
-    return bootstrapPromise;
-}
+import { ensureInlineRuntimeHost } from './core/runtime/runtime-host-bootstrap';
+import { installRoutingLoader } from './core/runtime/routing-settings';
 
 function isCoreIpcMessage(value: unknown): value is CoreIpcMessage {
     return typeof value === 'object' && value !== null && 'type' in value;
@@ -45,7 +25,7 @@ function handleMessage(
     if (!isCoreIpcMessage(message)) return false;
     if (message.type !== 'classifyBatch' && message.type !== 'runtimeStatus') return false;
 
-    void ensureRuntimeHost()
+    void ensureInlineRuntimeHost()
         .then((host) => host.handleMessage(message))
         .then(sendResponse)
         .catch((error: unknown) => {
@@ -57,11 +37,21 @@ function handleMessage(
 
 chrome.runtime.onMessage.addListener(handleMessage);
 
+installRoutingLoader();
 installAuthenticityContextMenu();
 registerAuthenticityBackgroundHandlers();
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
     installAuthenticityContextMenu();
+    if (details.reason !== 'install') return;
+
+    chrome.storage.local.get('onboardingComplete', (result: unknown) => {
+        const record = result as { readonly onboardingComplete?: boolean };
+        if (record.onboardingComplete) return;
+
+        const wizardUrl = chrome.runtime.getURL('options.html?wizard=1');
+        void chrome.tabs.create({ url: wizardUrl });
+    });
 });
 
 console.log('[Core] Firefox inference runtime host loaded');

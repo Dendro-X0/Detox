@@ -7,6 +7,7 @@ export type { Detector, InferenceProvider, DetectorLabel } from './types/detecto
 export type {
     CoreIpcMessage,
     DetoxIpcMessage,
+    SignalLensIpcMessage,
     ClassifyBatchRequest,
     ClassifyBatchResponse,
     RuntimeStatusResponse,
@@ -57,7 +58,14 @@ export {
     ONNX_DETECTOR_ID,
     REMOTE_API_DETECTOR_ID,
     DEFAULT_CLASSIFY_THRESHOLD,
+    OFFSCREEN_PORT_NAME,
+    OFFSCREEN_REQUEST_ID_PREFIX,
 } from './runtime/constants';
+export {
+    ENFORCEMENT_DATASET,
+    enforcementAttrSelector,
+} from './enforcement/element-state';
+export { CONTENT_PERF_REQUEST, CONTENT_PERF_RESPONSE } from './ipc/content-messages';
 export { loadBuiltinMods } from '../mods/load-builtin-mods';
 export { getBuildProfile, isFullBuild, type BuildProfile } from '../build-profile';
 export { MOD_CATALOG, getModsForProfile, type ModDescriptor } from '../mods/mod-manifest';

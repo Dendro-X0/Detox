@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fixture — chrome heavy</title>
+</head>
+<body>
+  <header role="banner">
+    <button type="button" data-fixture-chrome="header-btn">Sign in</button>
+    <nav role="navigation">
+      <a href="/trending" data-fixture-chrome="nav-trending">Trending</a>
+    </nav>
+  </header>
+  <main>
+    <p data-fixture-unit="main-content">
+      The main article paragraph sits below heavy chrome. Only this prose and the second
+      paragraph in the thread should count as scannable content units for classification.
+    </p>
+    <div role="complementary" aria-label="Related">
+      <p data-fixture-chrome="related-widget">
+        Related posts widget with promotional copy that should be excluded from scanning.
+      </p>
+    </div>
+    <p data-fixture-unit="thread-reply">
+      A second substantive paragraph representing a user reply with enough words to pass
+      minimum length gates once the universal scanner grouping rules are implemented.
+    </p>
+  </main>
+  <footer role="contentinfo">
+    <p data-fixture-chrome="footer-legal">Copyright and legal links belong to page chrome.</p>
+  </footer>
+</body>
+</html>
