@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { fetchAvailableLlmModels } from '../core/llm/openai-models-adapter';
+import { isLocalhostEndpoint } from '../core/llm/local-endpoint-presets';
 import { useLocale } from '../i18n/LocaleContext';
 import SlSelect from './components/SlSelect';
 
@@ -25,12 +26,13 @@ export default function LlmModelSelector({ endpoint, apiKey, value, onChange }: 
             setStatusMessage(t('llm.configureUrl'));
             return;
         }
+        const localEndpoint = isLocalhostEndpoint(endpoint);
         if (!force && fetchKey === lastFetchKey.current && models.length > 0) {
             return;
         }
 
         setStatus('loading');
-        setStatusMessage(t('llm.fetching'));
+        setStatusMessage(localEndpoint ? t('llm.fetchingLocal') : t('llm.fetching'));
 
         const result = await fetchAvailableLlmModels(endpoint, apiKey);
         lastFetchKey.current = fetchKey;
@@ -38,7 +40,11 @@ export default function LlmModelSelector({ endpoint, apiKey, value, onChange }: 
         if (!result.ok) {
             setModels([]);
             setStatus('error');
-            setStatusMessage(result.error);
+            setStatusMessage(
+                localEndpoint && !apiKey.trim()
+                    ? t('llm.localFetchFailed')
+                    : result.error
+            );
             return;
         }
 

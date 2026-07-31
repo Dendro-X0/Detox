@@ -2,7 +2,7 @@
 
 Features that ship **separately from core filtering** — advisory-only, opt-in, and grounded in retrieval rather than auto-blocking.
 
-→ Doc hub: [`../README.md`](../README.md) · Product phases: [`../planning/product-roadmap.md`](../planning/product-roadmap.md)
+→ Doc hub: [`../README.md`](../README.md) · UX roadmap: [`../planning/ux-capability-roadmap.md`](../planning/ux-capability-roadmap.md)
 
 ## Principles (all experimental work)
 
@@ -16,7 +16,8 @@ Features that ship **separately from core filtering** — advisory-only, opt-in,
 
 | Feature | Status | Doc | Code |
 |---------|--------|-----|------|
-| **Authenticity / claim assist** | **Prototype shipped** (Phase G) | [`authenticity-analysis.md`](./authenticity-analysis.md) | `src/mods/analyzers/authenticity/` |
+| **Authenticity / claim assist** | **Prototype shipped** (Phase G); v2.3 hardening | [`authenticity-analysis.md`](./authenticity-analysis.md) | `src/mods/analyzers/authenticity/` |
+| **Visual analysis** | **Concept only** — not in v2.x–v3.0 roadmap | [`visual-analysis.md`](./visual-analysis.md) | — |
 
 ### Authenticity assist (summary)
 
@@ -27,6 +28,15 @@ Features that ship **separately from core filtering** — advisory-only, opt-in,
 - **Search-only default:** zero LLM tokens until user enables T3 and configures an endpoint.
 
 Product phase **G** is complete. The feature remains **experimental** — API surfaces, quotas, and UX will evolve.
+
+### Visual analysis (summary)
+
+- **Not scheduled** for v2.3.x or v3.0.0 — documented so image-only toxicity gap is understood.
+- Future concept: user-triggered **region capture** + user-deployed VLM or API (Track 3).
+- **Advisory only** — no auto-hide on vision scores; advanced users only.
+- Prefer **layout mods** (collapse comment regions) in v3.1 before vision spikes.
+
+**Read:** [`visual-analysis.md`](./visual-analysis.md)
 
 **Try it:** see [`../guides/development.md`](../guides/development.md#testing-authenticity-assist).
 

@@ -1,0 +1,11 @@
+{
+  "modId": "adaptation-example",
+  "name": "Example adaptation pack",
+  "version": "1.0.0",
+  "description": "Copy this folder, rename adaptation-example, and edit both JSON files before signing.",
+  "permissionsSummary": "Local pattern lists only. No network. No upload. No page content storage.",
+  "packCategory": "language",
+  "languages": ["en"],
+  "contexts": ["social-feed"],
+  "contentTypes": ["promotional"]
+}

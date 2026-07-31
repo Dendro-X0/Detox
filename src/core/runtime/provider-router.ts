@@ -22,6 +22,7 @@ import { isDetectorModEnabled } from '../../mods/mod-manifest';
 export type ClassifyBatchOptions = {
     readonly threshold: number;
     readonly detectorId?: string;
+    readonly applySupplementaryDetectors?: boolean;
 };
 
 /**
@@ -83,7 +84,8 @@ export class ProviderRouter {
         const mergedWithSupplements = await this.applySupplementaryDetectors(
             items,
             primaryResults,
-            options.threshold
+            options.threshold,
+            options.applySupplementaryDetectors
         );
 
         if (!routing.escalationEnabled || !routing.remoteApi.enabled) {
@@ -96,8 +98,11 @@ export class ProviderRouter {
     private async applySupplementaryDetectors(
         items: readonly ClassifyItemInput[],
         primaryResults: readonly ClassifyItemResult[],
-        threshold: number
+        threshold: number,
+        applySupplementaryDetectors = true
     ): Promise<readonly ClassifyItemResult[]> {
+        if (!applySupplementaryDetectors) return primaryResults;
+
         let merged = primaryResults;
 
         for (const detectorId of SUPPLEMENTARY_DETECTOR_IDS) {

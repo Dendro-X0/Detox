@@ -1,7 +1,5 @@
 {
-  "version": 1,
-  "mode": "focus",
-  "threshold": 0.5,
+  "version": 2,
   "samples": [
     {
       "id": "pass-news-analysis",
@@ -74,6 +72,54 @@
       "expect": "pass",
       "note": "Below classify length without promo signal",
       "text": "Thanks for the update."
+    },
+    {
+      "id": "pass-rym-album-review",
+      "expect": "pass",
+      "note": "RYM long-form review prose",
+      "hostname": "rateyourmusic.com",
+      "pageContexts": [],
+      "text": "This record rewards repeat listens. The second half opens with a muted piano motif before the band settles into a steady groove that feels earned rather than flashy."
+    },
+    {
+      "id": "pass-spotify-tracklist",
+      "expect": "pass",
+      "note": "Numbered track listing on music player",
+      "hostname": "open.spotify.com",
+      "pageContexts": [],
+      "text": "1. Airbag\n2. Paranoid Android\n3. Subterranean Homesick Alien\n4. Exit Music (For a Film)"
+    },
+    {
+      "id": "pass-spotify-lyric-line",
+      "expect": "pass",
+      "note": "Single lyric line in player UI",
+      "hostname": "open.spotify.com",
+      "pageContexts": [],
+      "text": "And you run and you run to catch up with the sun but it's sinking"
+    },
+    {
+      "id": "pass-discogs-credits",
+      "expect": "pass",
+      "note": "Release credits metadata",
+      "hostname": "discogs.com",
+      "pageContexts": [],
+      "text": "Recorded at Abbey Road Studios, London. Mastered by Bob Ludwig. Published by EMI Music Publishing."
+    },
+    {
+      "id": "pass-metacritic-summary",
+      "expect": "pass",
+      "note": "Metacritic summary blurb",
+      "hostname": "metacritic.com",
+      "pageContexts": [],
+      "text": "Generally favorable reviews based on 42 critic scores. Users rated this album 8.4 out of 10."
+    },
+    {
+      "id": "pass-lastfm-listening",
+      "expect": "pass",
+      "note": "Listening history copy",
+      "hostname": "last.fm",
+      "pageContexts": [],
+      "text": "You listened to 37 scrobbles from this artist this week. Top track: Motion Picture Soundtrack."
     },
     {
       "id": "block-outrage-scandal",

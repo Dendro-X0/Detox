@@ -6,10 +6,16 @@ import type { InferenceRoutingSettings, PrimaryProviderMode } from './core/types
 import { DEFAULT_ROUTING_SETTINGS } from './core/types/routing';
 import type { EnforcementActionId, EnforcementActionSettings } from './core/types/enforcement';
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from './core/types/enforcement';
+import {
+    DEFAULT_FILTER_APPEARANCE,
+    normalizeFilterAppearance,
+    type FilterAppearanceSettings,
+} from './core/types/filter-appearance';
 import { isFullBuild } from './build-profile';
 import { getBuildProfile } from './build-profile';
 import { PRIVACY_POLICY_URL } from './config/store-links';
 import { restoreWizardDefaults } from './core/settings/restore-wizard-defaults';
+import { BlockedItemRow } from './dashboard/BlockReasonChips';
 import DashboardShell from './dashboard/DashboardShell';
 import BrowsingModesPanel from './dashboard/BrowsingModesPanel';
 import DashboardQuickLinks from './dashboard/DashboardQuickLinks';
@@ -18,6 +24,9 @@ import GettingStartedPanel from './dashboard/GettingStartedPanel';
 import LanguageSettingsPanel from './dashboard/LanguageSettingsPanel';
 import FilteringSettingsPanel from './dashboard/FilteringSettingsPanel';
 import OverviewActivityPanel from './dashboard/OverviewActivityPanel';
+import OverviewControlStrip from './dashboard/OverviewControlStrip';
+import FilterInsightsPanel from './dashboard/FilterInsightsPanel';
+import RecentBlockedPanel from './dashboard/RecentBlockedPanel';
 import OverviewStatusStrip from './dashboard/OverviewStatusStrip';
 import { detectorLabel, runtimeStateLabel } from './dashboard/runtime-labels';
 import { loadActiveBrowsingModeId, type BrowsingModeId } from './core/modes/browsing-modes';
@@ -27,6 +36,10 @@ import { getSettingsTabLabels } from './i18n/settings-tabs';
 import { useLocale } from './i18n/LocaleContext';
 import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
 import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
+import FilterModelsPanel from './dashboard/FilterModelsPanel';
+import AdaptationPacksPanel from './dashboard/AdaptationPacksPanel';
+import SetupCompleteBanner from './dashboard/SetupCompleteBanner';
+import ThemeToggle from './dashboard/ThemeToggle';
 import UserRulesPanel from './dashboard/UserRulesPanel';
 import SiteWhitelistPanel from './dashboard/SiteWhitelistPanel';
 import type { AuthenticitySettings } from './mods/analyzers/authenticity/settings';
@@ -104,10 +117,6 @@ const PRESET_THRESHOLDS: Record<PolicyPreset, number> = {
   strict: 0.3,
 };
 
-function getPresetLabel(preset: PolicyPreset, t: (key: string) => string): string {
-  return t(`wizard.sensitivityPresets.${preset}.label`);
-}
-
 function formatTime(ts: number): string {
   const d = new Date(ts);
   return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
@@ -148,6 +157,7 @@ function App({ onRestartWizard }: AppProps) {
   const [showPackSelector, setShowPackSelector] = useState(false);
   const [routing, setRouting] = useState<InferenceRoutingSettings>(DEFAULT_ROUTING_SETTINGS);
   const [enforcementAction, setEnforcementAction] = useState<EnforcementActionSettings>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS);
+  const [filterAppearance, setFilterAppearance] = useState<FilterAppearanceSettings>(DEFAULT_FILTER_APPEARANCE);
   const [siteRuleHost, setSiteRuleHost] = useState('');
   const [siteRuleThreshold, setSiteRuleThreshold] = useState(0.5);
   const saveEnforcementAction = (next: EnforcementActionSettings): void => {
@@ -157,6 +167,13 @@ function App({ onRestartWizard }: AppProps) {
 
   const setActionId = (activeActionId: EnforcementActionId): void => {
     saveEnforcementAction({ activeActionId });
+    void markSettingsCustomized();
+  };
+
+  const saveFilterAppearance = (next: FilterAppearanceSettings): void => {
+    const normalized = normalizeFilterAppearance(next);
+    setFilterAppearance(normalized);
+    chrome.storage.local.set({ filterAppearance: normalized });
     void markSettingsCustomized();
   };
 
@@ -175,13 +192,14 @@ function App({ onRestartWizard }: AppProps) {
   };
 
   useEffect(() => {
-    chrome.storage.local.get(['enabled', 'stats', 'policy', 'inferenceRouting', 'enforcementAction'], (res: unknown) => {
+    chrome.storage.local.get(['enabled', 'stats', 'policy', 'inferenceRouting', 'enforcementAction', 'filterAppearance'], (res: unknown) => {
       const record = res as {
         readonly enabled?: boolean;
         readonly stats?: Stats;
         readonly policy?: PolicySettings;
         readonly inferenceRouting?: InferenceRoutingSettings;
         readonly enforcementAction?: EnforcementActionSettings;
+        readonly filterAppearance?: Partial<FilterAppearanceSettings>;
       };
       setEnabled(record.enabled ?? true);
       setStats(record.stats ?? { scanned: 0, toxic: 0 });
@@ -191,6 +209,9 @@ function App({ onRestartWizard }: AppProps) {
       }
       if (record.enforcementAction) {
         setEnforcementAction({ ...DEFAULT_ENFORCEMENT_ACTION_SETTINGS, ...record.enforcementAction });
+      }
+      if (record.filterAppearance) {
+        setFilterAppearance(normalizeFilterAppearance(record.filterAppearance));
       }
     });
 
@@ -222,6 +243,11 @@ function App({ onRestartWizard }: AppProps) {
       }
       if (changes.enforcementAction) {
         setEnforcementAction(changes.enforcementAction.newValue as EnforcementActionSettings);
+      }
+      if (changes.filterAppearance) {
+        setFilterAppearance(
+          normalizeFilterAppearance(changes.filterAppearance.newValue as FilterAppearanceSettings)
+        );
       }
       if (changes.activeBrowsingModeId) {
         const next = changes.activeBrowsingModeId.newValue;
@@ -516,6 +542,7 @@ function App({ onRestartWizard }: AppProps) {
           <span className="label">{t('settings.header.scanned7Day')}</span>
         </div>
       </div>
+      <ThemeToggle compact />
     </div>
   ) : null;
 
@@ -561,6 +588,8 @@ function App({ onRestartWizard }: AppProps) {
       setPrimaryMode={setPrimaryMode}
       enforcementAction={enforcementAction}
       setActionId={setActionId}
+      filterAppearance={filterAppearance}
+      setFilterAppearance={saveFilterAppearance}
       activeBrowsingModeId={activeBrowsingModeId}
       runtimeStatus={runtimeStatus}
       packState={packState}
@@ -694,45 +723,12 @@ function App({ onRestartWizard }: AppProps) {
       ) : (
         <ul className="blocked-list sl-scroll-region">
           {blockedItems.slice(0, 10).map((item) => (
-            <li key={item.id} className="blocked-item">
-              <div className="blocked-header">
-                <span className="badge">{item.labelId ?? item.label ?? t('settings.debug.noiseLabel')}</span>
-                <span className="score">{(item.score * 100).toFixed(0)}%</span>
-                <span className="time">{formatTime(item.timestamp)}</span>
-              </div>
-              <div className="preview" title={item.preview}>{item.preview}</div>
-              <div className="hostname">{item.hostname}</div>
-            </li>
+            <BlockedItemRow key={item.id} item={item} formatTime={formatTime} />
           ))}
         </ul>
       )}
       </div>
     </details>
-  );
-
-  const browsingModeSummary =
-    activeBrowsingModeId !== null
-      ? t(`browsingModes.${activeBrowsingModeId}.label`)
-      : t('browsingModes.customNote');
-
-  const filterStyleSummary = t(`wizard.filterStyles.${enforcementAction.activeActionId}`);
-
-  const overviewSummaryCard = (
-    <div className="card policy-card">
-      <h3>{t('settings.overview.currentSettings')}</h3>
-      <div className="sl-kv-grid">
-        <span className="label">{t('settings.overview.focusMode')}</span>
-        <span className="value">{enabled ? t('common.enabled') : t('common.disabled')}</span>
-        <span className="label">{t('settings.overview.browsingMode')}</span>
-        <span className="value">{browsingModeSummary}</span>
-        <span className="label">{t('settings.overview.sensitivity')}</span>
-        <span className="value">{getPresetLabel(policy.preset, t)}</span>
-        <span className="label">{t('settings.overview.filterStyle')}</span>
-        <span className="value">{filterStyleSummary}</span>
-        <span className="label">{t('settings.overview.perSiteOverrides')}</span>
-        <span className="value">{Object.keys(policy.perSite).length}</span>
-      </div>
-    </div>
   );
 
   const optionsTabPanel = (
@@ -744,6 +740,7 @@ function App({ onRestartWizard }: AppProps) {
               title={t('settings.tabs.overview')}
               description={t('settings.overview.tabIntro')}
             />
+            <SetupCompleteBanner />
             <OverviewStatusStrip
               enabled={enabled}
               activeBrowsingModeId={activeBrowsingModeId}
@@ -752,7 +749,17 @@ function App({ onRestartWizard }: AppProps) {
             <div className="sl-span-full">
               <GettingStartedPanel />
             </div>
+            <OverviewControlStrip
+              enabled={enabled}
+              activeBrowsingModeId={activeBrowsingModeId}
+              sensitivity={policy.preset}
+              filterStyle={enforcementAction.activeActionId}
+              appearancePreset={filterAppearance.presetId}
+              onNavigate={setSettingsTab}
+            />
             <OverviewActivityPanel />
+            <FilterInsightsPanel onNavigate={setSettingsTab} />
+            <RecentBlockedPanel />
             <div className="sl-span-full">
               <BrowsingModesPanel
                 onModeApplied={refreshSettingsFromStorage}
@@ -761,7 +768,6 @@ function App({ onRestartWizard }: AppProps) {
             </div>
             <DashboardQuickLinks onNavigate={setSettingsTab} />
             <LanguageSettingsPanel />
-            {overviewSummaryCard}
             {runtimeStatusCard}
           </div>
         ) : null}
@@ -797,6 +803,8 @@ function App({ onRestartWizard }: AppProps) {
               title={t('settings.tabs.plugins')}
               description={t('plugins.tabIntro')}
             />
+            <div className="sl-span-full"><FilterModelsPanel /></div>
+            <div className="sl-span-full"><AdaptationPacksPanel /></div>
             <div className="sl-span-full"><PluginLibraryPanel /></div>
             <details className="sl-install-details sl-span-full">
               <summary>{t('plugins.advanced.authenticitySummary')}</summary>
@@ -812,6 +820,13 @@ function App({ onRestartWizard }: AppProps) {
               description={t('settings.privacy.tabIntro')}
             />
             {privacyCard}
+            <div className="card policy-card">
+              <h3>{t('theme.heading')}</h3>
+              <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+                {t('theme.description')}
+              </p>
+              <ThemeToggle />
+            </div>
             <div className="sl-span-full">{advancedCard}</div>
             <div className="sl-span-full">{debugSection}</div>
           </div>

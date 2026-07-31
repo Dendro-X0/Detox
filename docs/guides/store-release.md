@@ -4,6 +4,7 @@ Package, verify, and publish SignalLens to the Chrome Web Store and Firefox Add-
 
 → Checklist: [`../../store/RELEASE-CHECKLIST.md`](../../store/RELEASE-CHECKLIST.md)  
 → Listing copy: [`../../store/listing-chrome.md`](../../store/listing-chrome.md), [`../../store/listing-firefox.md`](../../store/listing-firefox.md)  
+→ Scope FAQ: [`../scope-faq.md`](../scope-faq.md) · audit: [`../../store/SCOPE-AUDIT.md`](../../store/SCOPE-AUDIT.md)  
 → Privacy policy: [`../../store/PRIVACY.md`](../../store/PRIVACY.md)
 
 ## What ships in the **core** store build
@@ -21,6 +22,9 @@ Full profile (`pnpm build:full`) adds blur/collapse, site hint mods, and ONNX pa
 ## Local release commands
 
 ```bash
+# Automated §G gates (run first)
+pnpm release:preflight
+
 # Chrome Web Store zip
 pnpm release:chrome
 

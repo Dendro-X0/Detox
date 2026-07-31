@@ -11,8 +11,12 @@ import { MOD_CATALOG } from '../mods/mod-manifest';
 import { getLocalizedModFields } from '../i18n/mod-catalog';
 import { useLocale } from '../i18n/LocaleContext';
 import { detectorLabel } from './runtime-labels';
+import FilterAppearancePanel from './FilterAppearancePanel';
 import FilterStylePreview from './FilterStylePreview';
+import FilterPreviewPanel from './FilterPreviewPanel';
+import type { FilterAppearanceSettings } from '../core/types/filter-appearance';
 import { getVisibleFilterStyles } from './filter-styles';
+import { SCOPE_FAQ_URL } from '../config/store-links';
 
 type PolicySettings = {
     readonly preset: PolicyPreset;
@@ -41,6 +45,8 @@ export type FilteringSettingsPanelProps = {
     readonly setPrimaryMode: (mode: PrimaryProviderMode) => void;
     readonly enforcementAction: EnforcementActionSettings;
     readonly setActionId: (actionId: EnforcementActionId) => void;
+    readonly filterAppearance: FilterAppearanceSettings;
+    readonly setFilterAppearance: (next: FilterAppearanceSettings) => void;
     readonly activeBrowsingModeId: BrowsingModeId | null;
     readonly runtimeStatus: RuntimeStatus;
     readonly packState: LanguagePackState;
@@ -60,6 +66,8 @@ export default function FilteringSettingsPanel({
     setPrimaryMode,
     enforcementAction,
     setActionId,
+    filterAppearance,
+    setFilterAppearance,
     activeBrowsingModeId,
     runtimeStatus,
     packState,
@@ -129,6 +137,13 @@ export default function FilteringSettingsPanel({
             <section className="sl-filtering-section sl-span-full">
                 <h3 className="sl-filtering-section-title">{t('settings.filtering.classifyHeading')}</h3>
                 <p className="muted sl-filtering-section-desc">{t('settings.filtering.classifyDescription')}</p>
+                <p className="sl-wizard-callout sl-filtering-scope-note">
+                    {t('settings.filtering.scopeHonestyNote')}{' '}
+                    <a href={SCOPE_FAQ_URL} target="_blank" rel="noopener noreferrer">
+                        {t('settings.filtering.scopeFaqLink')}
+                    </a>
+                </p>
+                <p className="sl-wizard-callout sl-filtering-non-social-note">{t('settings.filtering.nonSocialNote')}</p>
             </section>
 
             <div className="card policy-card">
@@ -278,6 +293,8 @@ export default function FilteringSettingsPanel({
                 ) : null}
             </div>
 
+            <FilterPreviewPanel threshold={policy.threshold} enabledModIds={enabledModIds} />
+
             <section className="sl-filtering-section sl-span-full">
                 <h3 className="sl-filtering-section-title">{t('settings.filtering.presentHeading')}</h3>
                 <p className="muted sl-filtering-section-desc">{t('settings.filtering.presentDescription')}</p>
@@ -312,6 +329,12 @@ export default function FilteringSettingsPanel({
                     ))}
                 </div>
             </div>
+
+            <FilterAppearancePanel
+                appearance={filterAppearance}
+                activeActionId={enforcementAction.activeActionId}
+                onChange={setFilterAppearance}
+            />
 
             {isFullBuild() ? (
                 <details className="sl-install-details sl-span-full">

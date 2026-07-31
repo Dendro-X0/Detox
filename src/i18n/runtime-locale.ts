@@ -1,3 +1,4 @@
+import { refreshFilteredAffordanceLabels } from '../core/enforcement/filtered-affordance';
 import { formatFilteredTitle } from '../core/enforcement/format-filtered-title';
 import { ENFORCEMENT_DATASET } from '../core/enforcement/element-state';
 import type { Verdict } from '../core/types/verdict';
@@ -42,8 +43,9 @@ export function subscribeRuntimeLocale(onChange: (localeId: LocaleId) => void): 
     return () => chrome.storage.onChanged.removeListener(listener);
 }
 
-/** Re-apply titles on filtered elements after locale change. */
+/** Re-apply titles and badge labels on filtered elements after locale change. */
 export function refreshFilteredElementTitles(): void {
+    refreshFilteredAffordanceLabels();
     for (const element of document.querySelectorAll<HTMLElement>('[data-sl-blocked="true"]')) {
         const raw = element.dataset[ENFORCEMENT_DATASET.verdict];
         if (!raw) continue;

@@ -13,6 +13,7 @@ import {
 import { openAuthenticityPanel } from '../authenticity/open-panel';
 import { useLocale } from '../i18n/LocaleContext';
 import LlmModelSelector from './LlmModelSelector';
+import LocalLlmEndpointField from './LocalLlmEndpointField';
 import SlSelect from './components/SlSelect';
 
 const SEARCH_PROVIDER_IDS: readonly AuthenticitySearchProvider[] = [
@@ -210,18 +211,11 @@ export default function AuthenticitySettingsPanel() {
             </div>
 
             <h4 className="sl-subsection-title">{t('authenticity.llmHeading')}</h4>
+            <LocalLlmEndpointField
+                endpoint={settings.llmEndpoint}
+                onEndpointChange={(llmEndpoint) => persist({ ...settings, llmEndpoint })}
+            />
             <div className="sl-form-stack">
-                <div className="sl-form-field">
-                    <label className="sl-form-label" htmlFor="authenticity-llm-endpoint">{t('authenticity.llmEndpoint')}</label>
-                    <input
-                        id="authenticity-llm-endpoint"
-                        type="url"
-                        className="sl-input"
-                        placeholder={t('authenticity.llmEndpointPlaceholder')}
-                        value={settings.llmEndpoint}
-                        onChange={(e) => persist({ ...settings, llmEndpoint: e.target.value })}
-                    />
-                </div>
                 <div className="sl-form-field">
                     <label className="sl-form-label" htmlFor="authenticity-llm-key">{t('authenticity.llmApiKey')}</label>
                     <input

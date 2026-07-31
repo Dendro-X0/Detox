@@ -9,6 +9,7 @@ import {
     storeVerdict,
     validateEnforcementTarget,
 } from '../../../core/enforcement/element-state';
+import { getResolvedFilterAppearance } from '../../../core/settings/filter-appearance-store';
 import { formatFilteredTitle } from '../../../core/enforcement/format-filtered-title';
 
 export const DIM_ACTION_ID = 'dim';
@@ -24,9 +25,10 @@ export const dimAction: EnforcementAction = {
         const validationError = validateEnforcementTarget(element, context);
         if (validationError) return validationError;
 
+        const appearance = getResolvedFilterAppearance();
         storeOriginalStyles(element);
-        element.style.opacity = '0.35';
-        element.style.filter = 'grayscale(40%)';
+        element.style.opacity = String(appearance.contentOpacity);
+        element.style.filter = `grayscale(${appearance.grayscalePercent}%)`;
         element.style.transition = 'opacity 0.4s, filter 0.4s';
         element.title = formatFilteredTitle(verdict);
         markElementBlocked(element, DIM_ACTION_ID, context.blockId);

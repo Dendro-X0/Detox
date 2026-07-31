@@ -2,13 +2,19 @@
 
 import type { ContentUnit } from '../scanner/content-unit';
 import { applyUnitEnforcement } from '../enforcement/apply-unit-enforcement';
+import { resolveEnforcementTarget } from '../enforcement/enforcement-target';
 import { ENFORCEMENT_DATASET } from '../enforcement/element-state';
 import type { CoreIpcMessage } from '../ipc/messages';
 import type { FilteredItemRecord } from '../types/block';
 import { isDomainAllowlisted } from '../rules/user-rules-store';
-import { getThresholdForHost } from '../policy/policy-store';
+import { getAdaptationPageContext } from '../adaptation/adaptation-pack-registry';
+import {
+    resolveClassificationThreshold,
+    shouldApplySupplementaryDetectors,
+} from '../filtering/filtering-profile';
 import { sessionGet, sessionSet } from '../storage/extension-session';
 import { recordBlocksDiscovered, recordBlocksScanned } from '../storage/scan-stats-store';
+import { extractDomContextSignals } from '../filtering/dom-context-signals';
 import { shouldClassifyText } from './text-gate';
 import type { Verdict } from '../types/verdict';
 import { verdictFromClassifyResult } from '../types/verdict';
@@ -48,6 +54,7 @@ export class ClassificationPipeline {
     private readonly registry = new ScanWorkRegistry();
     private readonly pump: ProgressiveScanPump;
     private readonly scannedUnitIds = new Set<string>();
+    private readonly filteredUnitIds = new Set<string>();
     private intersectionObserver: IntersectionObserver | null = null;
     private batchSequence = 0;
 
@@ -67,6 +74,7 @@ export class ClassificationPipeline {
     clearQueues(): void {
         this.registry.clear();
         this.scannedUnitIds.clear();
+        this.filteredUnitIds.clear();
         this.pump.reset();
         if (this.intersectionObserver) {
             this.intersectionObserver.disconnect();
@@ -192,6 +200,28 @@ export class ClassificationPipeline {
         return cleaned.slice(0, PREVIEW_MAX_LENGTH) + '...';
     }
 
+    private tryApplyFilter(unit: ContentUnit, verdict: Verdict): boolean {
+        if (!verdict.matched) return false;
+        if (unit.element.dataset[ENFORCEMENT_DATASET.userRevealed] === 'true') return false;
+        if (this.filteredUnitIds.has(unit.id)) return false;
+
+        const target = resolveEnforcementTarget(unit.element);
+        if (target.dataset[ENFORCEMENT_DATASET.blocked] === 'true') {
+            this.filteredUnitIds.add(unit.id);
+            return false;
+        }
+
+        const result = applyUnitEnforcement(unit.id, unit.element, verdict);
+        if (!result.success) return false;
+
+        const enforcedTarget = resolveEnforcementTarget(unit.element);
+        if (enforcedTarget.dataset[ENFORCEMENT_DATASET.blocked] !== 'true') return false;
+
+        this.filteredUnitIds.add(unit.id);
+        void this.recordFilteredItem(unit.id, verdict, unit.text);
+        return true;
+    }
+
     private async recordFilteredItem(id: string, verdict: Verdict, content: string): Promise<void> {
         const item: FilteredItemRecord = {
             id,
@@ -200,6 +230,7 @@ export class ClassificationPipeline {
             detectorId: verdict.detectorId,
             preview: this.sanitizePreview(content),
             hostname: location.hostname,
+            pageKey: currentPageKey(),
             timestamp: Date.now(),
         };
         const existing = (await sessionGet<readonly FilteredItemRecord[]>('blockedItems')) ?? [];
@@ -230,12 +261,8 @@ export class ClassificationPipeline {
             const verdict = this.verdictCache.get(c.hash);
             if (verdict) {
                 const unit = sorted.find((i) => i.id === c.id)?.unit;
-                if (unit && unit.element.dataset[ENFORCEMENT_DATASET.userRevealed] !== 'true') {
-                    applyUnitEnforcement(unit.id, unit.element, verdict);
-                    if (verdict.matched) {
-                        filteredDelta += 1;
-                        void this.recordFilteredItem(unit.id, verdict, unit.text);
-                    }
+                if (unit && this.tryApplyFilter(unit, verdict)) {
+                    filteredDelta += 1;
                 }
                 this.deps.onClassificationRecorded?.();
             }
@@ -259,10 +286,20 @@ export class ClassificationPipeline {
             return;
         }
 
+        const pageContexts = getAdaptationPageContext();
         const request: CoreIpcMessage = {
             type: 'classifyBatch',
-            items: eligibleToClassify.map((item) => ({ id: item.id, text: item.text })),
-            threshold: getThresholdForHost(location.hostname),
+            items: eligibleToClassify.map((item) => {
+                const unit = sorted.find((i) => i.id === item.id)?.unit;
+                const dom = unit ? extractDomContextSignals(unit.element) : undefined;
+                return {
+                    id: item.id,
+                    text: item.text,
+                    context: dom ? { dom } : undefined,
+                };
+            }),
+            threshold: resolveClassificationThreshold(location.hostname),
+            applySupplementaryDetectors: shouldApplySupplementaryDetectors(pageContexts),
         };
 
         this.deps.profiler?.markStage('tokenizationMs');
@@ -284,12 +321,8 @@ export class ClassificationPipeline {
                             const verdict = verdictFromClassifyResult(result);
                             this.verdictCache.set(original.hash, verdict);
 
-                            if (verdict.matched) {
+                            if (this.tryApplyFilter(originalUnit, verdict)) {
                                 filteredDelta += 1;
-                                if (originalUnit.element.dataset[ENFORCEMENT_DATASET.userRevealed] !== 'true') {
-                                    applyUnitEnforcement(originalUnit.id, originalUnit.element, verdict);
-                                    void this.recordFilteredItem(originalUnit.id, verdict, originalUnit.text);
-                                }
                             }
                             this.deps.onClassificationRecorded?.();
                         }

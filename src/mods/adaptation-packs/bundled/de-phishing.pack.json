@@ -1,0 +1,23 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-de-phishing",
+  "version": "1.0.0",
+  "languages": ["de"],
+  "contexts": ["social-feed", "news", "ecommerce"],
+  "contentTypes": ["phishing"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "konto verifizieren",
+    "identität bestätigen",
+    "konto gesperrt",
+    "ungewöhnliche anmeldung",
+    "passwort sofort zurücksetzen"
+  ],
+  "noisePatterns": {
+    "promo": ["hier klicken zur verifizierung", "dringende aktion erforderlich"]
+  }
+}

@@ -92,6 +92,7 @@ export class InferenceRuntimeHost {
             const results = await providerRouter.classifyBatch(message.items, {
                 threshold,
                 detectorId: message.detectorId,
+                applySupplementaryDetectors: message.applySupplementaryDetectors,
             });
             return { type: 'classifyBatchResult', results };
         } catch (error: unknown) {

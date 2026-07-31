@@ -6,10 +6,18 @@ export const ONNX_DETECTOR_ID = 'onnx-pack';
 export const REMOTE_API_DETECTOR_ID = 'remote-api';
 /** Optional pattern detector (promo, outrage bait, engagement bait). */
 export const NOISE_PATTERNS_DETECTOR_ID = 'noise-patterns';
+/** Language-agnostic behavior signals (caps, hooks, emoji spam, DOM sponsorship). */
+export const BEHAVIOR_SIGNALS_DETECTOR_ID = 'behavior-signals';
+/** Semantic topic diet (D1 embeddings, experimental — full build). */
+export const TOPIC_CLASSIFIER_DETECTOR_ID = 'topic-classifier';
 export const DEFAULT_CLASSIFY_THRESHOLD = 0.9;
 
 /** Supplementary detectors merged with primary when their mod is enabled. */
-export const SUPPLEMENTARY_DETECTOR_IDS: readonly string[] = [NOISE_PATTERNS_DETECTOR_ID];
+export const SUPPLEMENTARY_DETECTOR_IDS: readonly string[] = [
+    NOISE_PATTERNS_DETECTOR_ID,
+    BEHAVIOR_SIGNALS_DETECTOR_ID,
+    TOPIC_CLASSIFIER_DETECTOR_ID,
+];
 
 /** Chrome offscreen document messaging port (background ↔ offscreen). */
 export const OFFSCREEN_PORT_NAME = 'signallens-offscreen';

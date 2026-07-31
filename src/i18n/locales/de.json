@@ -15,7 +15,8 @@
     "disabled": "Deaktiviert",
     "yes": "ja",
     "no": "nein",
-    "none": "keine"
+    "none": "keine",
+    "dismiss": "Schließen"
   },
   "options": {
     "loadingSubtitle": "Dashboard wird geladen…",
@@ -34,6 +35,8 @@
     "thisPage": "Diese Seite",
     "scanned": "Gescannt",
     "filtered": "Gefiltert",
+    "blockedOnThisPage": "Auf dieser Seite gefiltert",
+    "revealOnPage": "Auf Seite einblenden",
     "scanningProgress": "{{discovered}} Blöcke gefunden · Scan läuft",
     "noMatchesYet": "Noch keine Treffer für Ihre Blockier-Schlüsselwörter. Fügen Sie Themen unter Regeln im Dashboard hinzu.",
     "diagnosticsSummary": "Scan-Diagnose",
@@ -69,6 +72,7 @@
       "scanning": "Diese Seite wird gescannt…",
       "filtered": "{{count}} Elemente gefiltert — zum Einblenden klicken.",
       "noMatches": "Gescannt — noch keine Treffer für Ihre Regeln.",
+      "newsNoMatchesHint": "Nachrichtenseiten nutzen oft sachliche Schlagzeilen ohne Promo- oder Köder-Formulierungen — Rauschregeln greifen dann nicht. Für themenbasierte Nachrichtenfilterung: Themen-Diät unter Regeln (Full Build, experimentell).",
       "idle": "Bereit, diese Seite zu scannen."
     },
     "pauseThisSite": "Filterung auf dieser Seite pausieren",
@@ -110,6 +114,23 @@
       "activityFilteredToday": "Heute gefiltert",
       "activityScanned7d": "Gescannt (7 Tage)",
       "activityFiltered7d": "Gefiltert (7 Tage)",
+      "recentBlockedHeading": "Kürzlich gefiltert",
+      "recentBlockedActive": "{{count}} aktiv auf dieser Seite — Badge oder Block anklicken zum Einblenden.",
+      "recentBlockedEmpty": "In dieser Sitzung noch nichts gefiltert. Promo- oder Köder-Text ist ein guter Test bei aktivem Fokusmodus.",
+      "controlStripHeading": "Filter-Steuerung",
+      "controlStripDescription": "Kurzüberblick, was aktiv ist. Chip anklicken für die passenden Einstellungen.",
+      "controlStrip": {
+        "mode": "Modus",
+        "sensitivity": "Empfindlichkeit",
+        "style": "Stil",
+        "appearance": "Erscheinungsbild",
+        "detectors": "{{count}} Detektoren"
+      },
+      "controlStripTopicNote": "Optionale Themen-Diät (Welt-/Nachrichtenthemen) unter Regeln → Themen-Diät und Plugins → Topic classifier — getrennt von der Rauschfilterung.",
+      "insightsHeading": "Filter-Feedback",
+      "insightsEmpty": "Markieren Sie Blocks im Popup oder Dashboard als falsch oder gut, um Muster zu sehen.",
+      "insightsDetectorRow": "{{wrong}} falsch · {{ok}} gut",
+      "insightsTuneLink": "Filter-Einstellungen anpassen →",
       "statusStrip": {
         "focusOn": "Fokus an",
         "focusOff": "Fokus aus",
@@ -118,6 +139,8 @@
         "whitelist": "{{count}} auf Whitelist",
         "filteredToday": "{{count}} heute gefiltert"
       },
+      "setupCompleteTitle": "Einrichtung abgeschlossen",
+      "setupCompleteBody": "Sie können diesen Tab jederzeit schließen. Öffnen Sie das Dashboard erneut über Erweiterungen → SignalLens → Optionen.",
       "quickLinksHeading": "Konfigurieren",
       "quickLinksEssentialHeading": "Feintuning (optional)",
       "quickLinksEssentialHint": "Die meisten bleiben bei den Assistenten-Standards. Nur öffnen, wenn Sie Empfindlichkeit, Schlüsselwörter oder Whitelist anpassen möchten.",
@@ -133,7 +156,7 @@
         "heading": "Erste Schritte",
         "description": "SignalLens läuft auf jeder normalen Webseite. Besuchen Sie eine Seite mit Feeds oder Kommentaren, um die Filterung zu erleben.",
         "tipBrowse": "Öffnen Sie eine Seite mit Beiträgen oder Kommentaren — die Filterung startet automatisch, wenn der Fokusmodus an ist.",
-        "tipReveal": "Klicken Sie auf abgedunkelte oder verwischte Blöcke, um sie einzublenden. Nichts wird dauerhaft ausgeblendet.",
+        "tipReveal": "Gefilterte Blöcke zeigen ein kleines Badge und sind abgedunkelt oder verwischt — klicken Sie auf Badge oder Block zum Einblenden. Nichts bleibt dauerhaft verborgen.",
         "tipRules": "Passen Sie Themen und Schlüsselwörter unter Regeln an oder wechseln Sie den Surfmodus oben.",
         "tipAuthenticity": "Optional: Authentizitäts-Assistent unter Plugins für beratende Quellenprüfungen (Seitenleiste)."
       }
@@ -186,6 +209,9 @@
       "browsingModeNotice": "{{mode}}-Surfmodus ist aktiv. Änderungen hier wechseln zu benutzerdefiniert.",
       "classifyHeading": "Inhalte klassifizieren",
       "classifyDescription": "Wie SignalLens Rauschen erkennt — Inferenzmodus, Schwellwert und aktive Detektoren.",
+      "scopeHonestyNote": "SignalLens liest Seitentext, keine Bilder oder Videos. Beiträge nur mit Bildern werden nicht gefiltert.",
+      "scopeFaqLink": "Umfang & FAQ →",
+      "nonSocialNote": "Auf Musik-Playern, Review-Seiten und anderen Nicht-Feed-Seiten bleiben Verhaltens- und Muster-Detektoren aus; Schwellenwerte sind konservativer. Musik-Streaming in Regeln auf die Whitelist setzen, um das Scannen ganz zu überspringen.",
       "presentHeading": "Treffer darstellen",
       "presentDescription": "Wie gefilterte Blöcke auf der Seite aussehen. Klicken zum Einblenden.",
       "sensitivityDescription": "Höhere Empfindlichkeit markiert mehr Inhalte. Niedrigere reduziert Fehlalarme.",
@@ -214,9 +240,43 @@
       "threshold": "Schwellwert: {{percent}} %",
       "filterStyleHeading": "Filterstil",
       "filterStyleDescription": "Wählen Sie, wie gefilterte Inhalte auf der Seite erscheinen. Klicken Sie auf einen gefilterten Block, um ihn einzublenden.",
+      "appearanceHeading": "Erscheinungsbild gefilterter Inhalte",
+      "appearanceDescription": "Passen Sie an, wie blockierte Inhalte auf der Seite aussehen. Voreinstellungen sind Startpunkte — Custom für volle Kontrolle.",
+      "appearancePresets": {
+        "balanced": "Ausgewogen",
+        "soft": "Sanft",
+        "strong": "Stark",
+        "custom": "Benutzerdefiniert"
+      },
+      "appearancePreviewLabel": "Rauschen · 48 %",
+      "appearanceContentOpacity": "Sichtbarkeit des Inhalts",
+      "appearanceContentOpacityHint": "Niedriger = dunkler und schwerer lesbar.",
+      "appearanceGrayscale": "Graustufen",
+      "appearanceBlur": "Unschärfe",
+      "appearanceFrameBorder": "Rahmenrand",
+      "appearanceFrameFill": "Rahmen-Tönung",
+      "appearanceShowHint": "„Zum Anzeigen klicken“ anzeigen",
+      "appearanceCustomFootnote": "Wählen Sie Benutzerdefiniert für die Regler. Weitere Community-Stile können später als Presets folgen.",
       "languagePackHeading": "Sprachpaket",
       "advancedPackSummary": "Erweitert: Sprachpaket und ONNX-Routing",
       "hide": "Ausblenden",
+      "previewHeading": "Snippet testen",
+      "previewDescription": "Text einfügen, um zu sehen, wie Empfindlichkeit und Detektoren reagieren — ohne Seitenbesuch.",
+      "previewInputLabel": "Beispieltext",
+      "previewPlaceholder": "Überschrift, Kommentar oder Werbezeile einfügen…",
+      "previewSamplesLabel": "Beispiele",
+      "previewWouldFilter": "Würde dieses Snippet filtern",
+      "previewWouldPass": "Würde passieren — unter Schwelle oder ohne Treffer",
+      "previewGated": "Zu kurz oder wenig Signal — Scanner würde überspringen",
+      "previewMatched": "Treffer",
+      "previewBelowThreshold": "unter Schwelle",
+      "previewBehaviorNote": "Verhaltenssignale nutzen sprachunabhängige Muster (Großbuchstaben, Hooks, Emoji/Link-Spam) plus optionale DOM-Hinweise — nicht nur Stichwörter.",
+      "feedbackPrompt": "War diese Filterung korrekt?",
+      "feedbackWrong": "Falsch blockiert",
+      "feedbackOk": "Richtig blockiert",
+      "feedbackMarkedWrong": "Als Fehlblock markiert — hilft bei der Feinabstimmung.",
+      "feedbackMarkedOk": "Als richtiger Block markiert.",
+      "feedbackSummary": "Ihr Feedback: {{wrong}} falsch · {{ok}} richtig — lokal gespeichert.",
       "change": "Ändern",
       "detected": "Erkannt:",
       "detectedConfidence": "{{language}} ({{percent}} % Konfidenz)",
@@ -253,12 +313,24 @@
     }
   },
   "rules": {
-    "tabIntro": "Filterung auf bestimmten Seiten pausieren, dann Schlüsselwörter und Seiten-Schwellen feinabstimmen.",
+    "tabIntro": "Filterung auf vertrauenswürdigen Seiten pausieren, dann Themen-Voreinstellungen und Schlüsselwörter wählen.",
     "advanced": {
       "perSiteSummary": "Erweitert: Empfindlichkeit pro Website"
     },
     "heading": "Ihre Filterregeln",
-    "description": "Passen Sie an, was gefiltert wird. Assistenten-Auswahl füllt diese Listen; Sie können sie jederzeit verfeinern.",
+    "description": "Themen-Voreinstellungen fügen Phrasengruppen per Klick hinzu. Eigene Schlüsselwörter verfeinern darüber hinaus.",
+    "topicPresetsHeading": "Themen-Voreinstellungen",
+    "topicPresetsDescription": "Thema aktivieren, um die Phrasenliste hinzuzufügen oder zu entfernen. Standard aus, sofern nicht im Assistenten gewählt.",
+    "topicPresetKeywordCount": "{{count}} Phrasen",
+    "searchKeywords": "Schlüsselwörter suchen…",
+    "topicPresetHints": {
+      "outrage": "Empörung, Drama und Boykott-Sprache in Feeds.",
+      "spam": "Promo-Codes, Affiliate-Links und Verkaufs-Aufrufe.",
+      "hostile": "Beleidigungen und feindselige Kommentare.",
+      "engagement-bait": "Köder-Schlagzeilen und „Sie werden nicht glauben“-Formulierungen.",
+      "low-effort": "Einzeiler wie „lol“ oder „kam her um zu sagen“.",
+      "geopolitics": "Phrasenliste für Nachrichtenformulierungen (z. B. „breaking news“, „airstrike“) — keine vollständige Themenfilterung. Sachliche BBC-Schlagzeilen treffen oft nicht; für Themen: Themen-Diät."
+    },
     "summary": {
       "block": "{{count}} Block-Schlüsselwörter",
       "allow": "{{count}} Allow-Schlüsselwörter",
@@ -269,7 +341,28 @@
       "spam": "Spam",
       "hostile": "Feindselig",
       "engagement-bait": "Engagement-Köder",
-      "low-effort": "Wenig Aufwand"
+      "low-effort": "Wenig Aufwand",
+      "geopolitics": "Nachrichten & Geopolitik"
+    },
+    "topicDiet": {
+      "heading": "Themen-Diät (experimentell)",
+      "description": "Semantische Themenfilterung — getrennt von den Rausch-Voreinstellungen oben. Erfordert das Topic-classifier-Plugin (Full Build).",
+      "experimental": "Forschungsvorschau — lokale MiniLM-Embeddings, Reveal-first.",
+      "modRequired": "Aktivieren Sie „Topic classifier (experimental)“ unter Plugins.",
+      "enable": "Themen-Diät für dieses Profil aktivieren",
+      "blockGroup": "Themen blockieren",
+      "allowGroup": "Immer erlauben (Block überschreiben)",
+      "separateFromNoise": "Themen-Blocks zeigen Fachlabels (z. B. Weltpolitik), keine Rausch-Chips.",
+      "topics": {
+        "world-affairs": "Weltpolitik",
+        "domestic-politics": "Innenpolitik",
+        "tech": "Technik",
+        "music": "Musik",
+        "culture-arts": "Kultur & Kunst",
+        "business": "Wirtschaft",
+        "health-science": "Gesundheit & Wissenschaft",
+        "sports": "Sport"
+      }
     },
     "blockKeywords": {
       "title": "Blockier-Schlüsselwörter",
@@ -313,7 +406,7 @@
       },
       "music-lyrics": {
         "label": "Musik-Streaming",
-        "hint": "Web-Player, in denen synchronisierte Songtexte gefiltert würden"
+        "hint": "Kein Scan auf Spotify, Apple Music, YouTube Music, Tidal und Deezer — empfohlen, wenn Songtexte gefiltert wirken"
       }
     }
   },
@@ -335,6 +428,49 @@
     "installedPackages": "Installierte Pakete: {{names}}",
     "sectionEnabled": "{{enabled}} / {{total}} an",
     "enableAllHints": "Alle Seiten-Hinweise aktivieren",
+    "filterModels": {
+      "heading": "Filter-Modelle",
+      "description": "Scanning findet Text auf der Seite; Detektoren klassifizieren ihn anhand Ihrer Regeln. Aktivieren Sie Detektoren unten — heuristische Schlüsselwörter funktionieren offline ohne Cloud-Modell.",
+      "classifierHeading": "Primärer Klassifikator",
+      "classifierDescription": "Wie übereinstimmende Inhalte bewertet werden, bevor sie abgedunkelt werden.",
+      "heuristicHint": "Schlüsselwort- und Musterabgleich (Standard, kein Modell-Download)",
+      "localPackHint": "Lokales ONNX-Paket für stärkere Klassifikation (Vollversion)",
+      "coreBuildOnnxNote": "Lokale ONNX-Pakete erfordern die Vollversion. Die Core-Version nutzt heuristische Detektoren — aktivieren Sie Rausch-Muster unter Detektoren.",
+      "detectorsHeading": "Aktive Detektoren"
+    },
+    "adaptationPacks": {
+      "heading": "Adaptationspakete",
+      "description": "Optionale Textmuster-Erweiterungen — Phrasenlisten und Verhaltensgewichte, die mit den Kern-Detektoren zusammenwirken. Keine Bildanalyse.",
+      "privacyBanner": "Alle Scan- und Filterdaten bleiben auf Ihrem Gerät. Adaptationspakete fügen nur lokale Regeln hinzu: kein Netzwerk, kein Upload, keine Speicherung von Seiteninhalt außer der Sitzungsvorschau blockierter Elemente.",
+      "languageUniversal": "Alle Sprachen",
+      "filterLanguage": "Sprache",
+      "filterContentType": "Inhaltstyp",
+      "languageFilters": {
+        "all": "Alle",
+        "universal": "Universal",
+        "en": "Englisch",
+        "de": "Deutsch"
+      },
+      "contentTypeFilters": {
+        "all": "Alle Typen"
+      },
+      "contentTypes": {
+        "promotional": "Werbung",
+        "clickbait": "Clickbait",
+        "phishing": "Phishing",
+        "toxic": "Toxisch"
+      },
+      "languageGroups": {
+        "en": "Englische Pakete",
+        "de": "Deutsche Pakete",
+        "universal": "Universelle Pakete",
+        "other": "Weitere Sprachen"
+      },
+      "noMatchingPacks": "Keine Pakete entsprechen den aktuellen Filtern.",
+      "activeSummary": "{{count}} Paket(e) aktiv — {{keywords}} Zusatzmuster geladen.",
+      "noneActive": "Keine Adaptationspakete aktiv. Sprachpakete gelten, wenn die Seitensprache passt.",
+      "installHint": "Community-Pakete: `pnpm adaptation:scaffold <slug>`, pack.json bearbeiten, dann `pnpm adaptation:build <dir>`. Signierte .signallens-mod.json über Plugin-Bibliothek → Paket installieren. Siehe packages/adaptation-packs/README.md."
+    },
     "sections": {
       "hint": "Site-Hinweise",
       "detector": "Detektoren",
@@ -484,7 +620,62 @@
       "extractFailed": "Seitentext konnte nicht extrahiert werden. Tab neu laden."
     }
   },
+  "filterReasons": {
+    "revealed": "Eingeblendet",
+    "labels": {
+      "noise": "Rauschen",
+      "promo": "Werbung",
+      "clickbait": "Clickbait",
+      "phishing": "Phishing",
+      "toxic": "Toxische Sprache",
+      "neutral": "Neutral",
+      "outrage": "Empörungsköder",
+      "engagement-bait": "Engagement-Köder",
+      "behavior": "Verhalten",
+      "caps-shouting": "Großbuchstaben",
+      "punctuation-burst": "Ausrufezeichen-Flut",
+      "emoji-spam": "Emoji-Spam",
+      "url-heavy": "Link-lastig",
+      "repetition": "Wiederholung",
+      "engagement-hook": "Köder-Hook",
+      "listicle-structure": "Listicle-Format",
+      "symbol-noise": "Symbol-Rauschen",
+      "world-affairs": "Weltpolitik",
+      "domestic-politics": "Innenpolitik",
+      "tech": "Technik",
+      "music": "Musik",
+      "culture-arts": "Kultur & Kunst",
+      "business": "Wirtschaft",
+      "health-science": "Gesundheit & Wissenschaft",
+      "sports": "Sport"
+    }
+  },
+  "theme": {
+    "heading": "Darstellung",
+    "description": "Hell, dunkel oder Systemeinstellung verwenden.",
+    "options": {
+      "system": "System",
+      "light": "Hell",
+      "dark": "Dunkel"
+    },
+    "icon": {
+      "system": "◐",
+      "light": "☀",
+      "dark": "☾"
+    }
+  },
   "llm": {
+    "endpointPreset": "Endpunkt-Vorlage",
+    "localEndpointHint": "Lokale Server (Ollama, LM Studio) benötigen meist keinen API-Schlüssel. Aktualisieren lädt Modelle.",
+    "presets": {
+      "custom": "Eigene URL",
+      "ollama": "Ollama (localhost:11434)",
+      "lmstudio": "LM Studio (localhost:1234)",
+      "localai": "LocalAI (localhost:8080)",
+      "openai": "OpenAI API"
+    },
+    "fetchingLocal": "Modelle vom lokalen Server werden geladen…",
+    "localFetchFailed": "Lokaler Server nicht erreichbar — Modell-ID manuell eingeben oder Endpunkt prüfen.",
     "model": "Modell",
     "selectModel": "Modell wählen…",
     "modelPlaceholder": "Modell-ID (z. B. gpt-4o-mini)",
@@ -512,7 +703,10 @@
     }
   },
   "enforcement": {
-    "filteredTitle": "Gefilterter Inhalt ({{labelId}}: {{percent}} %) — Zum Anzeigen klicken"
+    "filteredTitle": "Gefilterter Inhalt ({{labelId}}: {{percent}} %) — Zum Anzeigen klicken",
+    "filteredBadge": "Gefiltert — zum Anzeigen klicken",
+    "filteredBadgeWithReason": "{{reason}} — zum Anzeigen klicken",
+    "clickToShow": "Zum Anzeigen klicken"
   },
   "content": {
     "authenticity": {
@@ -549,6 +743,72 @@
       "description": "Erkennt Werbung, Empörungs- und Engagement-Köder (mit Ihrer Schlüsselwortliste).",
       "permissionsSummary": "Kein Netzwerk; Musterabgleich auf extrahiertem Text.",
       "sizeLabel": "Enthalten"
+    },
+    "detector-behavior-signals": {
+      "name": "Verhaltenssignale",
+      "description": "Sprachunabhängige Hinweise: Großbuchstaben, Emoji/Link-Spam, Hooks und gesponserte DOM-Marker.",
+      "permissionsSummary": "Kein Netzwerk; nur extrahierter Text und lokale DOM-Hinweise.",
+      "sizeLabel": "Enthalten"
+    },
+    "detector-topic-classifier": {
+      "name": "Topic classifier (experimentell)",
+      "description": "Lokale semantische Themen-Diät — Welt-/Innenpolitik blockieren, Technik und Kultur erlauben.",
+      "permissionsSummary": "Lädt MiniLM-Embeddings beim ersten Start; nur extrahierter Text.",
+      "sizeLabel": "~25 MB beim ersten Start"
+    },
+    "adaptation-universal-social": {
+      "name": "Universeller Social-Feed",
+      "description": "Sprachunabhängige Feed-Hinweise: stärkere Engagement- und Emoji-Signale sowie gesponserte DOM-Marker.",
+      "permissionsSummary": "Nur lokaler Text und DOM-Hinweise. Kein Netzwerk. Keine Speicherung von Seiteninhalt.",
+      "sizeLabel": "~2 KB"
+    },
+    "adaptation-en-promo": {
+      "name": "Englisch — Werbung",
+      "description": "Zusätzliche englische Werbe- und E-Commerce-Muster.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei englischer Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-clickbait": {
+      "name": "Englisch — Clickbait",
+      "description": "Englische Engagement-Hooks und Listen-Köder für Feeds und Nachrichten.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei englischer Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-phishing": {
+      "name": "Englisch — Phishing",
+      "description": "Englische Konto-Verifizierungs- und Dringlichkeits-Betrugsmuster.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei englischer Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-toxic": {
+      "name": "Englisch — toxisch",
+      "description": "Englische Beleidigungs- und Empörungsformulierungen für Feeds und Kommentare.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei englischer Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-promo": {
+      "name": "Deutsch — Werbung",
+      "description": "Deutsche Promo- und Rabattformulierungen für Shops und Feeds.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei deutscher Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-clickbait": {
+      "name": "Deutsch — Clickbait",
+      "description": "Deutsche Engagement-Köder und sensationshungrige Schlagzeilen.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei deutscher Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-phishing": {
+      "name": "Deutsch — Phishing",
+      "description": "Deutsche Konto-Verifizierungs- und Dringlichkeits-Betrugsmuster.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei deutscher Seitensprache.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-toxic": {
+      "name": "Deutsch — toxisch",
+      "description": "Deutsche Beleidigungs- und Empörungsformulierungen für Feeds und Kommentare.",
+      "permissionsSummary": "Nur lokale Musterlisten. Aktiv bei deutscher Seitensprache.",
+      "sizeLabel": "~1 KB"
     },
     "detector-remote-api": {
       "name": "Remote-API",
@@ -630,6 +890,7 @@
       "body2": "Standardmodus ist lokal und offline-freundlich. Kein Konto erforderlich.",
       "quickStart": "Schnellstart (Fokus)",
       "quickStartHint": "Schnellstart aktiviert den Fokus-Surfmodus. Modus und Regeln können Sie jederzeit im Dashboard ändern.",
+      "textOnlyLimitation": "SignalLens liest Seitentext, keine Bilder oder Videos. Beiträge nur mit Bildern werden nicht gefiltert.",
       "setupAgainNote": "Ihre bisherigen Auswahlen sind vorausgewählt. Passen Sie an und schließen Sie ab, um zu übernehmen."
     },
     "mode": {
@@ -656,6 +917,7 @@
       "authenticityDisabled": "Aus",
       "whitelistCount": "{{count}} Gruppen aktiv",
       "topicsCount": "{{count}} ausgewählt",
+      "tipDashboardHandoff": "Abschließen öffnet Ihr Dashboard. Sie können den Tab jederzeit schließen und über Erweiterungen → SignalLens erneut öffnen.",
       "tipBrowse": "Öffnen Sie eine normale Website (keine chrome://-Seiten) mit Feed oder Kommentaren.",
       "tipReveal": "Klicken Sie auf gefilterte Inhalte, um sie einzublenden — nichts bleibt dauerhaft verborgen.",
       "tipFineTuneLater": "Optional: Dashboard später öffnen, um Filterung, Plugins oder Datenschutz fein abzustimmen.",
@@ -675,6 +937,7 @@
     "topics": {
       "heading": "Was stört Sie?",
       "description": "Diese Themen nutzen wir als Schlüsselwort-Signale im heuristischen Modus.",
+      "noiseVsTopicNote": "Diese Voreinstellungen filtern Ton und Formulierung (Rauschen). Eine optionale Themen-Diät für Nachrichteninhalte finden Sie später unter Regeln — getrennt von diesem Schritt.",
       "pickAtLeastOne": "Wählen Sie mindestens ein Thema, um fortzufahren."
     },
     "botherCategories": {
@@ -682,7 +945,8 @@
       "spam": "Spam und Werbung",
       "hostile": "Feindselige oder beleidigende Sprache",
       "engagement-bait": "Engagement-Köder-Schlagzeilen",
-      "low-effort": "Kommentare mit wenig Aufwand"
+      "low-effort": "Kommentare mit wenig Aufwand",
+      "geopolitics": "Nachrichten und Geopolitik (optional — in Focus standardmäßig aus)"
     },
     "style": {
       "heading": "Filterstil",

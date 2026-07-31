@@ -6,6 +6,8 @@ export type ClassifyBatchRequest = {
     readonly items: readonly ClassifyItemInput[];
     readonly threshold?: number;
     readonly detectorId?: string;
+    /** When false, skip noise-pattern and behavior-signal detectors (feed-context pages only). */
+    readonly applySupplementaryDetectors?: boolean;
 };
 
 export type ClassifyBatchResponse = {

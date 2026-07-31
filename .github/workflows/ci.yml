@@ -34,6 +34,9 @@ jobs:
       - name: Scanner tests
         run: pnpm test:scanner
 
+      - name: Filter audit (D4 gate)
+        run: pnpm test:filter-audit
+
   e2e:
     name: Extension E2E
     runs-on: ubuntu-latest
@@ -111,6 +114,9 @@ jobs:
 
       - name: Store metadata
         run: pnpm store:verify
+
+      - name: Store scope audit (§F3)
+        run: pnpm store:verify:scope
 
       - name: Privacy policy URL (online)
         run: pnpm store:verify:online

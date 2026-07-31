@@ -1,0 +1,309 @@
+{
+  "version": 1,
+  "samples": [
+    {
+      "id": "bbc-armenia-votes",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "note": "Dogfood — political headline without geopolitics phrase list hits",
+      "text": "Armenia votes as Russia piles pressure on pro-West government"
+    },
+    {
+      "id": "bbc-hegseth-europe",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "text": "Hegseth attacks Europe over migration with beach invasion D-Day speech"
+    },
+    {
+      "id": "bbc-ohio-shooting",
+      "primaryTopic": "domestic-politics",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "text": "Manhunt for suspects after 12 people shot near festival in Ohio"
+    },
+    {
+      "id": "bbc-iran-visas",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "text": "Iran says staff blocked from entering US after players given World Cup visas"
+    },
+    {
+      "id": "bbc-st-petersburg-forum",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "text": "Lasting image of economic forum is plunging rouble over St Petersburg"
+    },
+    {
+      "id": "bbc-bartoli-culture",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "note": "Dogfood — homepage culture card; should not block under news diet",
+      "text": "Cecilia Bartoli: A voice defies time"
+    },
+    {
+      "id": "bbc-el-nino-science",
+      "primaryTopic": "health-science",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "text": "How the Godzilla El Niño could change the world"
+    },
+    {
+      "id": "bbc-james-bond-culture",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "text": "The battle to save James Bond from becoming slop"
+    },
+    {
+      "id": "bbc-tiktok-tech",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "text": "What goes on in TikTok's Farlands?"
+    },
+    {
+      "id": "bbc-hinge-business",
+      "primaryTopic": "business",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "text": "Hinge CEO: The cost of living crunch is changing how we date"
+    },
+    {
+      "id": "bbc-dynamic-pricing",
+      "primaryTopic": "business",
+      "blockUnderNewsDiet": false,
+      "source": "bbc",
+      "language": "en",
+      "text": "Has the world reached peak dynamic pricing?"
+    },
+    {
+      "id": "reddit-antigravity-it",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "it",
+      "note": "Dogfood — repetition FP fix; topic should stay tech",
+      "text": "Ho risolto il problema scaricando Antigravity CLI nella virtual machine. Per quanto riguarda IDE, sto utilizzando VS Code dove lancio il terminale con Antigravity CLI. Antigravity CLI funziona decisamente meglio rispetto a Code Assist."
+    },
+    {
+      "id": "reddit-engagement-hook-en",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "en",
+      "note": "Noise layer may block; topic is still tech/product",
+      "text": "no free meal anymore!! no free plan data is needed by google."
+    },
+    {
+      "id": "reddit-low-effort-suck",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "en",
+      "text": "this is suck"
+    },
+    {
+      "id": "reddit-star-wars-tech",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "en",
+      "text": "Luke Skywalker could bullseye womp rats in his T-16 back home, and they are not much bigger than two meters."
+    },
+    {
+      "id": "reddit-chinese-comment",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "zh",
+      "note": "Non-Latin — topic research must not rely on EN keywords only",
+      "text": "你是不是太久没有使用了吗？"
+    },
+    {
+      "id": "reddit-data-center-tech",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "en",
+      "text": "The new data center build needs another six months before we can migrate inference workloads off the legacy cluster."
+    },
+    {
+      "id": "tech-saas-docs",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "Developers can start a free trial of the API tier from the documentation page after creating an organization account."
+    },
+    {
+      "id": "tech-postgres-learning",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "I was today years old when I learned about PostgreSQL partial indexes and how they reduce write amplification on large tables."
+    },
+    {
+      "id": "music-album-review",
+      "primaryTopic": "music",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The new album blends chamber strings with subtle electronics; the tracklist rewards repeated listening on vinyl."
+    },
+    {
+      "id": "music-concert-announce",
+      "primaryTopic": "music",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The symphony announced a spring concert series featuring three visiting conductors and a restored opera program."
+    },
+    {
+      "id": "culture-theater-review",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The director uses the clown show metaphor throughout the second act, but the review stays analytical about staging and pacing."
+    },
+    {
+      "id": "health-hypertension-clinical",
+      "primaryTopic": "health-science",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "note": "Repeated clinical terms — must not classify as politics",
+      "text": "The patient presented with hypertension and related cardiovascular risk. Treatment for hypertension followed established clinical guidelines across twelve weeks."
+    },
+    {
+      "id": "health-vaccine-study",
+      "primaryTopic": "health-science",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "Researchers published peer-reviewed results from a multi-site vaccine trial with twelve thousand participants."
+    },
+    {
+      "id": "business-earnings-neutral",
+      "primaryTopic": "business",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "We reviewed the quarterly results and the team shared thoughtful feedback on next steps for the product roadmap."
+    },
+    {
+      "id": "business-market-volatility",
+      "primaryTopic": "business",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "Markets opened lower after earnings missed expectations, though analysts noted improving margins in the core segment."
+    },
+    {
+      "id": "sports-league-match",
+      "primaryTopic": "sports",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The championship match went to extra time before the home side scored in the ninety-second minute."
+    },
+    {
+      "id": "sports-olympic-preview",
+      "primaryTopic": "sports",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "Olympic organizers released the tournament schedule for track events and swimming heats next month."
+    },
+    {
+      "id": "domestic-parliament-vote",
+      "primaryTopic": "domestic-politics",
+      "blockUnderNewsDiet": true,
+      "source": "manual",
+      "language": "en",
+      "text": "Parliament votes on the revised budget after the prime minister addressed concerns from opposition leaders."
+    },
+    {
+      "id": "domestic-election-results",
+      "primaryTopic": "domestic-politics",
+      "blockUnderNewsDiet": true,
+      "source": "manual",
+      "language": "en",
+      "text": "Election results show a narrow lead in key swing districts with most ballot counts complete."
+    },
+    {
+      "id": "world-ceasefire-talks",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "manual",
+      "language": "en",
+      "text": "Ceasefire talks resume as diplomats seek a humanitarian corridor for aid deliveries."
+    },
+    {
+      "id": "world-military-strike",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "manual",
+      "language": "en",
+      "text": "Overnight military strike near the border raised fears of a wider regional conflict."
+    },
+    {
+      "id": "world-sanctions-announce",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "manual",
+      "language": "en",
+      "text": "Allies announced sanctions against state-owned energy firms following the latest missile attack."
+    },
+    {
+      "id": "neutral-gardening",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "note": "Low-signal lifestyle — borderline; labeled culture/leisure not news",
+      "text": "This paragraph describes calm gardening techniques and seasonal planting schedules for backyard vegetables and herbs."
+    },
+    {
+      "id": "tech-open-source-release",
+      "primaryTopic": "tech",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The open source project shipped a major release with improved CLI tooling and Kubernetes operator support."
+    },
+    {
+      "id": "culture-film-festival",
+      "primaryTopic": "culture-arts",
+      "blockUnderNewsDiet": false,
+      "source": "manual",
+      "language": "en",
+      "text": "The film festival jury praised the debut director for restraint and composition in the closing ceremony screening."
+    },
+    {
+      "id": "bbc-breaking-news-phrase",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "bbc",
+      "language": "en",
+      "note": "Keyword-friendly headline — D0 should catch; semantic model must too",
+      "text": "Breaking news: diplomatic crisis escalates after military strike near the border"
+    }
+  ]
+}

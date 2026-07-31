@@ -55,11 +55,14 @@
 ## Automated coverage (run before manual pass)
 
 ```bash
+pnpm dogfood:preflight     # filter audit + context gates (start here for v3.0 dogfood)
 pnpm test:scanner          # unit + acceptance fixtures
-pnpm test:filter-audit     # Focus-mode false-positive corpus
+pnpm test:filter-audit     # Focus + Research FP audit; writes artifacts/filter-audit-report.txt
 pnpm test:e2e:core         # wizard + filtering E2E
 pnpm test:e2e:acceptance   # SPA + static article E2E
 ```
+
+Structured v3.0 dogfood (Reddit + BBC + RYM): [`../qa/dogfood-signoff.md`](../qa/dogfood-signoff.md).
 
 ## Reporting issues
 

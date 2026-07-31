@@ -1,4 +1,5 @@
 import type { EnforcementContext } from '../types/enforcement';
+import { removeFilteredAffordance } from './filtered-affordance';
 import type { EnforcementResult } from './enforcement-result';
 
 export const ENFORCEMENT_DATASET = {
@@ -103,6 +104,7 @@ export function markElementBlocked(element: HTMLElement, actionId: string, block
 }
 
 export function clearBlockedState(element: HTMLElement): void {
+    removeFilteredAffordance(element);
     element.title = '';
     const handler = revealHandlerByElement.get(element);
     if (handler) {

@@ -4,22 +4,24 @@
 
 | What you need | Document |
 |---------------|----------|
-| **Universal scanner (active work)** | [`docs/planning/universal-scanner-roadmap.md`](docs/planning/universal-scanner-roadmap.md) |
+| **Purposeful browsing (platform plan)** | [`docs/planning/purposeful-browsing-roadmap.md`](docs/planning/purposeful-browsing-roadmap.md) |
 | **Version roadmap (v2.0 → v3.0 public production)** | [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md) |
+| **v3.0 launch scope (Option A)** | [`docs/planning/v3-focused-launch-scope.md`](docs/planning/v3-focused-launch-scope.md) |
+| **Universal scanner** | [`docs/planning/universal-scanner-roadmap.md`](docs/planning/universal-scanner-roadmap.md) |
 | **Product phases (A–G complete; historical)** | [`docs/planning/product-roadmap.md`](docs/planning/product-roadmap.md) |
 | **Doc index** | [`docs/README.md`](docs/README.md) |
 | **Local development** | [`docs/guides/development.md`](docs/guides/development.md) |
-| **Technical core (Phases 1–6 complete; Phase 7 active)** | [`CORE-ROADMAP.md`](CORE-ROADMAP.md) |
-| **Authenticity assist (frozen until scanner S4)** | [`docs/experimental/authenticity-analysis.md`](docs/experimental/authenticity-analysis.md) |
+| **Technical core (Phases 1–6 complete; Phase 7 = scanner)** | [`CORE-ROADMAP.md`](CORE-ROADMAP.md) |
+| **Authenticity assist (experimental)** | [`docs/experimental/authenticity-analysis.md`](docs/experimental/authenticity-analysis.md) |
 | **Firefox build** | [`docs/guides/firefox-build.md`](docs/guides/firefox-build.md) |
 | **Legacy v2 design spec** | [`v2-roadmap.md`](v2-roadmap.md) (historical) |
 
 ## Current focus
 
-**v2.1.x — Configure & trust** (Phase 2): wizard-first setup, heuristics, site whitelist.
+**Platform:** personal browsing assistant (steer · act · understand) — [`docs/planning/purposeful-browsing-roadmap.md`](docs/planning/purposeful-browsing-roadmap.md).
 
-**North star:** **v3.0.0** — initial public release after refining **scanning**, **filtering**, and **authenticity assist** (script-first public data → AI cross-reference).
+**Near-term ship:** **v2.3.0 → v3.0.0** text-noise wedge (Option A), then Preferences + interest diet (P1) and selection assist (P2).
 
-**Active work:** v2.1.x wizard-first setup — see [`docs/planning/wizard-first-checklist.md`](docs/planning/wizard-first-checklist.md).
+**North star:** purposeful browsing for diverse users — **≤ 1 minute** Express setup; dashboard as Preferences home; noise and interest kept separate.
 
-See [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md) for the full journey. Historical letter-phases remain in [`docs/planning/product-roadmap.md`](docs/planning/product-roadmap.md).
+See [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md) for release versions. Historical letter-phases remain in [`docs/planning/product-roadmap.md`](docs/planning/product-roadmap.md).

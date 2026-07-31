@@ -1,3 +1,4 @@
+import { getMergedAdaptationRules } from '../../../core/adaptation/adaptation-pack-registry';
 import { BOTHER_KEYWORD_MAP, type BotherCategory } from '../../../core/types/bother-keywords';
 import { getUserRules, loadUserRules } from '../../../core/rules/user-rules-store';
 
@@ -18,8 +19,10 @@ export async function getActiveKeywords(): Promise<readonly string[]> {
     const custom = getUserRules().blockKeywords;
 
     if (custom.length === 0) {
-        return defaultBlockKeywords();
+        const merged = getMergedAdaptationRules();
+        return [...new Set([...defaultBlockKeywords(), ...merged.supplementalKeywords])];
     }
 
-    return [...new Set(custom)];
+    const merged = getMergedAdaptationRules();
+    return [...new Set([...custom, ...merged.supplementalKeywords])];
 }

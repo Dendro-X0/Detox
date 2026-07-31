@@ -7,7 +7,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 ## [Unreleased]
 
 ### Added
-- **False-positive audit corpus** — Focus-mode dogfood fixtures (`tests/fixtures/filtering/focus-corpus.json`); CI gate via `pnpm test:filter-audit`
+
+## [2.3.0] - 2026-06-06
+
+### Added — Track A (filtering trust)
+- **Filter stats integrity** — filtered ≤ scanned; count only on successful enforcement (`classification-pipeline.ts`)
+- **In-page filtered badge** — reason + “click to show” on dimmed blocks (`filtered-affordance.ts`)
+- **Block reason UI** — Recent blocked panel + popup chips (`BlockReasonChips`, `format-block-reason.ts`)
+- **Non-social FP tuning** — conservative thresholds on music/review hosts; supplementary detector gating (`filtering-profile.ts`)
+- **FP audit gate** — `pnpm test:filter-audit` + `artifacts/filter-audit-report.*` (Focus/Research 0 FP on pass corpus)
+- **Structured dogfood** — [`docs/qa/dogfood-signoff.md`](docs/qa/dogfood-signoff.md) + `pnpm dogfood:preflight`
+- **Scope honesty (A-R4)** — [`docs/scope-faq.md`](docs/scope-faq.md), Filtering tab link, `pnpm store:verify:scope`, listing copy refresh
+
+### Added — Track C (release ops)
+- **Release preflight** — `pnpm release:preflight` (§G automated gates + report artifact)
+- **v2.3 release runbook** — [`docs/planning/v2.3-release-ops.md`](docs/planning/v2.3-release-ops.md)
+- **Dogfood issue log** — [`docs/qa/dogfood-issue-log.md`](docs/qa/dogfood-issue-log.md) for 30-day C-R5 gate
+
+### Added — prior unreleased
+- **Wizard dashboard handoff** — setup completes on Overview with dismissible banner; reopen via Extensions → SignalLens
+- **Filtering models panel** — Plugins tab classifier + detector selection (heuristic vs ONNX; noise patterns toggle)
+- **Dark theme** — light / dark / system toggle on dashboard header, Privacy tab, and popup
+- **Local LLM presets** — Ollama, LM Studio, LocalAI endpoint shortcuts in authenticity settings
 - **Wizard authenticity opt-in** — optional step after whitelist; search-only Wikipedia default; LLM API key optional
 - **ClaimReview retrieval (authenticity T2)** — Google Fact Check Tools API gather; structured snippet verify in pipeline
 - **SPA pushState acceptance** — E2E verifies scan stats reset on in-page navigation without full reload

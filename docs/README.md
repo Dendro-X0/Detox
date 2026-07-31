@@ -6,10 +6,16 @@ Navigation hub for **SignalLens** — a personal browsing layer for focus-first 
 
 | I want to… | Start here |
 |------------|------------|
-| **Build the universal scanner (active)** | [`planning/universal-scanner-roadmap.md`](./planning/universal-scanner-roadmap.md) |
+| **Platform plan (purposeful browsing, Preferences, 1-min setup)** | [`planning/purposeful-browsing-roadmap.md`](./planning/purposeful-browsing-roadmap.md) |
 | **Version roadmap (v2.0 → v3.0 production)** | [`planning/version-roadmap.md`](./planning/version-roadmap.md) |
+| **UX & capability roadmap (personas, text-first scope)** | [`planning/ux-capability-roadmap.md`](./planning/ux-capability-roadmap.md) |
+| **Universal scanner** | [`planning/universal-scanner-roadmap.md`](./planning/universal-scanner-roadmap.md) |
+| **v3.0 acceptance checklist (launch QA)** | [`planning/v3-acceptance-checklist.md`](./planning/v3-acceptance-checklist.md) |
+| **Structured dogfood sign-off (A-R5)** | [`qa/dogfood-signoff.md`](./qa/dogfood-signoff.md) |
+| **Scope FAQ & known limitations (A-R4)** | [`scope-faq.md`](./scope-faq.md) |
 | **Wizard-first setup checklist** | [`planning/wizard-first-checklist.md`](./planning/wizard-first-checklist.md) |
-| **v2.2.0 store prep (next)** | [`planning/v2.2-store-prep.md`](./planning/v2.2-store-prep.md) |
+| **v2.3.0 release ops (Track C)** | [`planning/v2.3-release-ops.md`](./planning/v2.3-release-ops.md) |
+| **v2.2.0 store prep (prior RC)** | [`planning/v2.2-store-prep.md`](./planning/v2.2-store-prep.md) |
 | Capture store screenshots | [`../store/SCREENSHOTS.md`](../store/SCREENSHOTS.md) |
 | See product phases (historical) | [`planning/product-roadmap.md`](./planning/product-roadmap.md) |
 | Build or load the Firefox extension | [`guides/firefox-build.md`](./guides/firefox-build.md) |

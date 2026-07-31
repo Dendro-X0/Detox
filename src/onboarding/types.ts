@@ -4,6 +4,7 @@ import type { BotherCategory } from '../core/types/bother-keywords';
 import type { BrowsingModeId } from '../core/modes/browsing-modes';
 import type { LocaleId } from '../i18n/types';
 import type { SiteWhitelistPresetId } from '../core/rules/site-whitelist-presets';
+import type { ExpressPresetId } from './express-presets';
 
 export type { BotherCategory } from '../core/types/bother-keywords';
 export { BOTHER_KEYWORD_MAP } from '../core/types/bother-keywords';
@@ -24,6 +25,15 @@ export type PresetModeOnboardingDraft = {
     readonly authenticityAssist?: AuthenticityAssistOptIn;
 };
 
+/** One-tap lifestyle seed — Express path (≤1 min setup). */
+export type ExpressOnboardingDraft = {
+    readonly setupPath: 'express';
+    readonly expressPresetId: ExpressPresetId;
+    readonly localeId: LocaleId;
+    readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];
+    readonly authenticityAssist?: AuthenticityAssistOptIn;
+};
+
 export type CustomOnboardingDraft = {
     readonly setupPath: 'custom';
     readonly localeId: LocaleId;
@@ -34,7 +44,10 @@ export type CustomOnboardingDraft = {
     readonly authenticityAssist?: AuthenticityAssistOptIn;
 };
 
-export type OnboardingDraft = PresetModeOnboardingDraft | CustomOnboardingDraft;
+export type OnboardingDraft =
+    | PresetModeOnboardingDraft
+    | ExpressOnboardingDraft
+    | CustomOnboardingDraft;
 
 export type OnboardingStorageRecord = {
     readonly onboardingComplete?: boolean;

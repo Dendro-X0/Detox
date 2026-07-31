@@ -3,7 +3,9 @@ import { useEffect, useState } from 'react';
 import App from './App';
 import DashboardShell from './dashboard/DashboardShell';
 import { LocaleProvider, useLocale } from './i18n/LocaleContext';
+import { ThemeProvider } from './theme/ThemeProvider';
 import OnboardingWizard, { type WizardCompleteOptions } from './OnboardingWizard';
+import { markWizardCompleteBanner } from './dashboard/SetupCompleteBanner';
 
 function OptionsAppContent() {
     const { t } = useLocale();
@@ -38,18 +40,8 @@ function OptionsAppContent() {
             window.history.replaceState({}, '', `${url.pathname}${url.hash}`);
         }
         setShowWizard(false);
-        if (options?.openDashboard) {
-            window.location.hash = 'overview';
-            return;
-        }
-        if (options?.openSample) {
-            return;
-        }
-        if (openedForInstallWizard) {
-            window.setTimeout(() => {
-                window.close();
-            }, 150);
-        }
+        markWizardCompleteBanner();
+        window.location.hash = options?.openSample ? 'overview' : 'overview';
     };
 
     if (showWizard) {
@@ -61,8 +53,10 @@ function OptionsAppContent() {
 
 export default function OptionsApp() {
     return (
-        <LocaleProvider>
-            <OptionsAppContent />
-        </LocaleProvider>
+        <ThemeProvider>
+            <LocaleProvider>
+                <OptionsAppContent />
+            </LocaleProvider>
+        </ThemeProvider>
     );
 }

@@ -2,6 +2,7 @@
 import { globalProfiler } from './v2/core/profiler';
 import { ClassificationPipeline } from './core/pipeline/classification-pipeline';
 import { revealContentUnit } from './core/enforcement/apply-unit-enforcement';
+import { markBlockedItemRevealed } from './core/feedback/reveal-feedback-store';
 import { ENFORCEMENT_DATASET, enforcementAttrSelector } from './core/enforcement/element-state';
 import { CONTENT_PERF_REQUEST, CONTENT_PERF_RESPONSE } from './core/ipc/content-messages';
 import { createScanCoordinator, type ScanCoordinator } from './core/scanner/scan-coordinator';
@@ -11,6 +12,8 @@ import { isModEnabled } from './core/mods/mod-enablement-store';
 import { installPolicyLoader } from './core/policy/policy-store';
 import { installUserRulesLoader, subscribeToUserRulesChanges, isDomainAllowlisted } from './core/rules/user-rules-store';
 import { installEnforcementActionLoader } from './core/registry/action-registry';
+import { installFilterAppearanceLoader } from './core/settings/filter-appearance-store';
+import { refreshFilterAppearanceStyles } from './core/enforcement/filtered-affordance';
 import { subscribeToEnabledModChanges } from './core/mods/mod-enablement-store';
 import { subscribeToInstalledModChanges } from './core/mods/installed-mod-store';
 import { loadBuiltinMods } from './mods/load-builtin-mods';
@@ -20,6 +23,8 @@ import { initRuntimeLocale, refreshFilteredElementTitles, subscribeRuntimeLocale
 import { extractPageContext, getSelectionSnapshot } from './authenticity/page-extract';
 import { sessionRemove } from './core/storage/extension-session';
 import { resetPageScanStats } from './core/storage/scan-stats-store';
+import { detectPageLanguage } from './v2/core/language-pack-manager';
+import { setAdaptationPageFromUrl, setAdaptationPageLanguage } from './core/adaptation/adaptation-pack-registry';
 
 console.log(`[Core] Content script loading (profile: ${getBuildProfile()})`);
 
@@ -170,7 +175,12 @@ chrome.storage.onChanged.addListener((changes) => {
         changes.userRules ||
         changes.userKeywords ||
         changes.enforcementAction ||
+        changes.filterAppearance ||
         changes.enabledModIds;
+
+    if (changes.filterAppearance) {
+        refreshFilterAppearanceStyles();
+    }
 
     if (modeSettingsChanged) {
         pipeline.clearCache();
@@ -194,6 +204,7 @@ async function ensureModsLoaded(): Promise<void> {
     await loadBuiltinMods();
     if (!modsInitialized) {
         installEnforcementActionLoader();
+        installFilterAppearanceLoader();
         installPolicyLoader();
         installUserRulesLoader();
         subscribeToEnabledModChanges(() => {
@@ -217,7 +228,6 @@ async function bootstrap(): Promise<void> {
     if (!isEnabled) return;
     resetPageState();
     console.log('[Core] Initializing content pipeline...');
-    void sessionRemove('blockedItems');
     setTimeout(() => requestIdleCallback(initScanner), 500);
 }
 
@@ -254,6 +264,7 @@ function onNavigationMaybeChanged(): void {
         return;
     }
     if (key === lastPageKey) return;
+    void sessionRemove('blockedItems');
     resetPageState();
     scheduleRescan();
 }
@@ -301,6 +312,10 @@ window.addEventListener('scroll', () => {
 
 function initScanner(): void {
     if (!isEnabled) return;
+
+    const pageLang = detectPageLanguage().primary;
+    setAdaptationPageLanguage(pageLang);
+    setAdaptationPageFromUrl(location.href);
 
     if (isDomainAllowlisted(location.hostname)) {
         stopScanner();
@@ -417,6 +432,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
     if (message.type === 'authenticity:getSelection') {
         sendResponse(getSelectionSnapshot());
+        return true;
+    }
+    if (message.type === 'revealBlockedUnit') {
+        const unitId = typeof message.unitId === 'string' ? message.unitId : '';
+        if (unitId) {
+            const target = document.querySelector<HTMLElement>(
+                enforcementAttrSelector('blockId', unitId)
+            );
+            revealContentUnit(unitId, target);
+            void markBlockedItemRevealed(unitId);
+            target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            sendResponse({ ok: true });
+        } else {
+            sendResponse({ ok: false });
+        }
         return true;
     }
     return false;

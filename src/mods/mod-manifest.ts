@@ -1,6 +1,7 @@
 import type { BuildProfile } from '../build-profile';
+import { ADAPTATION_PACK_CATALOG } from './adaptation-packs/catalog';
 
-export type ModKind = 'hint' | 'detector' | 'action';
+export type ModKind = 'hint' | 'detector' | 'action' | 'adaptation-pack';
 
 export type ModDescriptor = {
     readonly id: string;
@@ -17,6 +18,8 @@ export type ModDescriptor = {
     readonly runtimeId: string;
     /** Cannot be disabled in the plugin library. */
     readonly required?: boolean;
+    /** Included in default enabled set when mod ships in profile. Default true. */
+    readonly defaultEnabled?: boolean;
 };
 
 /** Mods required for baseline filtering on any profile. */
@@ -75,6 +78,18 @@ export const MOD_CATALOG: readonly ModDescriptor[] = [
         runtimeId: 'noise-patterns',
     },
     {
+        id: 'detector-behavior-signals',
+        kind: 'detector',
+        name: 'Behavior signals',
+        version: '1.0.0',
+        description:
+            'Language-agnostic noise cues: shouting caps, emoji/link spam, engagement hooks, and sponsored DOM markers.',
+        permissionsSummary: 'No network; reads extracted text and local DOM hints only.',
+        sizeLabel: 'Included',
+        profiles: ['core', 'full'],
+        runtimeId: 'behavior-signals',
+    },
+    {
         id: 'detector-remote-api',
         kind: 'detector',
         name: 'Remote API',
@@ -106,6 +121,19 @@ export const MOD_CATALOG: readonly ModDescriptor[] = [
         sizeLabel: 'Shared with local pack',
         profiles: ['full'],
         runtimeId: 'onnx-pack',
+    },
+    {
+        id: 'detector-topic-classifier',
+        kind: 'detector',
+        name: 'Topic classifier (experimental)',
+        version: '0.1.0',
+        description:
+            'Local semantic topic diet — block world/domestic news while allowing tech and culture. Research preview.',
+        permissionsSummary: 'Downloads MiniLM embeddings on first use; runs on extracted text only.',
+        sizeLabel: '~25 MB first run',
+        profiles: ['full'],
+        runtimeId: 'topic-classifier',
+        defaultEnabled: false,
     },
     {
         id: 'action-dim',
@@ -141,6 +169,7 @@ export const MOD_CATALOG: readonly ModDescriptor[] = [
         profiles: ['full'],
         runtimeId: 'collapse',
     },
+    ...ADAPTATION_PACK_CATALOG,
 ] as const;
 
 const MOD_BY_RUNTIME_ID = new Map(

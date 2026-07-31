@@ -29,6 +29,7 @@ describe('apply onboarding', () => {
         });
         expect(patch.activeBrowsingModeId).toBeNull();
         expect(patch.enabledModIds).toContain('detector-noise-patterns');
+        expect(patch.enabledModIds).toContain('detector-behavior-signals');
         expect(patch.userRules).toMatchObject({
             blockKeywords: expect.arrayContaining(['buy now']),
         });

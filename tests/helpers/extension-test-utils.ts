@@ -97,6 +97,10 @@ export function createFilteringStorageSeed(overrides: ExtensionStorageSeed = {})
             'detector-heuristic-keywords',
             'action-dim',
             'detector-noise-patterns',
+            'detector-behavior-signals',
+            'adaptation-universal-social',
+            'adaptation-en-clickbait',
+            'adaptation-de-clickbait',
         ],
         stats: { scanned: 0, toxic: 0 },
         ...overrides,
@@ -248,7 +252,7 @@ export async function completeWizardPresetStartBrowsing(page: Page): Promise<voi
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Start browsing' }).click();
+    await page.getByRole('button', { name: 'Open dashboard' }).click();
 }
 
 export async function waitForWizardApplied(context: BrowserContext): Promise<void> {

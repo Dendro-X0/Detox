@@ -2,6 +2,8 @@
  * Task-neutral classification result.
  * "matched" means the active policy considers this block actionable (e.g. filter/dim).
  */
+import type { DomContextSignals } from '../filtering/dom-context-signals';
+
 export type Verdict = {
     readonly matched: boolean;
     readonly score: number;
@@ -9,9 +11,14 @@ export type Verdict = {
     readonly detectorId: string;
 };
 
+export type ClassifyItemContext = {
+    readonly dom?: DomContextSignals;
+};
+
 export type ClassifyItemInput = {
     readonly id: string;
     readonly text: string;
+    readonly context?: ClassifyItemContext;
 };
 
 export type ClassifyItemResult = {

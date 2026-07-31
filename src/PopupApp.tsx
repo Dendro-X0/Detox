@@ -17,8 +17,12 @@ import type { PageScanStats, PeriodScanStats } from './core/storage/scan-stats-s
 import { loadUserRules, saveUserRules, isHostnameAllowlisted } from './core/rules/user-rules-store';
 import { markSettingsCustomized } from './core/modes/browsing-modes';
 import type { SettingsTabId } from './dashboard/settings-tabs';
+import { detectPageContexts } from './core/adaptation/page-context';
 import { hostnameFromTabUrl, resolvePopupPageStatus } from './popup/page-status';
 import { useLocale } from './i18n/LocaleContext';
+import ThemeToggle from './dashboard/ThemeToggle';
+import RecentBlockedPanel from './dashboard/RecentBlockedPanel';
+import { revealBlockedUnitOnActiveTab } from './popup/reveal-on-tab';
 
 type RuntimeStatus = {
   readonly state: string;
@@ -310,6 +314,9 @@ function PopupApp() {
   const canPauseThisSite = pageHostname !== null
     && !isHostnameAllowlisted(pageHostname, allowDomains);
 
+  const isNewsSite = pageHostname !== null
+    && detectPageContexts(`https://${pageHostname}/`).includes('news');
+
   const nowMs = Date.now();
   const hintLabel = diagnostics?.activeHintPacks.length
     ? diagnostics.activeHintPacks.join(', ')
@@ -359,6 +366,11 @@ function PopupApp() {
               {t('popup.scanningProgress', { discovered: pageStats.discovered })}
             </p>
           ) : null}
+          {pageStatusKind === 'noMatches' && isNewsSite ? (
+            <p className="muted sl-popup-page-status-hint">
+              {t('popup.pageStatus.newsNoMatchesHint')}
+            </p>
+          ) : null}
           {canPauseThisSite ? (
             <button
               type="button"
@@ -380,6 +392,19 @@ function PopupApp() {
           ) : null}
           {pauseNotice ? (
             <p className="sl-popup-pause-notice">{pauseNotice}</p>
+          ) : null}
+          {pageStatusKind === 'filtered' && pageStats.pageKey ? (
+            <RecentBlockedPanel
+              limit={6}
+              compact
+              bare
+              pageKey={pageStats.pageKey}
+              showFeedback
+              heading={t('popup.blockedOnThisPage')}
+              onReveal={(item) => {
+                void revealBlockedUnitOnActiveTab(item.id);
+              }}
+            />
           ) : null}
         </div>
       ) : null}
@@ -515,6 +540,10 @@ function PopupApp() {
       <button className="preset-btn" style={{ width: '100%', textAlign: 'center' }} onClick={() => { openDashboard(); }}>
         {t('popup.openDashboard')}
       </button>
+      <div className="sl-popup-theme-section">
+        <span className="sl-popup-theme-label">{t('theme.heading')}</span>
+        <ThemeToggle popup />
+      </div>
     </div>
   );
 }

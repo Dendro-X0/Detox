@@ -1,0 +1,23 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-en-promo",
+  "version": "1.0.0",
+  "languages": ["en"],
+  "contexts": ["ecommerce", "social-feed"],
+  "contentTypes": ["promotional"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "act now",
+    "order now",
+    "free shipping",
+    "limited stock",
+    "while supplies last"
+  ],
+  "noisePatterns": {
+    "promo": ["% off today only", "use code at checkout", "shop now and save"]
+  }
+}

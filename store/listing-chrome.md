@@ -2,34 +2,37 @@
 
 Use this copy when submitting the **core** build (`signallens-chrome-core-*.zip`).
 
+**Scope audit:** [`SCOPE-AUDIT.md`](./SCOPE-AUDIT.md) · **FAQ:** [`../docs/scope-faq.md`](../docs/scope-faq.md)
+
 ## Single purpose
 
-Help users reduce distracting or unwanted web content using **personal** keyword and mode settings — always reversible (dim/reveal), never permanent blocking.
+Help users reduce distracting **textual** noise on the web using **personal** keyword and mode settings — always reversible (dim/reveal), never permanent blocking.
 
 ## Short description (≤ 132 characters)
 
-Browse with focus: filter noise using your keywords and modes. Local-first, reversible dimming. Optional research assist.
+Reduce textual noise — promo, bait, toxic language. Reveal-first dimming. Local rules, your keywords. Image-only posts not filtered.
 
 ## Detailed description
 
-**SignalLens** is a personal browsing layer — not a “detox” or moralizing filter.
+**SignalLens** is a personal browsing layer for **text-first** noise reduction — not a feed fact-checker or image moderator.
 
 ### What it does
 
-- Scans readable content on pages you visit
-- Dims (or blurs/collapses in full builds) text that matches **your** block keywords
-- Offers **Focus / Research / Unwind** browsing modes — one tap updates sensitivity, keywords, and filter style
-- Keeps filtered content **revealable** with a click
+- Scans **readable text** on pages you visit (posts, comments, headlines, captions)
+- Dims text that matches **your** block keywords and browsing mode (Focus / Research / Unwind)
+- Keeps filtered content **revealable** — click any match or the in-page badge to show it again
+- Runs core filtering **locally** in your browser
 
 ### What it does not do
 
-- Does not permanently remove content
-- Does not label content as “true” or “false” by default
-- Does not upload page text for core filtering (local heuristic matching)
+- Does **not** filter image-only posts (no caption text to classify)
+- Does **not** analyze pictures, video, or memes without readable text
+- Does **not** permanently remove content or auto-label posts as true/false
+- Does **not** upload page text for core filtering
 
 ### Optional experimental features
 
-**Authenticity assist** (off by default) helps you research a **selected passage** with advisory flags and source links. Search-only mode uses zero LLM tokens unless you opt in.
+**Authenticity assist** (off by default) lets you research a **selected passage** with advisory source links. It does not filter your feed and is not required for core noise reduction.
 
 ### Privacy
 
@@ -47,12 +50,12 @@ English
 
 Capture at 1280×800 or 640×400:
 
-1. **Onboarding wizard** — mode step or done step with **Start browsing** (v2.1.2+)
+1. **Onboarding wizard** — welcome step showing text-only limitation, or done step with **Start browsing**
 2. Popup — Focus mode enabled + browsing mode switcher
-3. Options dashboard — Filtering tab + Rules (essential surfaces)
-4. Page with dimmed content + reveal hint
+3. Options dashboard — Filtering tab (scope note + sensitivity)
+4. Page with dimmed content + reveal hint / badge
 5. Browsing modes panel (Overview tab)
-6. (Optional) Authenticity side panel — selection scope
+6. *(Optional)* Authenticity side panel — selection scope (experimental, not hero)
 
 ## Permission justifications (review form)
 
@@ -72,6 +75,7 @@ Capture at 1280×800 or 640×400:
 ## Pre-submit
 
 - [ ] Run `pnpm release:chrome` locally — verify passes
+- [ ] Run `pnpm store:verify:scope` — listing copy audit
 - [ ] Rotate mod signing trust anchor (production keys)
 - [ ] Host privacy policy at a public URL
 - [ ] Upload zip from `releases/`, not raw `dist/` folder

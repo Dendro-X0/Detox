@@ -1,0 +1,17 @@
+{
+  "modId": "adaptation-de-phishing",
+  "name": "De Phishing adaptation pack",
+  "version": "1.0.0",
+  "description": "Local de rules for social-feed pages. Edit pack.json before signing.",
+  "permissionsSummary": "Local pattern lists only. No network. No upload. No page content storage.",
+  "packCategory": "language",
+  "languages": [
+    "de"
+  ],
+  "contexts": [
+    "social-feed"
+  ],
+  "contentTypes": [
+    "phishing"
+  ]
+}

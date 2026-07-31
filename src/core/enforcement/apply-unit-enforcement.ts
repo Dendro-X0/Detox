@@ -1,6 +1,6 @@
 import type { Verdict } from '../types/verdict';
 import { applyEnforcementToElement } from './apply-enforcement';
-import { resolveEnforcementTarget } from './enforcement-target';
+import { pickEnforcementElement, resolveEnforcementTarget } from './enforcement-target';
 import { ENFORCEMENT_DATASET } from './element-state';
 import type { EnforcementResult } from './enforcement-result';
 import { revealBlockedContent } from './reveal-block';
@@ -11,7 +11,8 @@ export function applyUnitEnforcement(
     element: HTMLElement,
     verdict: Verdict
 ): EnforcementResult {
-    const target = resolveEnforcementTarget(element);
+    const leafTarget = resolveEnforcementTarget(element);
+    const target = pickEnforcementElement(element, leafTarget);
     if (target.dataset[ENFORCEMENT_DATASET.userRevealed] === 'true') {
         return { success: true };
     }

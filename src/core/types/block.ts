@@ -6,6 +6,8 @@ export type ScanItem = {
     readonly text: string;
 };
 
+export type BlockFeedback = 'wrong' | 'ok';
+
 export type FilteredItemRecord = {
     readonly id: string;
     readonly score: number;
@@ -13,5 +15,8 @@ export type FilteredItemRecord = {
     readonly detectorId: string;
     readonly preview: string;
     readonly hostname: string;
+    readonly pageKey?: string;
     readonly timestamp: number;
+    readonly revealed?: boolean;
+    readonly feedback?: BlockFeedback;
 };

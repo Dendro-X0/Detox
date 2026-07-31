@@ -3,3 +3,4 @@
  */
 export { localPackProvider } from './local-pack/provider';
 export { onnxPackProvider } from './onnx-pack/provider';
+export { topicClassifierProvider } from './topic-classifier/provider';

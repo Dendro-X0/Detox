@@ -1,0 +1,672 @@
+/**
+ * SignalLens theme tokens — single source for dashboard + popup.
+ * Set data-theme on <html> via ThemeProvider (light | dark | system-resolved).
+ */
+
+/* ── Light (default) ── */
+html[data-theme='light'],
+html.sl-app:not([data-theme]),
+html.sl-popup:not([data-theme]) {
+  --sl-bg-page: #e8ecf1;
+  --sl-bg-surface: #ffffff;
+  --sl-bg-elevated: #f8fafc;
+  --sl-bg-muted: #f1f5f9;
+  --sl-bg-inset: #eef2f6;
+  --sl-bg-header-widget: #f8fafc;
+  --sl-bg-tab-bar: #f4f6f9;
+  --sl-bg-tab-active: #ffffff;
+  --sl-bg-tab-hover: rgba(255, 255, 255, 0.7);
+  --sl-text-primary: #0f172a;
+  --sl-text-secondary: #64748b;
+  --sl-text-muted: #94a3b8;
+  --sl-text-accent: #047857;
+  --sl-border: #e2e8f0;
+  --sl-border-strong: #cbd5e1;
+  --sl-shadow: rgba(15, 23, 42, 0.06);
+  --sl-shadow-md: rgba(15, 23, 42, 0.08);
+  --sl-accent: #059669;
+  --sl-accent-bright: #10b981;
+  --sl-accent-soft: #ecfdf5;
+  --sl-accent-soft-border: #a7f3d0;
+  --sl-accent-ring: rgba(16, 185, 129, 0.15);
+  --sl-callout-bg: #ecfdf5;
+  --sl-callout-border: #a7f3d0;
+  --sl-input-bg: #ffffff;
+  --sl-btn-bg: #ffffff;
+  --sl-btn-bg-hover: #f8fafc;
+  --sl-btn-border: #cbd5e1;
+  --sl-btn-secondary-bg: #f8fafc;
+  --sl-btn-secondary-hover: #f1f5f9;
+  --sl-btn-secondary-border: #e2e8f0;
+  --sl-btn-secondary-text: #334155;
+  --sl-chip-bg: #ffffff;
+  --sl-chip-border: #e2e8f0;
+  --sl-link: #059669;
+  --sl-footer-bg: rgba(255, 255, 255, 0.92);
+  --sl-scrollbar-track: #e8ecf1;
+  --sl-scrollbar-thumb: #94a3b8;
+  --sl-danger: #b91c1c;
+  --sl-warning: #b45309;
+  --sl-badge-info-bg: #e0f2fe;
+  --sl-badge-info-text: #0369a1;
+  --sl-badge-purple-bg: #ede9fe;
+  --sl-badge-purple-text: #5b21b6;
+  --sl-select-menu-shadow: rgba(15, 23, 42, 0.12);
+}
+
+/* ── Dark ── */
+html[data-theme='dark'] {
+  --sl-bg-page: #090c10;
+  --sl-bg-surface: #121820;
+  --sl-bg-elevated: #1a222d;
+  --sl-bg-muted: #1e2733;
+  --sl-bg-inset: #0d1117;
+  --sl-bg-header-widget: #1a222d;
+  --sl-bg-tab-bar: #0d1117;
+  --sl-bg-tab-active: #1a222d;
+  --sl-bg-tab-hover: rgba(255, 255, 255, 0.04);
+  --sl-text-primary: #e8edf4;
+  --sl-text-secondary: #9aa8bc;
+  --sl-text-muted: #6b7a90;
+  --sl-text-accent: #5ee9b5;
+  --sl-border: #2a3544;
+  --sl-border-strong: #3d4d62;
+  --sl-shadow: rgba(0, 0, 0, 0.25);
+  --sl-shadow-md: rgba(0, 0, 0, 0.4);
+  --sl-accent: #34d399;
+  --sl-accent-bright: #5ee9b5;
+  --sl-accent-soft: rgba(52, 211, 153, 0.1);
+  --sl-accent-soft-border: rgba(52, 211, 153, 0.35);
+  --sl-accent-ring: rgba(52, 211, 153, 0.2);
+  --sl-callout-bg: rgba(52, 211, 153, 0.08);
+  --sl-callout-border: rgba(52, 211, 153, 0.28);
+  --sl-input-bg: #0f141c;
+  --sl-btn-bg: #1a222d;
+  --sl-btn-bg-hover: #232d3b;
+  --sl-btn-border: #3d4d62;
+  --sl-btn-secondary-bg: #1a222d;
+  --sl-btn-secondary-hover: #232d3b;
+  --sl-btn-secondary-border: #2a3544;
+  --sl-btn-secondary-text: #e8edf4;
+  --sl-chip-bg: #1a222d;
+  --sl-chip-border: #2a3544;
+  --sl-link: #5ee9b5;
+  --sl-footer-bg: rgba(18, 24, 32, 0.94);
+  --sl-scrollbar-track: #090c10;
+  --sl-scrollbar-thumb: #3d4d62;
+  --sl-danger: #f87171;
+  --sl-warning: #fbbf24;
+  --sl-badge-info-bg: rgba(56, 189, 248, 0.15);
+  --sl-badge-info-text: #7dd3fc;
+  --sl-badge-purple-bg: rgba(167, 139, 250, 0.15);
+  --sl-badge-purple-text: #c4b5fd;
+  --sl-select-menu-shadow: rgba(0, 0, 0, 0.45);
+}
+
+/* ── Base document ── */
+html.sl-app,
+html.sl-app body,
+html.sl-popup,
+html.sl-popup body {
+  background: var(--sl-bg-page);
+  color: var(--sl-text-primary);
+}
+
+/* ── Typography ── */
+html.sl-app h1,
+html.sl-app h2,
+html.sl-app h3,
+html.sl-app h4,
+html.sl-app .sl-tab-intro-title,
+html.sl-app .sl-panel h3,
+html.sl-app .card h3,
+html.sl-app .policy-card h3,
+html.sl-app .pack-card h3,
+html.sl-app .sl-subsection-title,
+html.sl-popup h1 {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .muted,
+html.sl-app .sl-tab-intro-desc,
+html.sl-app .sl-handoff-list,
+html.sl-popup .muted {
+  color: var(--sl-text-secondary) !important;
+}
+
+html.sl-app a {
+  color: var(--sl-link);
+}
+
+/* ── Shell ── */
+html.sl-app .sl-shell-header {
+  background: var(--sl-bg-surface);
+  border-bottom-color: var(--sl-border);
+  box-shadow: 0 1px 3px var(--sl-shadow);
+}
+
+html.sl-app .sl-brand-title {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-brand-subtitle {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-shell-footer {
+  background: var(--sl-footer-bg);
+  border-top-color: var(--sl-border);
+}
+
+/* ── Header widget ── */
+html.sl-app .sl-header-actions,
+html.sl-app .sl-header-controls {
+  background: var(--sl-bg-header-widget);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .sl-header-focus-label {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-header-stats {
+  border-left-color: var(--sl-border);
+}
+
+html.sl-app .sl-header-stat .value {
+  color: var(--sl-accent-bright);
+}
+
+html.sl-app .sl-header-stat .label {
+  color: var(--sl-text-muted);
+}
+
+/* ── Tab navigation ── */
+html.sl-app .sl-tab-nav {
+  background: var(--sl-bg-tab-bar);
+  border-top-color: var(--sl-border);
+}
+
+html.sl-app .sl-tab-btn {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-tab-btn:hover {
+  color: var(--sl-text-primary);
+  background: var(--sl-bg-tab-hover);
+}
+
+html.sl-app .sl-tab-btn.is-active {
+  color: var(--sl-text-accent);
+  background: var(--sl-bg-tab-active);
+  border-bottom-color: var(--sl-accent);
+}
+
+/* ── Cards & surfaces ── */
+html.sl-app .card,
+html.sl-app .policy-card,
+html.sl-app .pack-card,
+html.sl-popup .card {
+  background: var(--sl-bg-surface);
+  color: var(--sl-text-primary);
+  border-color: var(--sl-border);
+  box-shadow: 0 1px 3px var(--sl-shadow);
+}
+
+html.sl-app .container.options-dashboard {
+  background: transparent;
+}
+
+/* ── Buttons ── */
+html.sl-app .sl-btn {
+  background: var(--sl-btn-bg);
+  border-color: var(--sl-btn-border);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-btn:hover:not(:disabled) {
+  background: var(--sl-btn-bg-hover);
+  border-color: var(--sl-border-strong);
+}
+
+html.sl-app .sl-btn-primary {
+  background: var(--sl-accent);
+  border-color: var(--sl-accent);
+  color: #ffffff;
+}
+
+html.sl-app .sl-btn-primary:hover:not(:disabled) {
+  background: var(--sl-accent-bright);
+  border-color: var(--sl-accent-bright);
+}
+
+html.sl-app .sl-btn-ghost {
+  background: transparent;
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-btn-ghost:hover:not(:disabled) {
+  background: var(--sl-bg-muted);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .preset-btn {
+  background: var(--sl-btn-secondary-bg);
+  border-color: var(--sl-btn-secondary-border);
+  color: var(--sl-btn-secondary-text);
+}
+
+html.sl-app .preset-btn:hover {
+  background: var(--sl-btn-secondary-hover);
+}
+
+html.sl-app .preset-btn.active {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent);
+  color: var(--sl-text-accent);
+}
+
+html.sl-app .sl-btn-text {
+  color: var(--sl-link);
+}
+
+/* ── Choice controls ── */
+html.sl-app .sl-choice-item {
+  background: var(--sl-bg-elevated);
+  border-color: var(--sl-border);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-choice-item:hover {
+  background: var(--sl-bg-muted);
+  border-color: var(--sl-border-strong);
+}
+
+html.sl-app .sl-choice-item.is-active {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent);
+  color: var(--sl-text-primary);
+  box-shadow: 0 0 0 1px var(--sl-accent-ring);
+}
+
+html.sl-app .sl-choice-item.is-active .muted,
+html.sl-app .sl-choice-item.is-active .sl-choice-item-hint {
+  color: var(--sl-text-secondary) !important;
+}
+
+/* ── Forms ── */
+html.sl-app .sl-input,
+html.sl-app select.sl-select,
+html.sl-app .sl-select-trigger {
+  background: var(--sl-input-bg);
+  color: var(--sl-text-primary);
+  border-color: var(--sl-border-strong);
+}
+
+html.sl-app .sl-form-label,
+html.sl-app .sl-form-hint {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-form-hint.is-error {
+  color: var(--sl-danger);
+}
+
+/* ── Status & chips ── */
+html.sl-app .sl-overview-status-strip {
+  background: var(--sl-bg-elevated);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .sl-status-chip {
+  background: var(--sl-chip-bg);
+  border-color: var(--sl-chip-border);
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-status-chip--focus.is-on {
+  color: var(--sl-text-accent);
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent-soft-border);
+}
+
+html.sl-app .sl-status-chip--focus:not(.is-on) {
+  background: var(--sl-bg-muted);
+  color: var(--sl-text-muted);
+}
+
+/* ── Quick links & mod cards ── */
+html.sl-app .sl-quick-link-btn {
+  background: var(--sl-bg-elevated);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .sl-quick-link-btn:hover {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent-soft-border);
+}
+
+html.sl-app .sl-quick-link-btn strong {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-mod-card {
+  background: var(--sl-bg-elevated);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .sl-mod-meta,
+html.sl-app .sl-mod-footnote {
+  color: var(--sl-text-muted);
+}
+
+html.sl-app .sl-filter-model-row {
+  background: var(--sl-bg-elevated);
+  border-color: var(--sl-border);
+}
+
+/* ── KV grids & stats ── */
+html.sl-app .sl-kv-grid .label,
+html.sl-app .stat-row .label,
+html.sl-popup .stat-row .label,
+html.sl-popup .stat-item .label {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-kv-grid .value,
+html.sl-app .stat-row .value,
+html.sl-popup .value {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-header-stat .value,
+html.sl-popup .value {
+  color: var(--sl-accent-bright);
+}
+
+/* ── Callouts & banners ── */
+html.sl-app .sl-wizard-callout,
+html.sl-app .sl-setup-banner {
+  background: var(--sl-callout-bg);
+  border: 1px solid var(--sl-callout-border);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-wizard-validation {
+  color: var(--sl-warning);
+}
+
+/* ── Details / accordions ── */
+html.sl-app .sl-install-details,
+html.sl-app .sl-install-details summary,
+html.sl-app .sl-debug-details summary {
+  color: var(--sl-text-primary);
+  border-color: var(--sl-border);
+}
+
+/* ── Wizard progress ── */
+html.sl-app .sl-wizard-progress-meta {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-wizard-progress-track {
+  background: var(--sl-bg-muted);
+}
+
+html.sl-app .sl-wizard-step-pill {
+  background: var(--sl-bg-muted);
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-wizard-step-pill.is-active {
+  background: var(--sl-accent-soft);
+  color: var(--sl-text-accent);
+}
+
+html.sl-app .sl-wizard-step-pill.is-done {
+  background: var(--sl-accent-soft);
+  color: var(--sl-text-accent);
+}
+
+/* ── Select dropdown ── */
+html.sl-app .sl-select-option {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-select-option:hover {
+  background: var(--sl-bg-muted);
+}
+
+html.sl-app .sl-select-option.is-selected {
+  background: var(--sl-accent-soft);
+  color: var(--sl-text-accent);
+}
+
+/* ── Theme toggle ── */
+html.sl-app .sl-theme-toggle {
+  background: var(--sl-bg-muted);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .sl-theme-toggle-btn {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-theme-toggle-btn.is-active {
+  background: var(--sl-bg-surface);
+  color: var(--sl-accent);
+  box-shadow: 0 1px 2px var(--sl-shadow);
+}
+
+html.sl-app .sl-theme-toggle-compact {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-theme-toggle-compact:hover {
+  background: var(--sl-bg-muted);
+  color: var(--sl-text-primary);
+}
+
+/* ── Scrollbars ── */
+html.sl-app {
+  scrollbar-color: var(--sl-scrollbar-thumb) var(--sl-scrollbar-track);
+}
+
+html.sl-app ::-webkit-scrollbar-track {
+  background: var(--sl-scrollbar-track);
+}
+
+html.sl-app ::-webkit-scrollbar-thumb {
+  background: var(--sl-scrollbar-thumb);
+  border-color: var(--sl-scrollbar-track);
+}
+
+html.sl-popup {
+  scrollbar-color: var(--sl-scrollbar-thumb) var(--sl-scrollbar-track);
+}
+
+html.sl-popup ::-webkit-scrollbar-track {
+  background: var(--sl-scrollbar-track);
+}
+
+html.sl-popup ::-webkit-scrollbar-thumb {
+  background: var(--sl-scrollbar-thumb);
+}
+
+/* ── Popup specifics ── */
+html.sl-popup .container {
+  background: var(--sl-bg-page);
+  color: var(--sl-text-primary);
+}
+
+html.sl-popup .preset-btn {
+  background: var(--sl-btn-secondary-bg);
+  border-color: var(--sl-btn-secondary-border);
+  color: var(--sl-btn-secondary-text);
+}
+
+html.sl-popup .preset-btn.active {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent);
+  color: var(--sl-text-accent);
+}
+
+html.sl-popup .sl-popup-theme-label {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-popup .sl-popup-theme-section {
+  border-top-color: var(--sl-border);
+}
+
+html.sl-popup .sl-theme-toggle--popup {
+  background: var(--sl-bg-muted);
+  border-color: var(--sl-border);
+}
+
+html.sl-popup .sl-theme-toggle-btn--popup.is-active {
+  background: var(--sl-bg-surface);
+  color: var(--sl-accent);
+  box-shadow: 0 1px 3px var(--sl-shadow);
+}
+
+/* ── App.css shared components (dashboard + popup) ── */
+html.sl-app .sl-panel,
+html.sl-app .sl-wizard-review,
+html.sl-app .sl-detector-item,
+html.sl-app .sl-whitelist-preset,
+html.sl-app .sl-select-menu {
+  background: var(--sl-bg-surface);
+  border-color: var(--sl-border);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-select-menu {
+  box-shadow: 0 10px 24px var(--sl-select-menu-shadow);
+}
+
+html.sl-app .sl-wizard-review-title,
+html.sl-app .sl-wizard-review-row dt,
+html.sl-app .sl-section-title {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .sl-wizard-review-row dd,
+html.sl-app .sl-detector-item strong,
+html.sl-app .sl-whitelist-preset-body strong,
+html.sl-app .sl-filtering-section-title,
+html.sl-app .sl-check-row {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .sl-mod-card.is-enabled {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent-soft-border);
+}
+
+html.sl-app .sl-whitelist-preset.is-enabled {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent-soft-border);
+}
+
+html.sl-app .stat-row {
+  border-bottom-color: var(--sl-border);
+}
+
+html.sl-app .threshold-display {
+  border-top-color: var(--sl-border);
+}
+
+html.sl-app .blocked-item {
+  background: var(--sl-bg-elevated);
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .loading-spinner {
+  border-color: var(--sl-border);
+  border-top-color: var(--sl-accent-bright);
+}
+
+html.sl-app .loading-text {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .loading-subtext {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-app .perf-metrics {
+  background: var(--sl-bg-elevated);
+}
+
+html.sl-app h1 {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .card h3,
+html.sl-app .policy-card h3 {
+  color: var(--sl-text-primary);
+}
+
+html.sl-app .preset-btn {
+  background: var(--sl-btn-secondary-bg);
+  border-color: transparent;
+  color: var(--sl-btn-secondary-text);
+}
+
+html.sl-app .preset-btn:hover {
+  background: var(--sl-btn-secondary-hover);
+}
+
+html.sl-app .preset-btn.active {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent);
+  color: var(--sl-text-accent);
+}
+
+html.sl-app .diagnostics-details summary,
+html.sl-app .diagnostics-panel {
+  color: var(--sl-text-primary);
+  border-color: var(--sl-border);
+}
+
+html.sl-app .preview,
+html.sl-app .hostname,
+html.sl-app .time {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-popup h1,
+html.sl-popup .policy-card h3 {
+  color: var(--sl-text-primary);
+}
+
+html.sl-popup .muted,
+html.sl-popup .label,
+html.sl-popup .stat-row .label {
+  color: var(--sl-text-secondary);
+}
+
+html.sl-popup .stat-row .value,
+html.sl-popup .value {
+  color: var(--sl-accent-bright);
+}
+
+html.sl-popup .preset-btn {
+  background: var(--sl-btn-secondary-bg);
+  color: var(--sl-btn-secondary-text);
+}
+
+html.sl-popup .preset-btn.active {
+  background: var(--sl-accent-soft);
+  border-color: var(--sl-accent);
+  color: var(--sl-text-accent);
+}
+
+html.sl-popup .loading-text {
+  color: var(--sl-text-primary);
+}
+
+html.sl-popup .blocked-item {
+  background: var(--sl-bg-elevated);
+}

@@ -3,7 +3,8 @@ export type BotherCategory =
     | 'spam'
     | 'hostile'
     | 'engagement-bait'
-    | 'low-effort';
+    | 'low-effort'
+    | 'geopolitics';
 
 /**
  * Curated keyword groups for heuristic filtering on social feeds.
@@ -62,5 +63,26 @@ export const BOTHER_KEYWORD_MAP: Readonly<Record<BotherCategory, readonly string
         'underrated comment',
         'came here to say',
         'this is the way',
+    ],
+    geopolitics: [
+        'breaking news',
+        'war in',
+        'ceasefire',
+        'airstrike',
+        'military strike',
+        'troops deployed',
+        'sanctions against',
+        'geopolitical',
+        'diplomatic crisis',
+        'conflict escalates',
+        'invasion of',
+        'election results',
+        'prime minister',
+        'parliament votes',
+        'united nations',
+        'nato allies',
+        'humanitarian crisis',
+        'missile attack',
+        'border clash',
     ],
 };

@@ -60,14 +60,20 @@ After code changes, re-run rows **1–8** and **14** minimum.
 
 Full profile (`pnpm build:full:firefox`) additionally requires ONNX/WASM smoke on a machine with model packs fetched.
 
-## Sign-off
+## Sign-off (Track C-R2)
+
+Required for v2.3.0 AMO submit: rows **1–8** and **14** minimum.
 
 | Field | Value |
 |-------|--------|
-| Version | 2.1.2 |
+| Version | 2.3.0 |
+| Build | `dist-firefox/` or release zip |
 | Firefox version | |
 | OS | |
 | Tester | |
 | Date | |
+| Rows passed | 1–8, 14 |
 | Result | Pass / Fail |
 | Notes | |
+
+→ Release ops: [`../planning/v2.3-release-ops.md`](../planning/v2.3-release-ops.md)

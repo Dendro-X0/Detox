@@ -1,8 +1,8 @@
 # Version Roadmap
 
 > **North star:** **v3.0.0** — first **production-ready** release suitable for **initial public rollout** on Chrome Web Store and Firefox Add-ons.  
-> **Current version:** `2.2.0` (unlisted store RC — screenshots + Firefox manual QA before submit)  
-> **Related docs:** [Product phases (historical)](./product-roadmap.md) · [Technical core](../../CORE-ROADMAP.md) · [Authenticity assist](../experimental/authenticity-analysis.md) · [Store release](../guides/store-release.md)
+> **Current version:** `2.3.0` (unlisted dogfood RC — Track C: [`v2.3-release-ops.md`](./v2.3-release-ops.md))  
+> **Related docs:** [UX & capability roadmap](./ux-capability-roadmap.md) · [v3.0 acceptance checklist](./v3-acceptance-checklist.md) · [Product phases (historical)](./product-roadmap.md) · [Technical core](../../CORE-ROADMAP.md) · [Authenticity assist](../experimental/authenticity-analysis.md) · [Visual analysis (post–v3.0 concept)](../experimental/visual-analysis.md) · [Store release](../guides/store-release.md)
 
 ---
 
@@ -20,6 +20,7 @@ Before the first public launch, we refine **three systems** to production qualit
 
 ### Platform principles |
 
+- **Text-first filtering** — scroll-path classification analyzes **visible page text**, not image/video pixels. Image-only posts are a documented limitation through v3.0. See [`ux-capability-roadmap.md`](./ux-capability-roadmap.md).
 - **Plugin-based and extensible** — detectors, actions, analyzers, and site hints ship as mods; signed install path for optional packs. Good **defaults** so a fresh install works without tuning.
 - **Wizard-first configuration** — the onboarding wizard should capture **most** user intent (mode, topics, whitelist, sensitivity, filter style). The dashboard remains available for power users but must not be required for day-one value.
 - **Public data only (authenticity)** — analysis aggregates **publicly available, web-indexed** information. No access to private accounts, paywalled content the user cannot reach, internal databases, or non-indexed material. See [Data acquisition](#data-acquisition-authenticity) below.
@@ -48,7 +49,7 @@ Scripts & APIs gather public data  →  normalize & cache  →  AI cross-referen
 |---------|---------|
 | **Version** | User-facing release (`package.json` / manifest). Shippable artifact. |
 | **Phase** | Internal milestone grouping work across one or more versions. |
-| **Track** | Product line: **Track 1** = noise filtering (core value); **Track 2** = authenticity assist (experimental). |
+| **Track** | Product line: **Track 1** = text noise filtering (core); **Track 2** = text authenticity assist (experimental); **Track 3** = visual analysis (post–v3.0 concept only — see [`ux-capability-roadmap.md`](./ux-capability-roadmap.md)) |
 | **Build profile** | `core` (default, heuristic, small) vs `full` (ONNX, blur/collapse, hint mods). |
 
 **Principle:** Ship the **core build** early. Treat **full build** and **model tiers** as upgrades, not blockers for first public listing.
@@ -228,6 +229,7 @@ flowchart LR
 - Runtime model download from Hugging Face (bundled packs only)
 - Authenticity auto-run on scroll or full social feeds
 - LLM-as-browser (models do not fetch URLs themselves)
+- **Image / video classification, OCR, or visual feed filtering** (Track 3 — post–v3.0 only; [`visual-analysis.md`](../experimental/visual-analysis.md))
 
 ### Exit criteria
 
@@ -271,6 +273,7 @@ flowchart LR
 - Sync across devices
 - Team / enterprise admin
 - Large-scale third-party mod marketplace
+- Image / video moderation or meme filtering (Track 3 — see [`visual-analysis.md`](../experimental/visual-analysis.md))
 
 ### Exit criteria (initial public rollout gate)
 
@@ -291,11 +294,13 @@ Prioritized backlog **after** initial public release. Core authenticity framewor
 | Theme | Examples | Track |
 |-------|----------|-------|
 | **Authenticity scale** | Broader fact-check feeds, thread-scope UX, batch compare | 2 |
-| **Layout mods** | Hide sidebars, Shorts skip, structural noise | 1 |
+| **Semantic topics** | Local topic classifier (tech/music vs world-affairs); opt-in topic diet — see [`research-semantic-topics.md`](./research-semantic-topics.md) | 1 |
+| **Layout mods** | Hide sidebars, collapse comment regions, Shorts skip (structural — not visual ML) | 1 |
 | **Time budgets** | Soft per-site session limits | 1 |
 | **Mod marketplace** | Curated third-party signed mods | 1 |
 | **Sync** | Export/import settings (file-based first) | 1 |
 | **Locales** | Additional languages beyond en/de | 1 |
+| **Visual analysis (experimental)** | Region capture, user-deployed VLM, co-browse assist — advisory only | 3 |
 
 ---
 
@@ -315,6 +320,7 @@ Prioritized backlog **after** initial public release. Core authenticity framewor
 - Full-feed authenticity analysis without explicit user action
 - LLM browsing or citing non-public / non-fetched sources
 - Requiring dashboard navigation to complete first-run setup
+- **Automatic image/video moderation on scroll** (Track 3 may offer **user-triggered** advisory only, post–v3.0)
 
 ### Optional / tiered
 
@@ -347,13 +353,17 @@ Historical letter-phases (A–G, H, I) remain documented in [`product-roadmap.md
 
 ---
 
-## Immediate next steps (v2.3.x refinement — active)
+## Immediate next steps (Option A — focused v3.0 launch)
 
-1. **v2.2.0 store:** Firefox manual QA, screenshots, unlisted submit ([`v2.2-store-prep.md`](./v2.2-store-prep.md))
-2. **Filtering:** false-positive audit on dogfood corpus ✅
-3. **Authenticity:** ClaimReview/Wikipedia retrieval scripts; auditable gather → verify → analyze tests
-4. **Wizard:** optional authenticity opt-in step ✅; restore defaults ✅
-5. **Scanner:** site-hint tuning; SPA acceptance hardening ✅ (pushState E2E)
+**Locked scope:** [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md). Track 2 authenticity is **not** a v3.0 gate; store hero = text noise filtering only.
+
+1. **Track A:** Block reason in session UI (A-R1); non-social FP tuning (A-R2); scope FAQ + store copy (A-R4)
+2. **Track A:** FP audit script + dogfood sign-off §A–§D (A-R3, A-R5)
+3. **Track C:** Tag `v2.3.0` unlisted; Firefox manual QA; §G gates
+4. **Track C:** 30-day dogfood → §A–§D + §F pass → tag `v3.0.0` **listed**
+5. **Deferred:** authenticity pipeline rewrite, visual analysis, layout mods (v3.1+)
+
+Prior Track 1 items (packs, context merge, reveal feedback, stats/badge fixes) are ✅ — see [`ux-capability-roadmap.md`](./ux-capability-roadmap.md) v2.3 table.
 
 ---
 

@@ -1,0 +1,22 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-en-toxic",
+  "version": "1.0.0",
+  "languages": ["en"],
+  "contexts": ["social-feed", "news"],
+  "contentTypes": ["toxic"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "you are an idiot",
+    "kill yourself",
+    "go die",
+    "worthless trash"
+  ],
+  "noisePatterns": {
+    "outrage": ["how stupid can you be", "absolute moron", "shut up and"]
+  }
+}

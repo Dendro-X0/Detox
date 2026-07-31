@@ -534,6 +534,7 @@
   "mods.action-collapse.permissionsSummary": "Aktualisiert Inline-Stile auf übereinstimmenden Elementen.",
   "mods.action-collapse.sizeLabel": "~3 KB",
   "enforcement.filteredTitle": "Gefilterter Inhalt ({{labelId}}: {{percent}} %) — Zum Anzeigen klicken",
+  "enforcement.filteredBadge": "Gefiltert — zum Anzeigen klicken",
   "content.authenticity.badgeTitle": "SignalLens Authentizitäts-Assistent (nur Hinweis). Klicken zum Schließen.",
   "content.authenticity.status.unsupported": "Quellen nicht gefunden",
   "content.authenticity.status.disputed": "Umstritten — prüfen",

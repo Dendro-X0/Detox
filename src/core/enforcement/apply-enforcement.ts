@@ -1,3 +1,4 @@
+import { markBlockedItemRevealed } from '../feedback/reveal-feedback-store';
 import type { Verdict } from '../types/verdict';
 import type { EnforcementContext } from '../types/enforcement';
 import { DEFAULT_ENFORCEMENT_CONTEXT } from '../types/enforcement';
@@ -6,6 +7,7 @@ import {
     getActiveEnforcementAction,
     getEnforcementAction,
 } from '../registry/action-registry';
+import { attachFilteredAffordance } from './filtered-affordance';
 import { ENFORCEMENT_DATASET, clearBlockedState, restoreOriginalStyles } from './element-state';
 
 /**
@@ -22,13 +24,26 @@ export function applyEnforcementToElement(
 
     const mergedContext: EnforcementContext = { ...DEFAULT_ENFORCEMENT_CONTEXT, ...context };
     const action = getActiveEnforcementAction();
-    return action.apply(element, verdict, mergedContext);
+    const result = action.apply(element, verdict, mergedContext);
+    if (
+        result.success &&
+        element.dataset[ENFORCEMENT_DATASET.blocked] === 'true' &&
+        element.dataset[ENFORCEMENT_DATASET.userRevealed] !== 'true'
+    ) {
+        attachFilteredAffordance(element, verdict);
+    }
+    return result;
 }
 
 /**
  * Reveal a previously filtered element, using the action that originally filtered it.
  */
 export function revealEnforcementElement(element: HTMLElement): void {
+    const blockId = element.dataset[ENFORCEMENT_DATASET.blockId];
+    if (blockId) {
+        void markBlockedItemRevealed(blockId);
+    }
+
     const actionId = element.dataset[ENFORCEMENT_DATASET.actionId];
     const action = actionId ? getEnforcementAction(actionId) : getActiveEnforcementAction();
     if (action) {

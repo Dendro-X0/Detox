@@ -2,5 +2,7 @@
   "productName": "SignalLens",
   "repoUrl": "https://github.com/Dendro-X0/Detox",
   "privacyPolicyPath": "store/PRIVACY.md",
-  "privacyPolicyUrl": "https://github.com/Dendro-X0/Detox/blob/main/store/PRIVACY.md"
+  "privacyPolicyUrl": "https://github.com/Dendro-X0/Detox/blob/main/store/PRIVACY.md",
+  "scopeFaqPath": "docs/scope-faq.md",
+  "scopeFaqUrl": "https://github.com/Dendro-X0/Detox/blob/main/docs/scope-faq.md"
 }

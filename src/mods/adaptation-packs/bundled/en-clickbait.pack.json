@@ -1,0 +1,27 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-en-clickbait",
+  "version": "1.0.0",
+  "languages": ["en"],
+  "contexts": ["social-feed", "news"],
+  "contentTypes": ["clickbait"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "you won't believe",
+    "what happened next",
+    "doctors hate this",
+    "one weird trick",
+    "shocking truth"
+  ],
+  "noisePatterns": {
+    "engagement-bait": [
+      "you won't believe what",
+      "this one trick",
+      "number 7 will shock you"
+    ]
+  }
+}

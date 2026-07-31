@@ -1,0 +1,22 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-de-promo",
+  "version": "1.0.0",
+  "languages": ["de"],
+  "contexts": ["ecommerce", "social-feed"],
+  "contentTypes": ["promotional"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "jetzt zuschlagen",
+    "nur heute",
+    "gratis versand",
+    "solange der vorrat reicht"
+  ],
+  "noisePatterns": {
+    "promo": ["% rabatt", "nur solange der vorrat reicht", "jetzt bestellen und sparen"]
+  }
+}

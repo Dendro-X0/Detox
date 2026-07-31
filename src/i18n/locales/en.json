@@ -15,7 +15,8 @@
     "disabled": "Disabled",
     "yes": "yes",
     "no": "no",
-    "none": "none"
+    "none": "none",
+    "dismiss": "Dismiss"
   },
   "options": {
     "loadingSubtitle": "Loading your dashboard…",
@@ -34,6 +35,8 @@
     "thisPage": "This page",
     "scanned": "Scanned",
     "filtered": "Filtered",
+    "blockedOnThisPage": "Filtered on this page",
+    "revealOnPage": "Reveal on page",
     "scanningProgress": "{{discovered}} blocks found · scanning in progress",
     "noMatchesYet": "Nothing matched your block keywords yet. Add topics under Rules in the dashboard.",
     "diagnosticsSummary": "Scan diagnostics",
@@ -69,6 +72,7 @@
       "scanning": "Scanning this page…",
       "filtered": "{{count}} items filtered — click any match to reveal.",
       "noMatches": "Scanned — nothing matched your rules yet.",
+      "newsNoMatchesHint": "News sites often use factual headlines without promo or bait phrasing — noise rules may not match. For subject-based news filtering, enable Topic diet under Rules (full build, experimental).",
       "idle": "Ready to scan this page."
     },
     "pauseThisSite": "Pause filtering on this site",
@@ -110,6 +114,23 @@
       "activityFilteredToday": "Filtered today",
       "activityScanned7d": "Scanned (7 days)",
       "activityFiltered7d": "Filtered (7 days)",
+      "recentBlockedHeading": "Recently filtered",
+      "recentBlockedActive": "{{count}} active on this page — click a row's block on the page or use the badge to reveal.",
+      "recentBlockedEmpty": "Nothing filtered this session yet. Promo-heavy or bait-style text is a good test while focus mode is on.",
+      "controlStripHeading": "Filter control",
+      "controlStripDescription": "Quick view of what's active. Click a chip to open the related settings.",
+      "controlStrip": {
+        "mode": "Mode",
+        "sensitivity": "Sensitivity",
+        "style": "Style",
+        "appearance": "Appearance",
+        "detectors": "{{count}} detectors"
+      },
+      "controlStripTopicNote": "Optional topic diet (world/news subjects) lives under Rules → Topic diet and Plugins → Topic classifier — separate from noise filtering.",
+      "insightsHeading": "Filter feedback",
+      "insightsEmpty": "Mark blocks as wrong or good from the popup or dashboard to see patterns here.",
+      "insightsDetectorRow": "{{wrong}} wrong · {{ok}} good",
+      "insightsTuneLink": "Tune filtering settings →",
       "statusStrip": {
         "focusOn": "Focus on",
         "focusOff": "Focus off",
@@ -118,6 +139,8 @@
         "whitelist": "{{count}} whitelisted",
         "filteredToday": "{{count}} filtered today"
       },
+      "setupCompleteTitle": "Setup complete",
+      "setupCompleteBody": "You can close this tab anytime. Reopen the dashboard from your browser's extensions menu → SignalLens → Options (or Manage extension).",
       "quickLinksHeading": "Configure",
       "quickLinksEssentialHeading": "Fine-tune (optional)",
       "quickLinksEssentialHint": "Most people stay on the wizard defaults. Open these only if you want to adjust sensitivity, keywords, or whitelisted work sites.",
@@ -133,7 +156,7 @@
         "heading": "Getting started",
         "description": "SignalLens runs on every normal web page. Visit a site with feeds or comments to see filtering in action.",
         "tipBrowse": "Open a page with posts or comments — filtering starts automatically when focus mode is on.",
-        "tipReveal": "Click any dimmed or blurred block to reveal it. Nothing is permanently hidden.",
+        "tipReveal": "Filtered blocks show a small badge and are dimmed or blurred — click either to reveal. Nothing is permanently hidden.",
         "tipRules": "Adjust topics and keywords under Rules, or switch browsing mode above.",
         "tipAuthenticity": "Optional: enable authenticity assist under Plugins for advisory source checks (side panel)."
       }
@@ -186,6 +209,9 @@
       "browsingModeNotice": "{{mode}} browsing mode is active. Changes here switch you to a custom setup.",
       "classifyHeading": "Classify content",
       "classifyDescription": "How SignalLens decides what counts as noise — inference mode, match threshold, and active detectors.",
+      "scopeHonestyNote": "SignalLens reads page text, not pictures or video. Image-only posts are not filtered.",
+      "scopeFaqLink": "Scope & FAQ →",
+      "nonSocialNote": "On music players, review sites, and other non-feed pages, behavior and pattern detectors stay off and thresholds are more conservative. Whitelist music streaming in Rules to skip scanning entirely.",
       "presentHeading": "Present matches",
       "presentDescription": "How filtered blocks look on the page. Click any match to reveal it.",
       "sensitivityDescription": "Higher sensitivity flags more content. Lower sensitivity reduces false positives.",
@@ -214,9 +240,43 @@
       "threshold": "Threshold: {{percent}}%",
       "filterStyleHeading": "Filter Style",
       "filterStyleDescription": "Choose how filtered content appears on the page. Click any filtered block to reveal it.",
+      "appearanceHeading": "Filtered appearance",
+      "appearanceDescription": "Tune how blocked content looks on the page. Presets are a starting point — switch to Custom for full control.",
+      "appearancePresets": {
+        "balanced": "Balanced",
+        "soft": "Soft",
+        "strong": "Strong",
+        "custom": "Custom"
+      },
+      "appearancePreviewLabel": "Noise · 48%",
+      "appearanceContentOpacity": "Content visibility",
+      "appearanceContentOpacityHint": "Lower = darker and harder to read.",
+      "appearanceGrayscale": "Grayscale",
+      "appearanceBlur": "Blur strength",
+      "appearanceFrameBorder": "Frame border",
+      "appearanceFrameFill": "Frame tint",
+      "appearanceShowHint": "Show “Click to show” hint",
+      "appearanceCustomFootnote": "Select Custom to adjust sliders. More community styles may ship as presets later.",
       "languagePackHeading": "Language Pack",
       "advancedPackSummary": "Advanced: language pack and ONNX routing",
       "hide": "Hide",
+      "previewHeading": "Try a snippet",
+      "previewDescription": "Paste text to see how your current sensitivity and enabled detectors would treat it — no page visit required.",
+      "previewInputLabel": "Sample text",
+      "previewPlaceholder": "Paste a headline, comment, or promo line…",
+      "previewSamplesLabel": "Examples",
+      "previewWouldFilter": "Would filter this snippet",
+      "previewWouldPass": "Would pass — below threshold or no matching signals",
+      "previewGated": "Too short or low-signal — scanner would skip classification",
+      "previewMatched": "matched",
+      "previewBelowThreshold": "below threshold",
+      "previewBehaviorNote": "Behavior signals use language-agnostic patterns (caps bursts, hooks, emoji/link spam) plus optional DOM sponsorship hints — not keyword lists alone.",
+      "feedbackPrompt": "Was this filter correct?",
+      "feedbackWrong": "Wrong block",
+      "feedbackOk": "Good block",
+      "feedbackMarkedWrong": "Marked as wrong block — helps tune future filtering.",
+      "feedbackMarkedOk": "Marked as a good block.",
+      "feedbackSummary": "Your feedback: {{wrong}} wrong · {{ok}} good blocks recorded locally.",
       "change": "Change",
       "detected": "Detected:",
       "detectedConfidence": "{{language}} ({{percent}}% confidence)",
@@ -253,12 +313,24 @@
     }
   },
   "rules": {
-    "tabIntro": "Pause filtering on specific sites, then fine-tune keywords and per-site thresholds.",
+    "tabIntro": "Pause filtering on trusted sites, then choose topic presets and keywords.",
     "advanced": {
       "perSiteSummary": "Advanced: per-site sensitivity overrides"
     },
     "heading": "Your Filtering Rules",
-    "description": "Customize what gets filtered. Wizard choices seed these lists; you can refine them anytime.",
+    "description": "Topic presets add phrase groups in one click. Custom keywords fine-tune beyond presets.",
+    "topicPresetsHeading": "Topic presets",
+    "topicPresetsDescription": "Toggle a topic to add or remove its phrase list. Off by default unless you enabled it in setup.",
+    "topicPresetKeywordCount": "{{count}} phrases",
+    "searchKeywords": "Search keywords…",
+    "topicPresetHints": {
+      "outrage": "Drama, outrage, and boycott language in feeds.",
+      "spam": "Promo codes, affiliate links, and sales CTAs.",
+      "hostile": "Insults and hostile replies in comment threads.",
+      "engagement-bait": "Hook headlines and “you won't believe” phrasing.",
+      "low-effort": "One-liners like “lol” or “came here to say”.",
+      "geopolitics": "Phrase list for news wording (e.g. “breaking news”, “airstrike”) — not full headline topics. BBC-style factual headlines often won’t match; use Topic diet for subjects."
+    },
     "summary": {
       "block": "{{count}} block keywords",
       "allow": "{{count}} allow keywords",
@@ -269,7 +341,28 @@
       "spam": "Spam",
       "hostile": "Hostile",
       "engagement-bait": "Engagement bait",
-      "low-effort": "Low effort"
+      "low-effort": "Low effort",
+      "geopolitics": "News & geopolitics"
+    },
+    "topicDiet": {
+      "heading": "Topic diet (experimental)",
+      "description": "Semantic subject filtering — separate from noise presets above. Requires the Topic classifier plugin (full build).",
+      "experimental": "Research preview — local MiniLM embeddings, reveal-first dimming.",
+      "modRequired": "Enable “Topic classifier (experimental)” under Plugins to activate.",
+      "enable": "Enable topic diet on this profile",
+      "blockGroup": "Block subjects",
+      "allowGroup": "Always allow (override block)",
+      "separateFromNoise": "Topic blocks show subject labels (e.g. World affairs), not engagement/noise chips.",
+      "topics": {
+        "world-affairs": "World affairs",
+        "domestic-politics": "Domestic politics",
+        "tech": "Tech",
+        "music": "Music",
+        "culture-arts": "Culture & arts",
+        "business": "Business",
+        "health-science": "Health & science",
+        "sports": "Sports"
+      }
     },
     "blockKeywords": {
       "title": "Block keywords",
@@ -313,7 +406,7 @@
       },
       "music-lyrics": {
         "label": "Music streaming",
-        "hint": "Web players where synced lyrics would be filtered"
+        "hint": "Skips scanning on Spotify, Apple Music, YouTube Music, Tidal, and Deezer — recommended if synced lyrics look filtered"
       }
     }
   },
@@ -335,6 +428,49 @@
     "installedPackages": "Installed packages: {{names}}",
     "sectionEnabled": "{{enabled}} / {{total}} on",
     "enableAllHints": "Enable all site hints",
+    "filterModels": {
+      "heading": "Filtering models",
+      "description": "Scanning finds text on the page; detectors classify it against your rules. Enable detectors below — heuristic keywords work offline without a cloud model.",
+      "classifierHeading": "Primary classifier",
+      "classifierDescription": "Choose how matched content is scored before dimming or blur.",
+      "heuristicHint": "Keyword + pattern matching (default, no model download)",
+      "localPackHint": "On-device ONNX pack for stronger classification (full build)",
+      "coreBuildOnnxNote": "Local ONNX packs require the full build. Core build uses heuristic detectors — enable Noise patterns under Detectors below.",
+      "detectorsHeading": "Active detectors"
+    },
+    "adaptationPacks": {
+      "heading": "Adaptation packs",
+      "description": "Optional text-pattern supplements — phrase lists and behavior weights that merge with core detectors. No image analysis. Install only what you need.",
+      "privacyBanner": "All scan and filter data stays on your device. Adaptation packs add local rules only: no network access, no upload, no storage of page content beyond the current session blocked-item preview.",
+      "languageUniversal": "All languages",
+      "filterLanguage": "Language",
+      "filterContentType": "Content type",
+      "languageFilters": {
+        "all": "All",
+        "universal": "Universal",
+        "en": "English",
+        "de": "German"
+      },
+      "contentTypeFilters": {
+        "all": "All types"
+      },
+      "contentTypes": {
+        "promotional": "Promotional",
+        "clickbait": "Clickbait",
+        "phishing": "Phishing",
+        "toxic": "Toxic"
+      },
+      "languageGroups": {
+        "en": "English packs",
+        "de": "German packs",
+        "universal": "Universal packs",
+        "other": "Other languages"
+      },
+      "noMatchingPacks": "No packs match the current filters.",
+      "activeSummary": "{{count}} pack(s) active for this page — {{keywords}} supplemental pattern(s) loaded.",
+      "noneActive": "No adaptation packs enabled. Language-specific packs activate when the page language matches.",
+      "installHint": "Community packs: run `pnpm adaptation:scaffold <slug>`, edit pack.json, then `pnpm adaptation:build <dir>`. Install the signed .signallens-mod.json via Plugin Library → Install package. See packages/adaptation-packs/README.md."
+    },
     "sections": {
       "hint": "Site hints",
       "detector": "Detectors",
@@ -484,7 +620,62 @@
       "extractFailed": "Could not extract page text. Try reloading the tab."
     }
   },
+  "filterReasons": {
+    "revealed": "Revealed",
+    "labels": {
+      "noise": "Noise",
+      "promo": "Promo",
+      "clickbait": "Clickbait",
+      "phishing": "Phishing",
+      "toxic": "Toxic language",
+      "neutral": "Neutral",
+      "outrage": "Outrage bait",
+      "engagement-bait": "Engagement bait",
+      "behavior": "Behavior",
+      "caps-shouting": "Shouting caps",
+      "punctuation-burst": "Punctuation burst",
+      "emoji-spam": "Emoji spam",
+      "url-heavy": "Link-heavy",
+      "repetition": "Repetition",
+      "engagement-hook": "Engagement hook",
+      "listicle-structure": "Listicle format",
+      "symbol-noise": "Symbol noise",
+      "world-affairs": "World affairs",
+      "domestic-politics": "Domestic politics",
+      "tech": "Tech",
+      "music": "Music",
+      "culture-arts": "Culture & arts",
+      "business": "Business",
+      "health-science": "Health & science",
+      "sports": "Sports"
+    }
+  },
+  "theme": {
+    "heading": "Appearance",
+    "description": "Choose light, dark, or match your system setting.",
+    "options": {
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "icon": {
+      "system": "◐",
+      "light": "☀",
+      "dark": "☾"
+    }
+  },
   "llm": {
+    "endpointPreset": "Endpoint preset",
+    "localEndpointHint": "Local servers (Ollama, LM Studio) usually need no API key. Use Refresh to load models.",
+    "presets": {
+      "custom": "Custom URL",
+      "ollama": "Ollama (localhost:11434)",
+      "lmstudio": "LM Studio (localhost:1234)",
+      "localai": "LocalAI (localhost:8080)",
+      "openai": "OpenAI API"
+    },
+    "fetchingLocal": "Fetching models from your local server…",
+    "localFetchFailed": "Could not reach local server — enter a model id manually or check the endpoint.",
     "model": "Model",
     "selectModel": "Select a model…",
     "modelPlaceholder": "Model id (e.g. gpt-4o-mini)",
@@ -512,7 +703,10 @@
     }
   },
   "enforcement": {
-    "filteredTitle": "Filtered content ({{labelId}}: {{percent}}%) — Click to reveal"
+    "filteredTitle": "Filtered content ({{labelId}}: {{percent}}%) — Click to reveal",
+    "filteredBadge": "Filtered — click to show",
+    "filteredBadgeWithReason": "{{reason}} — click to show",
+    "clickToShow": "Click to show"
   },
   "content": {
     "authenticity": {
@@ -549,6 +743,72 @@
       "description": "Detects promos, outrage bait, and engagement-bait phrasing (works with your keyword list).",
       "permissionsSummary": "No network; pattern matching on extracted text.",
       "sizeLabel": "Included"
+    },
+    "detector-behavior-signals": {
+      "name": "Behavior signals",
+      "description": "Language-agnostic noise cues: shouting caps, emoji/link spam, engagement hooks, and sponsored DOM markers.",
+      "permissionsSummary": "No network; reads extracted text and local DOM hints only.",
+      "sizeLabel": "Included"
+    },
+    "detector-topic-classifier": {
+      "name": "Topic classifier (experimental)",
+      "description": "Local semantic topic diet — block world/domestic news while allowing tech and culture.",
+      "permissionsSummary": "Downloads MiniLM embeddings on first use; runs on extracted text only.",
+      "sizeLabel": "~25 MB first run"
+    },
+    "adaptation-universal-social": {
+      "name": "Universal social feed",
+      "description": "Language-agnostic social-feed cues: stronger engagement-hook and emoji signals, plus common sponsored DOM markers.",
+      "permissionsSummary": "Local text + DOM hints only. No network. No storage of page content.",
+      "sizeLabel": "~2 KB"
+    },
+    "adaptation-en-promo": {
+      "name": "English — promotional",
+      "description": "Supplemental English promo phrases and ecommerce noise patterns.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is English.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-clickbait": {
+      "name": "English — clickbait",
+      "description": "English engagement hooks and listicle-style bait phrasing for feeds and news.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is English.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-phishing": {
+      "name": "English — phishing",
+      "description": "English account-verification and urgency scam phrasing.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is English.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-en-toxic": {
+      "name": "English — toxic",
+      "description": "English insult and outrage phrasing for feeds and comment threads.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is English.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-promo": {
+      "name": "German — promotional",
+      "description": "German promo and discount phrasing for shops and feeds.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is German.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-clickbait": {
+      "name": "German — clickbait",
+      "description": "German engagement-bait and sensational headline phrasing.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is German.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-phishing": {
+      "name": "German — phishing",
+      "description": "German account-verification and urgency scam phrasing.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is German.",
+      "sizeLabel": "~1 KB"
+    },
+    "adaptation-de-toxic": {
+      "name": "German — toxic",
+      "description": "German insult and outrage phrasing for feeds and comment threads.",
+      "permissionsSummary": "Local pattern lists only. Active when page language is German.",
+      "sizeLabel": "~1 KB"
     },
     "detector-remote-api": {
       "name": "Remote API",
@@ -630,6 +890,7 @@
       "body2": "Default mode is local and offline-friendly. No account required.",
       "quickStart": "Quick start (Focus)",
       "quickStartHint": "Quick start applies the Focus browsing mode. You can change mode or rules anytime in the dashboard.",
+      "textOnlyLimitation": "SignalLens reads page text, not pictures or video. Image-only posts are not filtered.",
       "setupAgainNote": "Your previous choices are pre-selected. Adjust anything, then finish to apply."
     },
     "mode": {
@@ -656,6 +917,7 @@
       "authenticityDisabled": "Off",
       "whitelistCount": "{{count}} groups enabled",
       "topicsCount": "{{count}} selected",
+      "tipDashboardHandoff": "Finish to open your dashboard. You can close that tab anytime and reopen it from Extensions → SignalLens.",
       "tipBrowse": "Open a normal website (not chrome:// pages) with a feed or comments.",
       "tipReveal": "Click filtered content to reveal it — nothing stays hidden permanently.",
       "tipFineTuneLater": "Optional: open the dashboard later to fine-tune filtering, plugins, or privacy.",
@@ -675,6 +937,7 @@
     "topics": {
       "heading": "What bothers you?",
       "description": "We'll use these topics as keyword signals in heuristic mode.",
+      "noiseVsTopicNote": "These presets filter tone and phrasing (noise). An optional topic diet for news subjects is available later under Rules — separate from this step.",
       "pickAtLeastOne": "Select at least one topic to continue."
     },
     "botherCategories": {
@@ -682,7 +945,8 @@
       "spam": "Spam and promotions",
       "hostile": "Hostile or insulting language",
       "engagement-bait": "Engagement bait headlines",
-      "low-effort": "Low-effort comments"
+      "low-effort": "Low-effort comments",
+      "geopolitics": "News and geopolitics (optional — off by default in Focus)"
     },
     "style": {
       "heading": "Filter style",

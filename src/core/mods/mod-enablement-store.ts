@@ -33,7 +33,9 @@ function normalizeEnabledIds(ids: readonly string[], profile: BuildProfile): rea
 }
 
 export function getDefaultEnabledModIds(profile: BuildProfile = getBuildProfile()): readonly string[] {
-    return getModsForProfile(profile).map((mod) => mod.id);
+    return getModsForProfile(profile)
+        .filter((mod) => mod.defaultEnabled !== false)
+        .map((mod) => mod.id);
 }
 
 export function getEnabledModIds(): readonly string[] {

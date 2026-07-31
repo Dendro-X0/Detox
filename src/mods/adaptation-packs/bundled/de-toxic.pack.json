@@ -1,0 +1,22 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-de-toxic",
+  "version": "1.0.0",
+  "languages": ["de"],
+  "contexts": ["social-feed", "news"],
+  "contentTypes": ["toxic"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "du bist ein idiot",
+    "bring dich um",
+    "verpiss dich",
+    "wertloser abschaum"
+  ],
+  "noisePatterns": {
+    "outrage": ["wie dumm kann man sein", "halt die fresse"]
+  }
+}

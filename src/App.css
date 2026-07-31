@@ -224,6 +224,74 @@ input:checked + .slider:before {
   font-size: 0.7rem;
 }
 
+.sl-block-reason {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.35);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #15803d;
+}
+
+.sl-block-reason--compact {
+  font-size: 0.68rem;
+  padding: 0.15rem 0.45rem;
+}
+
+.sl-block-reason-score {
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+.sl-block-revealed-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.blocked-item.is-revealed {
+  opacity: 0.72;
+}
+
+.sl-recent-blocked-summary {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.sl-recent-blocked--compact h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.sl-recent-blocked--bare {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sl-recent-blocked--bare h3 {
+  font-size: 0.8rem;
+  margin: 0 0 0.5rem;
+}
+
+.sl-block-reveal-btn {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.sl-recent-blocked--compact .blocked-list {
+  max-height: 160px;
+}
+
 .muted {
   color: #9ca3af;
   font-size: 0.875rem;

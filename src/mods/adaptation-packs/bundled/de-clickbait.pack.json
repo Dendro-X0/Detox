@@ -1,0 +1,22 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-de-clickbait",
+  "version": "1.0.0",
+  "languages": ["de"],
+  "contexts": ["social-feed", "news"],
+  "contentTypes": ["clickbait"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": [
+    "nicht zu fassen",
+    "was als nächstes passierte",
+    "ärzte hassen diesen trick",
+    "du wirst es nicht glauben"
+  ],
+  "noisePatterns": {
+    "engagement-bait": ["du wirst nicht glauben", "nummer 7 wird dich schockieren"]
+  }
+}

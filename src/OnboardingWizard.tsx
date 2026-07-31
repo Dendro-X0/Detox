@@ -35,7 +35,14 @@ type OnboardingWizardProps = {
     readonly onComplete: (options?: WizardCompleteOptions) => void;
 };
 
-const BOTHER_IDS: readonly BotherCategory[] = ['outrage', 'spam', 'hostile', 'engagement-bait', 'low-effort'];
+const BOTHER_IDS: readonly BotherCategory[] = [
+    'outrage',
+    'spam',
+    'hostile',
+    'engagement-bait',
+    'low-effort',
+    'geopolitics',
+];
 
 const FILTER_STYLE_IDS: readonly { readonly id: EnforcementActionId; readonly fullOnly?: boolean }[] = [
     { id: 'dim' },
@@ -211,7 +218,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             localeId,
         });
         setSaving(false);
-        onComplete({ openDashboard: false });
+        onComplete({ openDashboard: true });
     };
 
     const next = (): void => {
@@ -255,7 +262,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             return;
         }
         if (step === 'done') {
-            void finish({ openDashboard: false });
+            void finish({ openDashboard: true });
         }
     };
 
@@ -392,7 +399,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                     {step === 'done'
                         ? saving
                             ? t('common.saving')
-                            : t('wizard.done.startBrowsing')
+                            : t('wizard.done.openDashboard')
                         : t('common.continue')}
                 </button>
             </div>
@@ -417,6 +424,9 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                         </p>
                         <p className="muted" style={{ marginBottom: 0 }}>
                             {t('wizard.welcome.body2')}
+                        </p>
+                        <p className="sl-wizard-callout sl-wizard-text-only-note">
+                            {t('wizard.welcome.textOnlyLimitation')}
                         </p>
                         {isSetupAgain ? (
                             <p className="sl-wizard-callout">{t('wizard.welcome.setupAgainNote')}</p>
@@ -519,6 +529,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                         <p className="muted" style={{ marginTop: 0 }}>
                             {t('wizard.topics.description')}
                         </p>
+                        <p className="sl-wizard-callout">{t('wizard.topics.noiseVsTopicNote')}</p>
                         <div className="sl-choice-list">
                             {BOTHER_IDS.map((id) => (
                                 <label
@@ -710,6 +721,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                             </dl>
                         </div>
                         <ul className="sl-handoff-list">
+                            <li>{t('wizard.done.tipDashboardHandoff')}</li>
                             <li>{t('wizard.done.tipBrowse')}</li>
                             <li>{t('wizard.done.tipReveal')}</li>
                             <li>{t('wizard.done.tipFineTuneLater')}</li>

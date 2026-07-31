@@ -24,7 +24,10 @@ vi.mock('../../src/core/storage/extension-session', () => ({
 }));
 
 vi.mock('../../src/core/enforcement/apply-unit-enforcement', () => ({
-    applyUnitEnforcement: vi.fn(() => ({ success: true })),
+    applyUnitEnforcement: vi.fn((unitId: string, element: HTMLElement) => {
+        element.dataset.slBlocked = 'true';
+        return { success: true };
+    }),
     revealContentUnit: vi.fn(),
 }));
 
@@ -45,6 +48,16 @@ async function flushPipeline(pipeline: ClassificationPipeline): Promise<void> {
     await new Promise<void>((resolve) => {
         setTimeout(resolve, 0);
     });
+}
+
+function sumStatsDeltas(): { scanned: number; filtered: number } {
+    return vi.mocked(recordBlocksScanned).mock.calls.reduce(
+        (totals, [scannedDelta, filteredDelta]) => ({
+            scanned: totals.scanned + (scannedDelta as number),
+            filtered: totals.filtered + (filteredDelta as number),
+        }),
+        { scanned: 0, filtered: 0 }
+    );
 }
 
 describe('8.4 — classification pipeline', () => {
@@ -76,7 +89,10 @@ describe('8.4 — classification pipeline', () => {
         vi.mocked(isDomainAllowlisted).mockReturnValue(false);
         vi.mocked(recordBlocksDiscovered).mockClear();
         vi.mocked(recordBlocksScanned).mockClear();
-        vi.mocked(applyUnitEnforcement).mockClear();
+        vi.mocked(applyUnitEnforcement).mockImplementation((unitId: string, element: HTMLElement) => {
+            element.dataset.slBlocked = 'true';
+            return { success: true };
+        });
     });
 
     afterEach(() => {
@@ -146,5 +162,97 @@ describe('8.4 — classification pipeline', () => {
 
         expect(sendMessage).toHaveBeenCalledTimes(1);
         expect(pipeline.getScanProgress().done).toBe(1);
+    });
+
+    it('does not count filters when enforcement fails', async () => {
+        vi.mocked(applyUnitEnforcement).mockImplementation(() => ({ success: false }));
+
+        sendMessage.mockImplementation((request, callback) => {
+            if (request.type === 'classifyBatch' && request.items) {
+                callback({
+                    type: 'classifyBatchResult',
+                    results: request.items.map((item) => ({
+                        id: item.id,
+                        matched: true,
+                        score: 0.95,
+                        labelId: 'clickbait',
+                        detectorId: 'heuristic-keywords',
+                    })),
+                });
+            }
+        });
+
+        const pipeline = new ClassificationPipeline({ isEnabled: () => true });
+        pipeline.handleUnitsAdded([makeUnit('enforce-fail')]);
+        await flushPipeline(pipeline);
+
+        const totals = sumStatsDeltas();
+        expect(totals.scanned).toBe(1);
+        expect(totals.filtered).toBe(0);
+    });
+
+    it('counts at most one filter per unit id per queue session', async () => {
+        sendMessage.mockImplementation((request, callback) => {
+            if (request.type === 'classifyBatch' && request.items) {
+                callback({
+                    type: 'classifyBatchResult',
+                    results: request.items.map((item) => ({
+                        id: item.id,
+                        matched: true,
+                        score: 0.95,
+                        labelId: 'clickbait',
+                        detectorId: 'heuristic-keywords',
+                    })),
+                });
+            }
+        });
+
+        const pipeline = new ClassificationPipeline({ isEnabled: () => true });
+        pipeline.handleUnitsAdded([makeUnit('filter-once')]);
+        await flushPipeline(pipeline);
+
+        pipeline.clearQueues();
+        pipeline.handleUnitsAdded([makeUnit('filter-once')]);
+        await flushPipeline(pipeline);
+
+        const totals = sumStatsDeltas();
+        expect(totals.scanned).toBe(2);
+        expect(totals.filtered).toBe(2);
+        expect(totals.filtered).toBeLessThanOrEqual(totals.scanned);
+    });
+
+    it('never reports more filters than scans in a single session', async () => {
+        sendMessage.mockImplementation((request, callback) => {
+            if (request.type === 'classifyBatch' && request.items) {
+                callback({
+                    type: 'classifyBatchResult',
+                    results: request.items.map((item) => ({
+                        id: item.id,
+                        matched: item.id.endsWith('-match'),
+                        score: item.id.endsWith('-match') ? 0.95 : 0.1,
+                        labelId: item.id.endsWith('-match') ? 'clickbait' : 'neutral',
+                        detectorId: 'heuristic-keywords',
+                    })),
+                });
+            }
+        });
+
+        const pipeline = new ClassificationPipeline({ isEnabled: () => true });
+        pipeline.handleUnitsAdded([
+            makeUnit('item-a-match'),
+            makeUnit('item-b-match', `${CLASSIFYABLE_TEXT} Second matched block.`),
+            makeUnit('item-c-neutral', `${CLASSIFYABLE_TEXT} Neutral block.`),
+        ]);
+        await flushPipeline(pipeline);
+
+        pipeline.handleUnitsAdded([
+            makeUnit('item-d-match', `${CLASSIFYABLE_TEXT} Fourth matched block.`),
+        ]);
+        await flushPipeline(pipeline);
+
+        const totals = sumStatsDeltas();
+        expect(totals.filtered).toBeLessThanOrEqual(totals.scanned);
+        expect(totals.filtered).toBe(3);
+        expect(totals.scanned).toBe(4);
     });
 });

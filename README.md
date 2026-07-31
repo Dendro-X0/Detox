@@ -1,6 +1,6 @@
 # SignalLens
 
-**Version:** 2.2.0 · **Stage:** Pre-release RC (unlisted store submit → [v3.0.0 public launch](docs/planning/version-roadmap.md))
+**Version:** 2.3.0 · **Stage:** Unlisted dogfood RC → [v3.0.0 public launch](docs/planning/version-roadmap.md) ([Track C ops](docs/planning/v2.3-release-ops.md))
 
 SignalLens is a browser extension that helps you browse with more focus by reducing low-value content using **your** rules — keywords, browsing modes, and site whitelists. Optional authenticity assist provides advisory source checks on text you select; it never auto-blocks content for “truth.”
 
@@ -52,12 +52,12 @@ Universal scanner → classifyBatch → heuristic (+ optional noise patterns) �
 
 | Milestone | Theme |
 |-----------|--------|
-| **v2.1.x** (now) | Wizard-first setup, heuristic tuning, dashboard polish |
-| **v2.2.x** | Unlisted store release candidate |
-| **v2.3.x** | Scanner / filtering / authenticity refinement |
-| **v3.0.0** | Initial public release |
+| **v2.3.x** (now) | Unlisted dogfood RC → text-noise launch wedge |
+| **v3.0.0** | Public release (Option A: excellent noise filter) |
+| **v3.1+** | Preferences hub, interest diet, ≤1-min Express setup |
+| **v3.2+** | Selection assist (search / verify / page tools) |
 
-→ [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md) · [`docs/planning/wizard-first-checklist.md`](docs/planning/wizard-first-checklist.md)
+→ [`docs/planning/purposeful-browsing-roadmap.md`](docs/planning/purposeful-browsing-roadmap.md) · [`docs/planning/version-roadmap.md`](docs/planning/version-roadmap.md)
 
 ## Documentation
 

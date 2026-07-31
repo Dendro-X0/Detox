@@ -30,6 +30,12 @@ playwright-report
 *.sw?
 
 # Large model pack artifacts (downloaded locally as release assets)
+
+# Generated QA reports
+artifacts/
+.cache/
+# ONNX Runtime WASM (fetched via pnpm prepare:ort)
+public/ort/
 public/model-packs/toxicity-multi-xlm-r/*
 !public/model-packs/toxicity-multi-xlm-r/modelpack.json
 

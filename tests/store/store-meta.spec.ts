@@ -11,4 +11,9 @@ describe('store metadata', () => {
         expect(meta.repoUrl).toMatch(/^https:\/\//);
         expect(existsSync(join(repoRoot, 'store/PRIVACY.md'))).toBe(true);
     });
+
+    it('defines scope FAQ URL and local doc', () => {
+        expect(meta.scopeFaqUrl).toMatch(/^https:\/\//);
+        expect(existsSync(join(repoRoot, 'docs/scope-faq.md'))).toBe(true);
+    });
 });

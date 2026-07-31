@@ -41,11 +41,25 @@ describe('10 — browsing modes', () => {
         expect(patch.enabledModIds).toContain('detector-heuristic-keywords');
         expect(patch.enabledModIds).toContain('action-dim');
         expect(patch.enabledModIds).toContain('detector-noise-patterns');
+        expect(patch.enabledModIds).toContain('detector-behavior-signals');
+        expect(patch.enabledModIds).toContain('adaptation-universal-social');
+        expect(patch.enabledModIds).toContain('adaptation-en-clickbait');
+        expect(patch.enabledModIds).toContain('adaptation-de-clickbait');
+        expect(patch.enabledModIds).not.toContain('adaptation-en-toxic');
     });
 
-    it('research mode omits optional noise pattern detector', () => {
+    it('unwind mode enables full EN/DE adaptation pack bundle', () => {
+        const patch = buildBrowsingModePatch('unwind');
+        expect(patch.enabledModIds).toContain('adaptation-en-toxic');
+        expect(patch.enabledModIds).toContain('adaptation-de-phishing');
+        expect(patch.enabledModIds).toContain('adaptation-en-promo');
+    });
+
+    it('research mode omits optional supplementary detectors', () => {
         const patch = buildBrowsingModePatch('research');
         expect(patch.enabledModIds).not.toContain('detector-noise-patterns');
+        expect(patch.enabledModIds).not.toContain('detector-behavior-signals');
+        expect(patch.enabledModIds).not.toContain('adaptation-universal-social');
     });
 
     it('getBrowsingMode returns metadata', () => {

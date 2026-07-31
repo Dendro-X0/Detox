@@ -8,6 +8,9 @@ import type {
     ModPackagePayload,
 } from './mod-package-types';
 import { MOD_PACKAGE_FORMAT } from './mod-package-types';
+import { validateAdaptationModPackagePayload } from './validate-adaptation-mod-package';
+
+const PACK_ASSET_PATH = 'pack.json';
 
 export type InstallModResult =
     | { readonly ok: true; readonly modId: string }
@@ -37,6 +40,10 @@ export function parseModPackageManifest(raw: unknown): ModPackageManifest | null
 }
 
 export function validateModPackagePayload(payload: ModPackagePayload): string | null {
+    if (payload.kind === 'adaptation-pack') {
+        return validateAdaptationModPackagePayload(payload);
+    }
+
     const catalogEntry = MOD_CATALOG.find((mod) => mod.id === payload.modId);
     if (!catalogEntry) return `Unknown mod id: ${payload.modId}`;
     if (catalogEntry.kind !== payload.kind) {
@@ -118,8 +125,28 @@ export async function installModPackage(
         readonly downloadedAt: string;
     }[] = [];
 
-    let totalBytes = files.reduce((sum, file) => sum + file.sizeBytes, 0);
-    let loadedBytes = 0;
+    if (payload.pack) {
+        emit(onProgress, {
+            modId,
+            phase: 'download',
+            filePath: PACK_ASSET_PATH,
+            bytesLoaded: 0,
+            bytesTotal: 1,
+        });
+        const packJson = `${JSON.stringify(payload.pack)}\n`;
+        const buffer = new TextEncoder().encode(packJson);
+        const hash = await sha256Hex(buffer.buffer);
+        await storeModAsset(modId, PACK_ASSET_PATH, buffer.buffer);
+        downloadedFiles.push({
+            relativePath: PACK_ASSET_PATH,
+            sha256: hash,
+            sizeBytes: buffer.byteLength,
+            downloadedAt: new Date().toISOString(),
+        });
+    }
+
+    let totalBytes = files.reduce((sum, file) => sum + file.sizeBytes, 0) + (payload.pack ? 1 : 0);
+    let loadedBytes = payload.pack ? 1 : 0;
 
     for (const file of files) {
         emit(onProgress, {
@@ -183,6 +210,9 @@ export async function installModPackage(
         kind: manifest.kind,
         installedAt: new Date().toISOString(),
         files: downloadedFiles,
+        description: manifest.description,
+        permissionsSummary: manifest.permissionsSummary,
+        adaptationMeta: manifest.adaptationMeta,
     });
 
     emit(onProgress, { modId, phase: 'complete', bytesLoaded: totalBytes, bytesTotal: totalBytes });

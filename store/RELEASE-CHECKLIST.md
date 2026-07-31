@@ -2,14 +2,15 @@
 
 Complete before Chrome Web Store or Firefox AMO submission.
 
-**v2.2.0 track:** see [`docs/planning/v2.2-store-prep.md`](../docs/planning/v2.2-store-prep.md).
+**v2.3.0 track:** see [`docs/planning/v2.3-release-ops.md`](../docs/planning/v2.3-release-ops.md).  
+**Prior RC:** [`docs/planning/v2.2-store-prep.md`](../docs/planning/v2.2-store-prep.md).
 
 ## Version and build
 
 - [ ] Bump `package.json` version
 - [ ] Align `src/manifest.json` and `manifest-firefox.json` versions
 - [ ] Update `CHANGELOG.md`
-- [ ] `pnpm test:ci` green (or `pnpm test:scanner` + local E2E smoke)
+- [ ] `pnpm release:preflight` green (or `pnpm test:ci` for full CI parity)
 - [ ] `pnpm release:chrome` produces zip in `releases/`
 - [ ] `pnpm release:firefox` produces zip in `releases/`
 

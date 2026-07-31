@@ -1,0 +1,18 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-universal-social",
+  "version": "1.0.0",
+  "languages": ["*"],
+  "contexts": ["social-feed"],
+  "contentTypes": ["clickbait"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "behaviorWeightBoosts": {
+    "engagement-hook": 0.06,
+    "emoji-spam": 0.04
+  },
+  "domPromotedMarkers": ["data-testid*=promo", "sponsored-post"]
+}

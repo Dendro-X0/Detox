@@ -6,6 +6,11 @@ import type { PolicyPreset, PolicySettings } from '../types/policy';
 import { PRESET_THRESHOLDS } from '../types/policy';
 import type { UserRulesSettings } from '../types/user-rules';
 import { BOTHER_KEYWORD_MAP, type BotherCategory } from '../types/bother-keywords';
+import {
+    FOCUS_ADAPTATION_MOD_IDS,
+    RESEARCH_ADAPTATION_MOD_IDS,
+    UNWIND_ADAPTATION_MOD_IDS,
+} from './adaptation-mode-bundles';
 
 export type BrowsingModeId = 'focus' | 'research' | 'unwind';
 
@@ -18,6 +23,7 @@ export type BrowsingModeDefinition = {
     readonly actionId: EnforcementActionId;
     readonly hintModIds: readonly string[];
     readonly detectorModIds: readonly string[];
+    readonly adaptationModIds: readonly string[];
 };
 
 export const BUILTIN_BROWSING_MODES: readonly BrowsingModeDefinition[] = [
@@ -29,7 +35,8 @@ export const BUILTIN_BROWSING_MODES: readonly BrowsingModeDefinition[] = [
         botherCategories: ['outrage', 'spam', 'engagement-bait'],
         actionId: 'dim',
         hintModIds: ['adapter-reddit'],
-        detectorModIds: ['detector-noise-patterns'],
+        detectorModIds: ['detector-noise-patterns', 'detector-behavior-signals'],
+        adaptationModIds: [...FOCUS_ADAPTATION_MOD_IDS],
     },
     {
         id: 'research',
@@ -40,6 +47,7 @@ export const BUILTIN_BROWSING_MODES: readonly BrowsingModeDefinition[] = [
         actionId: 'dim',
         hintModIds: [],
         detectorModIds: [],
+        adaptationModIds: [...RESEARCH_ADAPTATION_MOD_IDS],
     },
     {
         id: 'unwind',
@@ -49,7 +57,8 @@ export const BUILTIN_BROWSING_MODES: readonly BrowsingModeDefinition[] = [
         botherCategories: ['outrage', 'spam', 'hostile', 'engagement-bait', 'low-effort'],
         actionId: 'blur',
         hintModIds: ['adapter-reddit', 'adapter-youtube'],
-        detectorModIds: ['detector-noise-patterns'],
+        detectorModIds: ['detector-noise-patterns', 'detector-behavior-signals'],
+        adaptationModIds: [...UNWIND_ADAPTATION_MOD_IDS],
     },
 ] as const;
 
@@ -81,7 +90,7 @@ function resolveEnabledModIds(mode: BrowsingModeDefinition): readonly string[] {
     for (const required of REQUIRED_MOD_IDS) {
         if (isModUnlocked(required, profile)) ids.add(required);
     }
-    for (const modId of [...mode.hintModIds, ...mode.detectorModIds]) {
+    for (const modId of [...mode.hintModIds, ...mode.detectorModIds, ...mode.adaptationModIds]) {
         if (isModUnlocked(modId, profile)) ids.add(modId);
     }
     return [...ids];

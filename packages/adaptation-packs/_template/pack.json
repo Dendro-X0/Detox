@@ -1,0 +1,17 @@
+{
+  "format": "signallens-adaptation/1",
+  "packId": "adaptation-example",
+  "version": "1.0.0",
+  "languages": ["en"],
+  "contexts": ["social-feed"],
+  "contentTypes": ["promotional"],
+  "privacy": {
+    "networkAccess": false,
+    "persistsPageContent": false,
+    "telemetry": false
+  },
+  "supplementalKeywords": ["replace me with real phrases"],
+  "noisePatterns": {
+    "promo": ["replace me"]
+  }
+}
