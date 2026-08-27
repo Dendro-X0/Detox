@@ -149,7 +149,7 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 | P1-U2 | **“More of / Less of” interest step** | Chips mapped to L2 when available; until then map geopolitics + keyword seeds honestly labeled |
 | P1-U3 | **Preferences hub** | Consolidate topic presets, topic diet, whitelist, sensitivity under one mental model |
 | P1-U4 | **Preset gallery** | `focus-calm`, `less-politics`, `tech-music`, `comment-shield`, `deep-read` |
-| P1-U5 | **Post-setup confirmation** | Sample page or first-session “your settings” summary |
+| P1-U5 | **Post-setup confirmation** | Express done review + dashboard banner; topic seeds callout |
 
 #### Functional logic
 

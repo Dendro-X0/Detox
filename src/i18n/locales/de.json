@@ -156,6 +156,7 @@
       },
       "setupCompleteTitle": "Einrichtung abgeschlossen",
       "setupCompleteBody": "Sie können diesen Tab jederzeit schließen. Öffnen Sie das Dashboard erneut über Erweiterungen → SignalLens → Optionen.",
+      "setupCompleteExpressBody": "{{preset}} ist aktiv. Rauschfilterung startet beim nächsten Surfen — Präferenzen jederzeit für Interessen, Seiten oder Stil.",
       "quickLinksHeading": "Konfigurieren",
       "quickLinksEssentialHeading": "Feintuning (optional)",
       "quickLinksEssentialHint": "Die meisten bleiben bei den Assistenten-Standards. Nur öffnen, wenn Sie Empfindlichkeit, Schlüsselwörter oder Whitelist anpassen möchten.",
@@ -233,7 +234,8 @@
       "sensitivityDescription": "Höhere Empfindlichkeit markiert mehr Inhalte. Niedrigere reduziert Fehlalarme.",
       "detectorsHeading": "Aktive Detektoren",
       "detectorsDescription": "Detektoren laufen auf extrahiertem Text. Weitere unter Plugins verwalten.",
-      "editKeywordsLink": "Block-Schlüsselwörter unter Regeln bearbeiten →",
+      "editKeywordsLink": "Schlüsselwörter unter Präferenzen bearbeiten →",
+      "editPreferencesLink": "Empfindlichkeit und Stil unter Präferenzen bearbeiten →",
       "heuristicDescription": "Schlüsselwortlisten und Muster — offline, ohne Modell-Download.",
       "localPackDescription": "Gebündeltes ONNX-Modell für semantische Bewertung. Benötigt lokale Pack-Dateien.",
       "remoteApiHeading": "Remote-API-Eskalation (optional)",
@@ -369,6 +371,7 @@
       "blockGroup": "Themen blockieren",
       "allowGroup": "Immer erlauben (Block überschreiben)",
       "separateFromNoise": "Themen-Blocks zeigen Fachlabels (z. B. Weltpolitik), keine Rausch-Chips.",
+      "expressSeedsHint": "Interessenlisten aus Ihrer {{preset}}-Einrichtung sind unten gespeichert — aktivieren Sie die Themen-Diät, wenn Sie bereit sind (Topic-classifier-Plugin erforderlich).",
       "topics": {
         "world-affairs": "Weltpolitik",
         "domestic-politics": "Innenpolitik",
@@ -939,6 +942,9 @@
       "authenticityDisabled": "Aus",
       "whitelistCount": "{{count}} Gruppen aktiv",
       "topicsCount": "{{count}} ausgewählt",
+      "reviewTopicSeeds": "Interessen-Diät (gespeichert)",
+      "topicSeedsSaved": "Block-/Allow-Listen gespeichert — unter Präferenzen → Interessen aktivieren (Full Build)",
+      "expressTopicSeedsNote": "Interessen-Themen (z. B. weniger Politik, mehr Tech) sind vorkonfiguriert, aber aus bis Sie Themen-Diät unter Präferenzen → Interessen aktivieren und das Topic-classifier-Plugin einschalten.",
       "tipDashboardHandoff": "Abschließen öffnet Ihr Dashboard. Sie können den Tab jederzeit schließen und über Erweiterungen → SignalLens erneut öffnen.",
       "tipBrowse": "Öffnen Sie eine normale Website (keine chrome://-Seiten) mit Feed oder Kommentaren.",
       "tipReveal": "Klicken Sie auf gefilterte Inhalte, um sie einzublenden — nichts bleibt dauerhaft verborgen.",
@@ -959,7 +965,7 @@
     "topics": {
       "heading": "Was stört Sie?",
       "description": "Diese Themen nutzen wir als Schlüsselwort-Signale im heuristischen Modus.",
-      "noiseVsTopicNote": "Diese Voreinstellungen filtern Ton und Formulierung (Rauschen). Eine optionale Themen-Diät für Nachrichteninhalte finden Sie später unter Regeln — getrennt von diesem Schritt.",
+      "noiseVsTopicNote": "Diese Voreinstellungen filtern Ton und Formulierung (Rauschen). Eine optionale Themen-Diät für Nachrichteninhalte finden Sie später unter Präferenzen → Interessen — getrennt von diesem Schritt.",
       "pickAtLeastOne": "Wählen Sie mindestens ein Thema, um fortzufahren."
     },
     "botherCategories": {

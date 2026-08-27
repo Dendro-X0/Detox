@@ -8,6 +8,7 @@ import {
     type TopicPolicySettings,
 } from '../core/rules/topic-policy-store';
 import { TOPIC_IDS, type TopicId } from '../core/filtering/topic-types';
+import { isExpressPresetId } from '../onboarding/express-presets';
 import { useLocale } from '../i18n/LocaleContext';
 import { useEffect, useState } from 'react';
 
@@ -18,9 +19,14 @@ export default function TopicDietPanel() {
     const { t } = useLocale();
     const [policy, setPolicy] = useState<TopicPolicySettings | null>(null);
     const [modEnabled, setModEnabled] = useState(() => isModEnabled('detector-topic-classifier'));
+    const [expressPresetId, setExpressPresetId] = useState<string | null>(null);
 
     useEffect(() => {
         void loadTopicPolicy().then(setPolicy);
+        void chrome.storage.local.get('expressPresetId').then((result) => {
+            const id = (result as { readonly expressPresetId?: string }).expressPresetId;
+            setExpressPresetId(id && isExpressPresetId(id) ? id : null);
+        });
         return subscribeToEnabledModChanges(() => {
             setModEnabled(isModEnabled('detector-topic-classifier'));
         });
@@ -33,11 +39,22 @@ export default function TopicDietPanel() {
         await saveTopicPolicy(next);
     };
 
+    const hasExpressSeeds =
+        policy.blockTopics.length > 0 || policy.allowTopics.length > 0;
+
     return (
         <section className="sl-rules-section sl-topic-diet">
             <h4 className="sl-rules-section-title">{t('rules.topicDiet.heading')}</h4>
             <p className="muted sl-rules-section-desc">{t('rules.topicDiet.description')}</p>
             <p className="sl-topic-diet-experimental muted">{t('rules.topicDiet.experimental')}</p>
+
+            {expressPresetId && hasExpressSeeds && !policy.enabled ? (
+                <p className="sl-wizard-callout">
+                    {t('rules.topicDiet.expressSeedsHint', {
+                        preset: t(`wizard.expressPresets.${expressPresetId}.label`),
+                    })}
+                </p>
+            ) : null}
 
             {!modEnabled ? (
                 <p className="sl-topic-diet-mod-hint muted">{t('rules.topicDiet.modRequired')}</p>

@@ -1,4 +1,6 @@
+/// <reference types="chrome" />
 import { useEffect, useState } from 'react';
+import { isExpressPresetId } from '../onboarding/express-presets';
 import { useLocale } from '../i18n/LocaleContext';
 
 export const WIZARD_COMPLETE_BANNER_KEY = 'sl-wizard-complete-banner';
@@ -14,6 +16,7 @@ export function markWizardCompleteBanner(): void {
 export default function SetupCompleteBanner() {
     const { t } = useLocale();
     const [visible, setVisible] = useState(false);
+    const [expressPresetId, setExpressPresetId] = useState<string | null>(null);
 
     useEffect(() => {
         try {
@@ -21,6 +24,10 @@ export default function SetupCompleteBanner() {
         } catch {
             setVisible(false);
         }
+        void chrome.storage.local.get('expressPresetId').then((result) => {
+            const id = (result as { readonly expressPresetId?: string }).expressPresetId;
+            setExpressPresetId(id && isExpressPresetId(id) ? id : null);
+        });
     }, []);
 
     if (!visible) return null;
@@ -34,12 +41,17 @@ export default function SetupCompleteBanner() {
         setVisible(false);
     };
 
+    const presetLabel =
+        expressPresetId !== null ? t(`wizard.expressPresets.${expressPresetId}.label`) : null;
+
     return (
         <div className="sl-setup-banner sl-span-full" role="status">
             <div className="sl-setup-banner-body">
                 <strong>{t('settings.overview.setupCompleteTitle')}</strong>
                 <p className="muted" style={{ margin: '0.35rem 0 0' }}>
-                    {t('settings.overview.setupCompleteBody')}
+                    {presetLabel
+                        ? t('settings.overview.setupCompleteExpressBody', { preset: presetLabel })
+                        : t('settings.overview.setupCompleteBody')}
                 </p>
             </div>
             <button type="button" className="sl-btn sl-btn-ghost" onClick={dismiss}>

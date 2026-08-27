@@ -9,7 +9,7 @@
 
 1. Load unpacked extension from `dist/` after full build.
 2. **Plugins** → enable **Topic classifier (experimental)**.
-3. **Rules** → **Topic diet** → enable + confirm block/allow topics (default: block world/domestic, allow tech/music/culture).
+3. **Preferences** → **Interests** → **Topic diet** → enable + confirm block/allow topics (default: block world/domestic, allow tech/music/culture).
 4. Keep **Focus** or **Research** mode — topic layer runs in parallel to noise; badges should show **subject** labels (e.g. `World affairs`), not only `Noise` / `Link-heavy`.
 
 ---

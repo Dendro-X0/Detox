@@ -131,6 +131,11 @@ export default function FilteringSettingsPanel({
                         <dd>{detectorLabel(runtimeStatus.activeDetectorId, t)}</dd>
                     </div>
                 </dl>
+                {hidePersonalizationControls && onNavigatePreferences ? (
+                    <button type="button" className="sl-btn-text" onClick={onNavigatePreferences}>
+                        {t('settings.filtering.editPreferencesLink')}
+                    </button>
+                ) : null}
             </div>
 
             <section className="sl-filtering-section sl-span-full">

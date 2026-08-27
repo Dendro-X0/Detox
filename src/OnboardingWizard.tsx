@@ -13,9 +13,11 @@ import {
 import { useLocale } from './i18n/LocaleContext';
 import { applyOnboardingDraft } from './onboarding/apply-onboarding';
 import {
+    getExpressPreset,
     listExpressPresets,
     type ExpressPresetId,
 } from './onboarding/express-presets';
+import { getBrowsingMode } from './core/modes/browsing-modes';
 import { loadOnboardingPrefill } from './onboarding/load-onboarding-prefill';
 import { openWizardSamplePage } from './onboarding/sample-page';
 import type { BotherCategory, OnboardingDraft } from './onboarding/types';
@@ -383,13 +385,34 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 ? t('wizard.done.authenticityEnabled')
                 : t('wizard.done.authenticityDisabled'),
         };
-        if (setupPath === 'express' && expressPresetLabel) {
-            return [
-                { label: t('wizard.done.reviewPreset'), value: expressPresetLabel },
+        if (setupPath === 'express' && expressPresetId) {
+            const express = getExpressPreset(expressPresetId);
+            const mode = getBrowsingMode(express.browsingModeId);
+            const policyPreset = express.policyPreset ?? mode.preset;
+            const hasTopicSeeds =
+                express.topicPolicy.blockTopics.length > 0 ||
+                express.topicPolicy.allowTopics.length > 0;
+            const rows = [
+                { label: t('wizard.done.reviewPreset'), value: expressPresetLabel ?? '—' },
+                {
+                    label: t('wizard.done.reviewSensitivity'),
+                    value: t(`wizard.sensitivityPresets.${policyPreset}.label`),
+                },
+                {
+                    label: t('wizard.done.reviewStyle'),
+                    value: t(`wizard.filterStyles.${mode.actionId}`),
+                },
                 { label: t('wizard.done.reviewLanguage'), value: localeLabel },
                 whitelistRow,
                 authenticityRow,
             ];
+            if (hasTopicSeeds) {
+                rows.splice(3, 0, {
+                    label: t('wizard.done.reviewTopicSeeds'),
+                    value: t('wizard.done.topicSeedsSaved'),
+                });
+            }
+            return rows;
         }
         if (setupPath === 'preset-mode') {
             return [
@@ -413,7 +436,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         authenticityEnabled,
         localeLabel,
         preset,
-        expressPresetLabel,
+        expressPresetId,
         setupPath,
         t,
         topicsSummary,
@@ -830,6 +853,11 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                                 ))}
                             </dl>
                         </div>
+                        {setupPath === 'express' && expressPresetId &&
+                        (getExpressPreset(expressPresetId).topicPolicy.blockTopics.length > 0 ||
+                            getExpressPreset(expressPresetId).topicPolicy.allowTopics.length > 0) ? (
+                            <p className="sl-wizard-callout">{t('wizard.done.expressTopicSeedsNote')}</p>
+                        ) : null}
                         <ul className="sl-handoff-list">
                             <li>{t('wizard.done.tipDashboardHandoff')}</li>
                             <li>{t('wizard.done.tipBrowse')}</li>

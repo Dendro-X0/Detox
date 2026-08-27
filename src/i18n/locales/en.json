@@ -156,6 +156,7 @@
       },
       "setupCompleteTitle": "Setup complete",
       "setupCompleteBody": "You can close this tab anytime. Reopen the dashboard from your browser's extensions menu → SignalLens → Options (or Manage extension).",
+      "setupCompleteExpressBody": "{{preset}} is active. Noise filtering starts on your next browse — open Preferences anytime to adjust interests, sites, or style.",
       "quickLinksHeading": "Configure",
       "quickLinksEssentialHeading": "Fine-tune (optional)",
       "quickLinksEssentialHint": "Most people stay on the wizard defaults. Open these only if you want to adjust sensitivity, keywords, or whitelisted work sites.",
@@ -233,7 +234,8 @@
       "sensitivityDescription": "Higher sensitivity flags more content. Lower sensitivity reduces false positives.",
       "detectorsHeading": "Active detectors",
       "detectorsDescription": "Detectors run on extracted text from the universal scanner. Manage more under Plugins.",
-      "editKeywordsLink": "Edit block keywords under Rules →",
+      "editKeywordsLink": "Edit keywords under Preferences →",
+      "editPreferencesLink": "Edit sensitivity and style under Preferences →",
       "heuristicDescription": "Keyword lists and patterns — works offline, no model download.",
       "localPackDescription": "Bundled ONNX model for semantic scoring. Requires local pack files.",
       "remoteApiHeading": "Remote API escalation (optional)",
@@ -369,6 +371,7 @@
       "blockGroup": "Block subjects",
       "allowGroup": "Always allow (override block)",
       "separateFromNoise": "Topic blocks show subject labels (e.g. World affairs), not engagement/noise chips.",
+      "expressSeedsHint": "Interest lists from your {{preset}} setup are saved below — enable Topic diet when you're ready (requires Topic classifier plugin).",
       "topics": {
         "world-affairs": "World affairs",
         "domestic-politics": "Domestic politics",
@@ -938,7 +941,9 @@
       "authenticityEnabled": "Enabled (search-only)",
       "authenticityDisabled": "Off",
       "whitelistCount": "{{count}} groups enabled",
-      "topicsCount": "{{count}} selected",
+      "reviewTopicSeeds": "Interest diet (saved)",
+      "topicSeedsSaved": "Block/allow lists saved — enable under Preferences → Interests when ready (full build)",
+      "expressTopicSeedsNote": "Interest subjects (e.g. less politics, more tech) are pre-configured but off until you enable Topic diet under Preferences → Interests and turn on the Topic classifier plugin.",
       "tipDashboardHandoff": "Finish to open your dashboard. You can close that tab anytime and reopen it from Extensions → SignalLens.",
       "tipBrowse": "Open a normal website (not chrome:// pages) with a feed or comments.",
       "tipReveal": "Click filtered content to reveal it — nothing stays hidden permanently.",
@@ -959,7 +964,7 @@
     "topics": {
       "heading": "What bothers you?",
       "description": "We'll use these topics as keyword signals in heuristic mode.",
-      "noiseVsTopicNote": "These presets filter tone and phrasing (noise). An optional topic diet for news subjects is available later under Rules — separate from this step.",
+      "noiseVsTopicNote": "These presets filter tone and phrasing (noise). An optional topic diet for news subjects is available later under Preferences → Interests — separate from this step.",
       "pickAtLeastOne": "Select at least one topic to continue."
     },
     "botherCategories": {
