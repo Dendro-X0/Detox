@@ -84,9 +84,24 @@
     "tabs": {
       "overview": "Übersicht",
       "filtering": "Filterung",
+      "preferences": "Präferenzen",
       "rules": "Regeln",
       "plugins": "Plugins",
       "privacy": "Datenschutz"
+    },
+    "preferences": {
+      "tabIntro": "Stimmen Sie ab, was Sie sehen — Interessen, Rausch-Phrasen, vertrauenswürdige Seiten und wie gefilterte Inhalte erscheinen.",
+      "sections": {
+        "style": "Stil & Empfindlichkeit",
+        "styleDescription": "Wie aggressiv Inhalte markiert werden und wie gefilterte Blöcke auf der Seite aussehen.",
+        "interests": "Interessen",
+        "interestsDescription": "Themenbasierte Filterung für Nachrichten und Feeds (Full Build, experimentell). Getrennt von Rausch-Voreinstellungen.",
+        "interestsCoreNote": "Themen-Diät erfordert den Full Build mit dem Topic-classifier-Plugin. Rausch-Voreinstellungen und Schlüsselwörter unten funktionieren in allen Builds.",
+        "noise": "Rausch",
+        "noiseDescription": "Phrasen-Voreinstellungen und eigene Schlüsselwörter für Promo, Köder und feindseligen Ton — keine Schlagzeilen-Themen.",
+        "sites": "Seiten",
+        "sitesDescription": "Filterung auf Arbeits-Tools, E-Mail und anderen vertrauenswürdigen Domains pausieren."
+      }
     },
     "language": {
       "heading": "Oberflächensprache",
@@ -126,7 +141,7 @@
         "appearance": "Erscheinungsbild",
         "detectors": "{{count}} Detektoren"
       },
-      "controlStripTopicNote": "Optionale Themen-Diät (Welt-/Nachrichtenthemen) unter Regeln → Themen-Diät und Plugins → Topic classifier — getrennt von der Rauschfilterung.",
+      "controlStripTopicNote": "Optionale Themen-Diät (Welt-/Nachrichtenthemen) unter Präferenzen → Interessen und Plugins → Topic classifier — getrennt von der Rauschfilterung.",
       "insightsHeading": "Filter-Feedback",
       "insightsEmpty": "Markieren Sie Blocks im Popup oder Dashboard als falsch oder gut, um Muster zu sehen.",
       "insightsDetectorRow": "{{wrong}} falsch · {{ok}} gut",
@@ -147,7 +162,8 @@
       "quickLinksAdvancedHeading": "Erweitert",
       "quickLinksAdvancedHint": "Plugins, Authentizitäts-Assistent, Export/Import und Entwicklerwerkzeuge.",
       "quickLinks": {
-        "filtering": "Empfindlichkeit, Filterstil und Inferenz",
+        "filtering": "Inferenz, Detektoren und Erscheinungsbild",
+        "preferences": "Interessen, Rausch, Seiten und Filterstil",
         "rules": "Schlüsselwörter, Allowlisten und Seiten-Schwellen",
         "plugins": "Detektoren, Seiten-Hinweise und Authentizität",
         "privacy": "Export, Import und Entwicklerwerkzeuge"
@@ -157,7 +173,7 @@
         "description": "SignalLens läuft auf jeder normalen Webseite. Besuchen Sie eine Seite mit Feeds oder Kommentaren, um die Filterung zu erleben.",
         "tipBrowse": "Öffnen Sie eine Seite mit Beiträgen oder Kommentaren — die Filterung startet automatisch, wenn der Fokusmodus an ist.",
         "tipReveal": "Gefilterte Blöcke zeigen ein kleines Badge und sind abgedunkelt oder verwischt — klicken Sie auf Badge oder Block zum Einblenden. Nichts bleibt dauerhaft verborgen.",
-        "tipRules": "Passen Sie Themen und Schlüsselwörter unter Regeln an oder wechseln Sie den Surfmodus oben.",
+        "tipRules": "Passen Sie Themen und Schlüsselwörter unter Präferenzen an oder wechseln Sie den Surfmodus oben.",
         "tipAuthenticity": "Optional: Authentizitäts-Assistent unter Plugins für beratende Quellenprüfungen (Seitenleiste)."
       }
     },

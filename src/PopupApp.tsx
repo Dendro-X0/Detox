@@ -385,7 +385,7 @@ function PopupApp() {
             <button
               type="button"
               className="sl-btn-text sl-popup-manage-whitelist"
-              onClick={() => { openDashboard({ tab: 'rules' }); }}
+              onClick={() => { openDashboard({ tab: 'preferences' }); }}
             >
               {t('popup.manageWhitelist')}
             </button>

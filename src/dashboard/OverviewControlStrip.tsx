@@ -54,11 +54,11 @@ export default function OverviewControlStrip({
         },
         {
             label: `${t('settings.overview.controlStrip.sensitivity')}: ${t(`wizard.sensitivityPresets.${sensitivity}.label`)}`,
-            tab: 'filtering',
+            tab: 'preferences',
         },
         {
             label: `${t('settings.overview.controlStrip.style')}: ${t(`wizard.filterStyles.${filterStyle}`)}`,
-            tab: 'filtering',
+            tab: 'preferences',
         },
         {
             label: `${t('settings.overview.controlStrip.appearance')}: ${t(`settings.filtering.appearancePresets.${appearancePreset}`)}`,

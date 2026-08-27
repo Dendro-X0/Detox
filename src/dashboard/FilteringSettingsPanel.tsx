@@ -12,10 +12,10 @@ import { getLocalizedModFields } from '../i18n/mod-catalog';
 import { useLocale } from '../i18n/LocaleContext';
 import { detectorLabel } from './runtime-labels';
 import FilterAppearancePanel from './FilterAppearancePanel';
-import FilterStylePreview from './FilterStylePreview';
 import FilterPreviewPanel from './FilterPreviewPanel';
+import FilterStyleSettingsCard from './FilterStyleSettingsCard';
+import SensitivitySettingsCard from './SensitivitySettingsCard';
 import type { FilterAppearanceSettings } from '../core/types/filter-appearance';
-import { getVisibleFilterStyles } from './filter-styles';
 import { SCOPE_FAQ_URL } from '../config/store-links';
 
 type PolicySettings = {
@@ -53,10 +53,10 @@ export type FilteringSettingsPanelProps = {
     readonly showPackSelector: boolean;
     readonly setShowPackSelector: (open: boolean) => void;
     readonly setPackState: Dispatch<SetStateAction<LanguagePackState>>;
-    readonly onNavigateRules?: () => void;
+    readonly onNavigatePreferences?: () => void;
+    /** When true, sensitivity and filter style live under Preferences tab. */
+    readonly hidePersonalizationControls?: boolean;
 };
-
-const SENSITIVITY_PRESETS: readonly PolicyPreset[] = ['conservative', 'balanced', 'strict'];
 
 export default function FilteringSettingsPanel({
     policy,
@@ -74,7 +74,8 @@ export default function FilteringSettingsPanel({
     showPackSelector,
     setShowPackSelector,
     setPackState,
-    onNavigateRules,
+    onNavigatePreferences,
+    hidePersonalizationControls = false,
 }: FilteringSettingsPanelProps) {
     const { t } = useLocale();
     const [enabledModIds, setEnabledModIds] = useState<readonly string[]>([]);
@@ -83,8 +84,6 @@ export default function FilteringSettingsPanel({
         void loadEnabledModIds().then(setEnabledModIds);
         subscribeToEnabledModChanges(setEnabledModIds);
     }, []);
-
-    const visibleStyles = useMemo(() => getVisibleFilterStyles(t), [t]);
 
     const enabledDetectors = useMemo(
         () =>
@@ -236,39 +235,13 @@ export default function FilteringSettingsPanel({
                 )}
             </div>
 
-            <div className="card policy-card">
-                <h3>{t('settings.filtering.sensitivityHeading')}</h3>
-                <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-                    {t('settings.filtering.sensitivityDescription')}
-                </p>
-                <div className="sl-choice-list">
-                    {SENSITIVITY_PRESETS.map((preset) => (
-                        <button
-                            key={preset}
-                            type="button"
-                            className={`sl-choice-item${policy.preset === preset ? ' is-active' : ''}`}
-                            onClick={() => setPreset(preset)}
-                        >
-                            <span className="sl-choice-item-body">
-                                <strong>
-                                    {t(`wizard.sensitivityPresets.${preset}.label`)}
-                                    {preset === 'balanced' ? (
-                                        <span className="sl-badge-recommended">
-                                            {t('wizard.mode.recommended')}
-                                        </span>
-                                    ) : null}
-                                </strong>
-                                <span className="muted sl-choice-item-hint">
-                                    {t(`wizard.sensitivityPresets.${preset}.hint`)}
-                                </span>
-                            </span>
-                        </button>
-                    ))}
-                </div>
-                <p className="sl-filtering-threshold">
-                    {t('settings.filtering.threshold', { percent: (policy.threshold * 100).toFixed(0) })}
-                </p>
-            </div>
+            {!hidePersonalizationControls ? (
+                <SensitivitySettingsCard
+                    preset={policy.preset}
+                    threshold={policy.threshold}
+                    onPresetChange={setPreset}
+                />
+            ) : null}
 
             <div className="card policy-card sl-span-full">
                 <h3>{t('settings.filtering.detectorsHeading')}</h3>
@@ -286,8 +259,8 @@ export default function FilteringSettingsPanel({
                         );
                     })}
                 </ul>
-                {onNavigateRules ? (
-                    <button type="button" className="sl-btn-text" onClick={onNavigateRules}>
+                {onNavigatePreferences ? (
+                    <button type="button" className="sl-btn-text" onClick={onNavigatePreferences}>
                         {t('settings.filtering.editKeywordsLink')}
                     </button>
                 ) : null}
@@ -300,35 +273,12 @@ export default function FilteringSettingsPanel({
                 <p className="muted sl-filtering-section-desc">{t('settings.filtering.presentDescription')}</p>
             </section>
 
-            <div className="card policy-card sl-span-full">
-                <h3>{t('settings.filtering.filterStyleHeading')}</h3>
-                <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-                    {t('settings.filtering.filterStyleDescription')}
-                </p>
-                {!isFullBuild() && visibleStyles.length === 1 ? (
-                    <p className="sl-wizard-callout">{t('wizard.style.coreBuildNote')}</p>
-                ) : null}
-                <div className="sl-choice-list">
-                    {visibleStyles.map((action) => (
-                        <button
-                            key={action.id}
-                            type="button"
-                            className={`sl-choice-item sl-choice-item--with-preview${
-                                enforcementAction.activeActionId === action.id ? ' is-active' : ''
-                            }`}
-                            onClick={() => setActionId(action.id)}
-                        >
-                            <span className="sl-choice-item-body">
-                                <strong>{action.label}</strong>
-                                <span className="muted sl-choice-item-hint">
-                                    {t('wizard.style.previewLabel')}
-                                </span>
-                            </span>
-                            <FilterStylePreview styleId={action.id} />
-                        </button>
-                    ))}
-                </div>
-            </div>
+            {!hidePersonalizationControls ? (
+                <FilterStyleSettingsCard
+                    enforcementAction={enforcementAction}
+                    onActionChange={setActionId}
+                />
+            ) : null}
 
             <FilterAppearancePanel
                 appearance={filterAppearance}

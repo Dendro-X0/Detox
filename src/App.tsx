@@ -42,6 +42,9 @@ import SetupCompleteBanner from './dashboard/SetupCompleteBanner';
 import ThemeToggle from './dashboard/ThemeToggle';
 import UserRulesPanel from './dashboard/UserRulesPanel';
 import SiteWhitelistPanel from './dashboard/SiteWhitelistPanel';
+import SensitivitySettingsCard from './dashboard/SensitivitySettingsCard';
+import FilterStyleSettingsCard from './dashboard/FilterStyleSettingsCard';
+import TopicDietPanel from './dashboard/TopicDietPanel';
 import type { AuthenticitySettings } from './mods/analyzers/authenticity/settings';
 import { loadInstalledMods, type InstalledModRecord } from './core/mods/installed-mod-store';
 import { loadEnabledModIds, saveEnabledModIds } from './core/mods/mod-enablement-store';
@@ -596,7 +599,8 @@ function App({ onRestartWizard }: AppProps) {
       showPackSelector={showPackSelector}
       setShowPackSelector={setShowPackSelector}
       setPackState={setPackState}
-      onNavigateRules={() => setSettingsTab('rules')}
+      onNavigatePreferences={() => setSettingsTab('preferences')}
+      hidePersonalizationControls
     />
   );
 
@@ -782,14 +786,48 @@ function App({ onRestartWizard }: AppProps) {
           </div>
         ) : null}
 
-        {settingsTab === 'rules' ? (
-          <div className="sl-dashboard-grid">
+        {settingsTab === 'preferences' ? (
+          <div className="sl-dashboard-grid sl-preferences-panel">
             <DashboardTabIntro
-              title={t('settings.tabs.rules')}
-              description={t('rules.tabIntro')}
+              title={t('settings.tabs.preferences')}
+              description={t('settings.preferences.tabIntro')}
             />
-            <div className="sl-span-full"><SiteWhitelistPanel /></div>
-            <div className="sl-span-full"><UserRulesPanel /></div>
+            <section className="sl-preferences-section sl-span-full">
+              <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.style')}</h3>
+              <p className="muted sl-preferences-section-desc">{t('settings.preferences.sections.styleDescription')}</p>
+              <div className="sl-preferences-section-grid">
+                <SensitivitySettingsCard
+                  preset={policy.preset}
+                  threshold={policy.threshold}
+                  onPresetChange={setPreset}
+                />
+                <FilterStyleSettingsCard
+                  enforcementAction={enforcementAction}
+                  onActionChange={setActionId}
+                />
+              </div>
+            </section>
+            <section className="sl-preferences-section sl-span-full">
+              <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.interests')}</h3>
+              <p className="muted sl-preferences-section-desc">{t('settings.preferences.sections.interestsDescription')}</p>
+              {isFullBuild() ? (
+                <div className="card policy-card sl-span-full sl-preferences-interests-card">
+                  <TopicDietPanel />
+                </div>
+              ) : (
+                <p className="muted sl-preferences-section-footnote">{t('settings.preferences.sections.interestsCoreNote')}</p>
+              )}
+            </section>
+            <section className="sl-preferences-section sl-span-full">
+              <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.noise')}</h3>
+              <p className="muted sl-preferences-section-desc">{t('settings.preferences.sections.noiseDescription')}</p>
+              <UserRulesPanel embedded hideTopicDiet />
+            </section>
+            <section className="sl-preferences-section sl-span-full">
+              <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.sites')}</h3>
+              <p className="muted sl-preferences-section-desc">{t('settings.preferences.sections.sitesDescription')}</p>
+              <SiteWhitelistPanel embedded />
+            </section>
             <details className="sl-install-details sl-span-full">
               <summary>{t('rules.advanced.perSiteSummary')}</summary>
               {perSiteRulesCard}

@@ -902,6 +902,57 @@ html.sl-app .loading-container {
   margin-top: 0.25rem;
 }
 
+.sl-rules-section--first {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.sl-preferences-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sl-preferences-section-heading {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--sl-text-primary);
+}
+
+.sl-preferences-section-desc {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.sl-preferences-section-footnote {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.sl-preferences-section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: 0.85rem;
+}
+
+.sl-preferences-card-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: var(--sl-text-primary);
+}
+
+.sl-preferences-card-desc {
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+}
+
+.sl-preferences-interests-card .sl-topic-diet {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 .sl-rules-summary {
   margin: 0 0 1rem;
   font-size: 0.85rem;

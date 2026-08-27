@@ -19,7 +19,11 @@ function customWhitelistDomains(allowDomains: readonly string[]): readonly strin
     return allowDomains.filter((domain) => !presetDomains.has(domain.toLowerCase()));
 }
 
-export default function SiteWhitelistPanel() {
+export type SiteWhitelistPanelProps = {
+    readonly embedded?: boolean;
+};
+
+export default function SiteWhitelistPanel({ embedded = false }: SiteWhitelistPanelProps) {
     const { t } = useLocale();
     const [rules, setRules] = useState<UserRulesSettings>(DEFAULT_USER_RULES);
     const [status, setStatus] = useState<string | null>(null);
@@ -45,12 +49,16 @@ export default function SiteWhitelistPanel() {
         void persist({ ...rules, allowDomains });
     };
 
-    return (
-        <div className="card policy-card sl-whitelist-panel">
-            <h3>{t('whitelist.heading')}</h3>
-            <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
-                {t('whitelist.description')}
-            </p>
+    const body = (
+        <>
+            {!embedded ? (
+                <>
+                    <h3>{t('whitelist.heading')}</h3>
+                    <p className="muted" style={{ marginTop: 0, fontSize: '0.85rem' }}>
+                        {t('whitelist.description')}
+                    </p>
+                </>
+            ) : null}
             <p className="sl-rules-summary">
                 {t('whitelist.count', { count: rules.allowDomains.length })}
             </p>
@@ -101,6 +109,12 @@ export default function SiteWhitelistPanel() {
             />
 
             {status ? <p className="muted" style={{ marginBottom: 0 }}>{status}</p> : null}
-        </div>
+        </>
     );
+
+    if (embedded) {
+        return <div className="card policy-card sl-whitelist-panel">{body}</div>;
+    }
+
+    return <div className="card policy-card sl-whitelist-panel">{body}</div>;
 }

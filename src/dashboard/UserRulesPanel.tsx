@@ -8,7 +8,14 @@ import RuleListEditor from './RuleListEditor';
 import TopicPresetsPanel from './TopicPresetsPanel';
 import TopicDietPanel from './TopicDietPanel';
 
-export default function UserRulesPanel() {
+export type UserRulesPanelProps = {
+    /** Omit outer card chrome when nested under Preferences sections. */
+    readonly embedded?: boolean;
+    /** Topic diet lives under Interests in Preferences. */
+    readonly hideTopicDiet?: boolean;
+};
+
+export default function UserRulesPanel({ embedded = false, hideTopicDiet = false }: UserRulesPanelProps) {
     const { t } = useLocale();
     const [rules, setRules] = useState<UserRulesSettings>(DEFAULT_USER_RULES);
     const [status, setStatus] = useState<string | null>(null);
@@ -30,10 +37,14 @@ export default function UserRulesPanel() {
         t('rules.summary.allow', { count: rules.allowKeywords.length }),
     ];
 
-    return (
-        <div className="card policy-card sl-user-rules-panel">
-            <h3>{t('rules.heading')}</h3>
-            <p className="muted sl-rules-intro">{t('rules.description')}</p>
+    const body = (
+        <>
+            {!embedded ? (
+                <>
+                    <h3>{t('rules.heading')}</h3>
+                    <p className="muted sl-rules-intro">{t('rules.description')}</p>
+                </>
+            ) : null}
             <p className="sl-rules-summary">{summaryParts.join(' · ')}</p>
 
             <TopicPresetsPanel
@@ -43,9 +54,9 @@ export default function UserRulesPanel() {
                 }}
             />
 
-            <TopicDietPanel />
+            {!hideTopicDiet ? <TopicDietPanel /> : null}
 
-            <section className="sl-rules-section">
+            <section className={`sl-rules-section${embedded ? ' sl-rules-section--first' : ''}`}>
                 <RuleListEditor
                     title={t('rules.blockKeywords.title')}
                     description={t('rules.blockKeywords.description')}
@@ -74,6 +85,12 @@ export default function UserRulesPanel() {
             </section>
 
             {status ? <p className="sl-rules-status muted">{status}</p> : null}
-        </div>
+        </>
     );
+
+    if (embedded) {
+        return <div className="card policy-card sl-user-rules-panel sl-user-rules-panel--embedded">{body}</div>;
+    }
+
+    return <div className="card policy-card sl-user-rules-panel">{body}</div>;
 }

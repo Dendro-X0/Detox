@@ -72,7 +72,7 @@
       "scanning": "Scanning this page…",
       "filtered": "{{count}} items filtered — click any match to reveal.",
       "noMatches": "Scanned — nothing matched your rules yet.",
-      "newsNoMatchesHint": "News sites often use factual headlines without promo or bait phrasing — noise rules may not match. For subject-based news filtering, enable Topic diet under Rules (full build, experimental).",
+      "newsNoMatchesHint": "News sites often use factual headlines without promo or bait phrasing — noise rules may not match. For subject-based news filtering, enable Topic diet under Preferences (full build, experimental).",
       "idle": "Ready to scan this page."
     },
     "pauseThisSite": "Pause filtering on this site",
@@ -84,9 +84,24 @@
     "tabs": {
       "overview": "Overview",
       "filtering": "Filtering",
+      "preferences": "Preferences",
       "rules": "Rules",
       "plugins": "Plugins",
       "privacy": "Privacy"
+    },
+    "preferences": {
+      "tabIntro": "Tune what you see — interests, noise phrases, trusted sites, and how filtered content appears.",
+      "sections": {
+        "style": "Style & sensitivity",
+        "styleDescription": "How aggressively content is flagged and how filtered blocks look on the page.",
+        "interests": "Interests",
+        "interestsDescription": "Subject-based filtering for news and feeds (full build, experimental). Separate from noise presets.",
+        "interestsCoreNote": "Subject-based topic diet requires the full build with the Topic classifier plugin. Noise presets and keywords below work on all builds.",
+        "noise": "Noise",
+        "noiseDescription": "Phrase presets and custom keywords for promo, bait, and hostile tone — not headline subjects.",
+        "sites": "Sites",
+        "sitesDescription": "Pause filtering on work tools, email, and other trusted domains."
+      }
     },
     "language": {
       "heading": "Interface language",
@@ -126,7 +141,7 @@
         "appearance": "Appearance",
         "detectors": "{{count}} detectors"
       },
-      "controlStripTopicNote": "Optional topic diet (world/news subjects) lives under Rules → Topic diet and Plugins → Topic classifier — separate from noise filtering.",
+      "controlStripTopicNote": "Optional topic diet (world/news subjects) lives under Preferences → Interests and Plugins → Topic classifier — separate from noise filtering.",
       "insightsHeading": "Filter feedback",
       "insightsEmpty": "Mark blocks as wrong or good from the popup or dashboard to see patterns here.",
       "insightsDetectorRow": "{{wrong}} wrong · {{ok}} good",
@@ -147,7 +162,8 @@
       "quickLinksAdvancedHeading": "Advanced",
       "quickLinksAdvancedHint": "Plugins, authenticity assist, export/import, and developer tools.",
       "quickLinks": {
-        "filtering": "Sensitivity, filter style, and inference",
+        "filtering": "Inference, detectors, and appearance",
+        "preferences": "Interests, noise, sites, and filter style",
         "rules": "Keywords, allowlists, and per-site thresholds",
         "plugins": "Detectors, site hints, and authenticity assist",
         "privacy": "Export, import, and developer tools"
@@ -157,7 +173,7 @@
         "description": "SignalLens runs on every normal web page. Visit a site with feeds or comments to see filtering in action.",
         "tipBrowse": "Open a page with posts or comments — filtering starts automatically when focus mode is on.",
         "tipReveal": "Filtered blocks show a small badge and are dimmed or blurred — click either to reveal. Nothing is permanently hidden.",
-        "tipRules": "Adjust topics and keywords under Rules, or switch browsing mode above.",
+        "tipRules": "Adjust topics and keywords under Preferences, or switch browsing mode above.",
         "tipAuthenticity": "Optional: enable authenticity assist under Plugins for advisory source checks (side panel)."
       }
     },

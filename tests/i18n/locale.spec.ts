@@ -34,6 +34,7 @@ const REQUIRED_UI_KEYS = [
     'options.subtitle',
     'popup.openDashboard',
     'settings.tabs.overview',
+    'settings.tabs.preferences',
     'settings.language.heading',
     'browsingModes.heading',
     'settings.filtering.inferenceHeading',

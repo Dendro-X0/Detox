@@ -66,7 +66,7 @@ export default function OverviewStatusStrip({
             <button
                 type="button"
                 className="sl-status-chip sl-status-chip--link"
-                onClick={() => onNavigate?.('rules')}
+                onClick={() => onNavigate?.('preferences')}
             >
                 {t('settings.overview.statusStrip.whitelist', { count: whitelistCount })}
             </button>
