@@ -182,7 +182,8 @@ Notes: first model fetch uses `hf-mirror.com` when Hugging Face is unreachable. 
 - [x] Topic diet panel in Rules + separate badge labels (`World affairs · 42%`)
 - [x] Merge prefers topic label over noise when both match
 - [x] `pnpm test:topic-classifier` — policy unit tests + latency/FP gate on corpus
-- [ ] **Exit:** Dogfood on BBC + Reddit with mod enabled (manual)
+- [x] **Exit (automated):** BBC seed corpus 100% political recall — `pnpm spike3:bbc` ([`spike3-bbc-results.md`](../qa/spike3-bbc-results.md))
+- [ ] **Exit (manual):** Dogfood on BBC + Reddit with mod enabled in full build
 
 ### Spike 4 — UX + positioning
 
