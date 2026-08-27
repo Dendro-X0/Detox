@@ -6,12 +6,14 @@ import { localeIdFromBrowserLanguage, resolveLocaleId } from '../i18n/registry';
 import { LOCALE_STORAGE_KEY, type LocaleId } from '../i18n/types';
 import { inferBotherCategoriesFromKeywords } from './infer-bother-categories';
 import { enabledPresetIdsFromDomains, type SiteWhitelistPresetId } from '../core/rules/site-whitelist-presets';
+import { isExpressPresetId, type ExpressPresetId } from './express-presets';
 import type { PreferredSite } from './types';
 
 export type OnboardingPrefill = {
     readonly isSetupAgain: boolean;
     readonly localeId: LocaleId;
-    readonly setupPath: 'preset-mode' | 'custom' | null;
+    readonly setupPath: 'express' | 'preset-mode' | 'custom' | null;
+    readonly expressPresetId: ExpressPresetId | null;
     readonly browsingModeId: BrowsingModeId | null;
     readonly bothers: readonly BotherCategory[];
     readonly actionId: EnforcementActionId;
@@ -34,6 +36,7 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
         'userRules',
         'preferredSites',
         'authenticitySettings',
+        'expressPresetId',
     ]);
 
     const record = result as {
@@ -48,6 +51,7 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
         };
         readonly preferredSites?: readonly PreferredSite[];
         readonly authenticitySettings?: { readonly enabled?: boolean; readonly llmApiKey?: string };
+        readonly expressPresetId?: string;
     };
 
     const isSetupAgain = record.onboardingComplete === true;
@@ -56,8 +60,14 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
         ? resolveLocaleId(storedLocale)
         : localeIdFromBrowserLanguage(browserLanguage);
 
+    const expressPresetId =
+        isSetupAgain && record.expressPresetId && isExpressPresetId(record.expressPresetId)
+            ? record.expressPresetId
+            : null;
+
     const modeId =
         isSetupAgain &&
+        !expressPresetId &&
         record.activeBrowsingModeId &&
         isBrowsingModeId(record.activeBrowsingModeId)
             ? record.activeBrowsingModeId
@@ -76,10 +86,19 @@ export async function loadOnboardingPrefill(browserLanguage: string): Promise<On
     const authenticityLlmApiKey =
         isSetupAgain && authSettings?.llmApiKey ? authSettings.llmApiKey : '';
 
+    const setupPath = expressPresetId
+        ? 'express'
+        : modeId
+          ? 'preset-mode'
+          : isSetupAgain && blockKeywords.length > 0
+            ? 'custom'
+            : null;
+
     return {
         isSetupAgain,
         localeId,
-        setupPath: modeId ? 'preset-mode' : isSetupAgain && blockKeywords.length > 0 ? 'custom' : null,
+        setupPath,
+        expressPresetId,
         browsingModeId: modeId,
         bothers,
         actionId: record.enforcementAction?.activeActionId ?? 'dim',

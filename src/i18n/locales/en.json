@@ -890,6 +890,10 @@
       "body2": "Default mode is local and offline-friendly. No account required.",
       "quickStart": "Quick start (Focus)",
       "quickStartHint": "Quick start applies the Focus browsing mode. You can change mode or rules anytime in the dashboard.",
+      "expressHeading": "What do you want from browsing?",
+      "expressDescription": "Pick a starting point — you can change interests and rules anytime in Preferences.",
+      "expressHint": "Choose a preset below, then Continue. Two steps to start filtering.",
+      "customizeSetup": "Customize setup instead",
       "textOnlyLimitation": "SignalLens reads page text, not pictures or video. Image-only posts are not filtered.",
       "setupAgainNote": "Your previous choices are pre-selected. Adjust anything, then finish to apply."
     },
@@ -904,8 +908,10 @@
     "done": {
       "heading": "You're ready to browse",
       "summaryPreset": "{{mode}} mode is active. Visit any page with posts or comments to see filtering.",
+      "summaryExpress": "{{preset}} is active. Visit any page with posts or comments to see filtering.",
       "summaryCustom": "Your custom rules are active. Visit any page with posts or comments to see filtering.",
       "reviewHeading": "Your setup",
+      "reviewPreset": "Starting preset",
       "reviewMode": "Browsing mode",
       "reviewTopics": "Topics",
       "reviewStyle": "Filter style",
@@ -1000,6 +1006,28 @@
       "strict": {
         "label": "Strict",
         "hint": "More matches"
+      }
+    },
+    "expressPresets": {
+      "focus-calm": {
+        "label": "Calm focus",
+        "hint": "Less bait, outrage, and promo while you browse"
+      },
+      "less-politics": {
+        "label": "Less politics",
+        "hint": "Reduce news and geopolitics in your feed"
+      },
+      "tech-music": {
+        "label": "Tech & music",
+        "hint": "Keep tech and music; quiet political headlines"
+      },
+      "comment-shield": {
+        "label": "Comment shield",
+        "hint": "Strict filtering for toxic comment threads"
+      },
+      "deep-read": {
+        "label": "Deep reading",
+        "hint": "Conservative filtering for papers and long articles"
       }
     }
   }

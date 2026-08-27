@@ -249,9 +249,9 @@ Improvements that support every phase; prioritize by launch risk.
 
 ## Immediate next steps (recommended order)
 
-1. ~~**Finish P0 / Track C automated gates**~~ — `pnpm release:preflight` green (C-R3). Remaining: package zips (C-R1), Firefox manual QA (C-R2), screenshots, dogfood.
+1. ~~**Finish P0 / Track C automated gates**~~ — `pnpm release:preflight` green (C-R3). Remaining: store upload (C-R1), Firefox manual QA (C-R2), screenshots, dogfood.
 2. ~~**Define Express presets**~~ — `src/onboarding/express-presets.ts` + `setupPath: 'express'` apply path (keyword + topic seeds).
-3. **Wire Express path in wizard UI** — one-tap preset gallery (still UX; seeds are ready).
+3. ~~**Wire Express path in wizard UI**~~ — welcome preset gallery → done in 2 steps; guided customize unchanged.
 4. **Preferences IA sketch** against current `OptionsApp` tabs.
 5. **Gate semantic topic diet** — Spike 3 manual BBC/Reddit dogfood; then enable Layer 2 from Express seeds.
 6. **Only then** promote Assist convenience (P2) in store secondary copy.

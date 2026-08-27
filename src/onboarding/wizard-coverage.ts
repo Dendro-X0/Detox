@@ -22,6 +22,18 @@ export const WIZARD_PRESET_MODE_STORAGE_KEYS = [
     'enabledModIds',
 ] as const;
 
+/** Additional keys written by express lifestyle preset path. */
+export const WIZARD_EXPRESS_STORAGE_KEYS = [
+    'activeBrowsingModeId',
+    'policy',
+    'userRules',
+    'userKeywords',
+    'enforcementAction',
+    'enabledModIds',
+    'topicPolicy',
+    'expressPresetId',
+] as const;
+
 /** Additional keys written by custom wizard path. */
 export const WIZARD_CUSTOM_STORAGE_KEYS = [
     'activeBrowsingModeId',
@@ -53,7 +65,10 @@ export type DashboardAdvancedSurface = (typeof DASHBOARD_ADVANCED_SURFACES)[numb
 
 /** Wizard steps → primary storage effect (documentation + QA). */
 export const WIZARD_STEP_COVERAGE = {
-    welcome: { storageKeys: [] as const, notes: 'Quick start skips to preset Focus apply.' },
+    welcome: {
+        storageKeys: [] as const,
+        notes: 'Express preset selection or quick start; customize opens guided path.',
+    },
     language: { storageKeys: ['preferredLocale'] as const, notes: 'UI locale only.' },
     mode: {
         storageKeys: ['activeBrowsingModeId', 'policy', 'userRules', 'userKeywords', 'enforcementAction', 'enabledModIds'] as const,

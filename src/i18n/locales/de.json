@@ -890,6 +890,10 @@
       "body2": "Standardmodus ist lokal und offline-freundlich. Kein Konto erforderlich.",
       "quickStart": "Schnellstart (Fokus)",
       "quickStartHint": "Schnellstart aktiviert den Fokus-Surfmodus. Modus und Regeln können Sie jederzeit im Dashboard ändern.",
+      "expressHeading": "Was möchten Sie beim Surfen?",
+      "expressDescription": "Wählen Sie einen Startpunkt — Interessen und Regeln können Sie jederzeit unter Einstellungen ändern.",
+      "expressHint": "Preset wählen, dann Weiter — zwei Schritte bis zur Filterung.",
+      "customizeSetup": "Stattdessen anpassen",
       "textOnlyLimitation": "SignalLens liest Seitentext, keine Bilder oder Videos. Beiträge nur mit Bildern werden nicht gefiltert.",
       "setupAgainNote": "Ihre bisherigen Auswahlen sind vorausgewählt. Passen Sie an und schließen Sie ab, um zu übernehmen."
     },
@@ -904,8 +908,10 @@
     "done": {
       "heading": "Bereit zum Surfen",
       "summaryPreset": "{{mode}}-Modus ist aktiv. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren, um die Filterung zu sehen.",
+      "summaryExpress": "{{preset}} ist aktiv. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren, um die Filterung zu sehen.",
       "summaryCustom": "Ihre eigenen Regeln sind aktiv. Besuchen Sie eine Seite mit Beiträgen oder Kommentaren, um die Filterung zu sehen.",
       "reviewHeading": "Ihre Einrichtung",
+      "reviewPreset": "Start-Preset",
       "reviewMode": "Surfmodus",
       "reviewTopics": "Themen",
       "reviewStyle": "Filterstil",
@@ -1000,6 +1006,28 @@
       "strict": {
         "label": "Streng",
         "hint": "Mehr Treffer"
+      }
+    },
+    "expressPresets": {
+      "focus-calm": {
+        "label": "Ruhiger Fokus",
+        "hint": "Weniger Köder, Empörung und Werbung beim Surfen"
+      },
+      "less-politics": {
+        "label": "Weniger Politik",
+        "hint": "Weniger Nachrichten und Geopolitik im Feed"
+      },
+      "tech-music": {
+        "label": "Tech & Musik",
+        "hint": "Tech und Musik behalten; politische Schlagzeilen reduzieren"
+      },
+      "comment-shield": {
+        "label": "Kommentar-Schutz",
+        "hint": "Strikte Filterung für toxische Kommentarthreads"
+      },
+      "deep-read": {
+        "label": "Tiefes Lesen",
+        "hint": "Konservative Filterung für Papers und lange Artikel"
       }
     }
   }

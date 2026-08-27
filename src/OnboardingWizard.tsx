@@ -12,6 +12,10 @@ import {
 } from './core/modes/browsing-modes';
 import { useLocale } from './i18n/LocaleContext';
 import { applyOnboardingDraft } from './onboarding/apply-onboarding';
+import {
+    listExpressPresets,
+    type ExpressPresetId,
+} from './onboarding/express-presets';
 import { loadOnboardingPrefill } from './onboarding/load-onboarding-prefill';
 import { openWizardSamplePage } from './onboarding/sample-page';
 import type { BotherCategory, OnboardingDraft } from './onboarding/types';
@@ -23,7 +27,7 @@ import {
 
 type WizardStep = 'welcome' | 'language' | 'mode' | 'topics' | 'style' | 'sensitivity' | 'whitelist' | 'authenticity' | 'done';
 
-type SetupPath = 'preset-mode' | 'custom';
+type SetupPath = 'express' | 'preset-mode' | 'custom';
 
 export type WizardCompleteOptions = {
     readonly openSample?: boolean;
@@ -54,13 +58,18 @@ const SENSITIVITY_IDS: readonly PolicyPreset[] = ['conservative', 'balanced', 's
 
 const CUSTOM_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'topics', 'style', 'sensitivity', 'whitelist', 'authenticity', 'done'];
 const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whitelist', 'authenticity', 'done'];
+const EXPRESS_STEPS: readonly WizardStep[] = ['welcome', 'done'];
 
 const RECOMMENDED_MODE_ID: BrowsingModeId = 'focus';
+const RECOMMENDED_EXPRESS_PRESET_ID: ExpressPresetId = 'tech-music';
 
 function stepLabelsForPath(
     setupPath: SetupPath | null,
     t: (key: string) => string
 ): readonly string[] {
+    if (setupPath === 'express') {
+        return [t('wizard.stepLabels.welcome'), t('wizard.stepLabels.done')];
+    }
     const keys =
         setupPath === 'custom'
             ? [
@@ -89,6 +98,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const { localeId, availableLocales, browserSuggestedLocaleId, setLocaleId, t } = useLocale();
     const [step, setStep] = useState<WizardStep>('welcome');
     const [setupPath, setSetupPath] = useState<SetupPath | null>(null);
+    const [expressPresetId, setExpressPresetId] = useState<ExpressPresetId | null>(null);
     const [browsingModeId, setBrowsingModeId] = useState<BrowsingModeId | null>(null);
     const [bothers, setBothers] = useState<readonly BotherCategory[]>(['outrage', 'spam']);
     const [actionId, setActionId] = useState<EnforcementActionId>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId);
@@ -107,7 +117,10 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             setWhitelistPresetIds(prefill.whitelistPresetIds);
             setAuthenticityEnabled(prefill.authenticityEnabled);
             setAuthenticityLlmApiKey(prefill.authenticityLlmApiKey);
-            if (prefill.setupPath === 'preset-mode' && prefill.browsingModeId) {
+            if (prefill.setupPath === 'express' && prefill.expressPresetId) {
+                setSetupPath('express');
+                setExpressPresetId(prefill.expressPresetId);
+            } else if (prefill.setupPath === 'preset-mode' && prefill.browsingModeId) {
                 setSetupPath('preset-mode');
                 setBrowsingModeId(prefill.browsingModeId);
             } else if (prefill.setupPath === 'custom') {
@@ -117,7 +130,8 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 setBothers(prefill.bothers);
             } else if (!prefill.isSetupAgain) {
                 setBrowsingModeId(RECOMMENDED_MODE_ID);
-                setSetupPath('preset-mode');
+                setExpressPresetId(RECOMMENDED_EXPRESS_PRESET_ID);
+                setSetupPath('express');
             }
             setPrefillReady(true);
         });
@@ -138,7 +152,12 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         return match?.nativeName ?? browserSuggestedLocaleId.toUpperCase();
     }, [availableLocales, browserSuggestedLocaleId]);
 
-    const activeSteps = setupPath === 'custom' ? CUSTOM_STEPS : PRESET_STEPS;
+    const activeSteps =
+        setupPath === 'express'
+            ? EXPRESS_STEPS
+            : setupPath === 'custom'
+              ? CUSTOM_STEPS
+              : PRESET_STEPS;
 
     const progressMeta = useMemo(() => {
         const index = activeSteps.indexOf(step);
@@ -154,14 +173,31 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         setBothers((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
     };
 
+    const selectExpressPreset = (presetId: ExpressPresetId): void => {
+        setSetupPath('express');
+        setExpressPresetId(presetId);
+        setBrowsingModeId(null);
+    };
+
     const selectPresetMode = (modeId: BrowsingModeId): void => {
         setSetupPath('preset-mode');
+        setExpressPresetId(null);
         setBrowsingModeId(modeId);
     };
 
     const selectCustomPath = (): void => {
         setSetupPath('custom');
+        setExpressPresetId(null);
         setBrowsingModeId(null);
+    };
+
+    const startGuidedSetup = (): void => {
+        setSetupPath('preset-mode');
+        setExpressPresetId(null);
+        if (browsingModeId === null) {
+            setBrowsingModeId(RECOMMENDED_MODE_ID);
+        }
+        setStep('language');
     };
 
     const toggleWhitelistPreset = (presetId: SiteWhitelistPresetId): void => {
@@ -187,6 +223,15 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 bothers,
                 actionId,
                 preset,
+                whitelistPresetIds: whitelist,
+                authenticityAssist,
+            };
+        }
+        if (setupPath === 'express' && expressPresetId) {
+            return {
+                setupPath: 'express',
+                expressPresetId,
+                localeId,
                 whitelistPresetIds: whitelist,
                 authenticityAssist,
             };
@@ -223,6 +268,16 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
 
     const next = (): void => {
         if (step === 'welcome') {
+            if (setupPath === 'express' && expressPresetId) {
+                setStep('done');
+                return;
+            }
+            if (setupPath === null) {
+                setSetupPath('preset-mode');
+            }
+            if (browsingModeId === null && setupPath !== 'custom') {
+                setBrowsingModeId(RECOMMENDED_MODE_ID);
+            }
             setStep('language');
             return;
         }
@@ -305,10 +360,15 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const localeLabel =
         availableLocales.find((entry) => entry.id === localeId)?.nativeName ?? localeId.toUpperCase();
 
+    const expressPresetLabel =
+        expressPresetId !== null ? t(`wizard.expressPresets.${expressPresetId}.label`) : null;
+
     const topicsSummary =
         setupPath === 'custom'
             ? t('wizard.done.topicsCount', { count: bothers.length })
-            : activeModeLabel;
+            : setupPath === 'express' && expressPresetLabel
+              ? expressPresetLabel
+              : activeModeLabel;
 
     const whitelistSummary =
         whitelistPresetIds.length > 0
@@ -323,6 +383,14 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 ? t('wizard.done.authenticityEnabled')
                 : t('wizard.done.authenticityDisabled'),
         };
+        if (setupPath === 'express' && expressPresetLabel) {
+            return [
+                { label: t('wizard.done.reviewPreset'), value: expressPresetLabel },
+                { label: t('wizard.done.reviewLanguage'), value: localeLabel },
+                whitelistRow,
+                authenticityRow,
+            ];
+        }
         if (setupPath === 'preset-mode') {
             return [
                 { label: t('wizard.done.reviewMode'), value: activeModeLabel ?? '—' },
@@ -345,6 +413,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         authenticityEnabled,
         localeLabel,
         preset,
+        expressPresetLabel,
         setupPath,
         t,
         topicsSummary,
@@ -432,9 +501,48 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                             <p className="sl-wizard-callout">{t('wizard.welcome.setupAgainNote')}</p>
                         ) : (
                             <p className="muted" style={{ fontSize: '0.85rem', marginTop: '1rem' }}>
-                                {t('wizard.welcome.quickStartHint')}
+                                {t('wizard.welcome.expressHint')}
                             </p>
                         )}
+                        <h4 className="sl-wizard-section-title">{t('wizard.welcome.expressHeading')}</h4>
+                        <p className="muted" style={{ marginTop: 0 }}>
+                            {t('wizard.welcome.expressDescription')}
+                        </p>
+                        <div className="sl-choice-list">
+                            {listExpressPresets().map((preset) => (
+                                <button
+                                    key={preset.id}
+                                    type="button"
+                                    className={`sl-choice-item${
+                                        setupPath === 'express' && expressPresetId === preset.id
+                                            ? ' is-active'
+                                            : ''
+                                    }`}
+                                    onClick={() => selectExpressPreset(preset.id)}
+                                >
+                                    <span className="sl-choice-item-body">
+                                        <strong>
+                                            {t(`wizard.expressPresets.${preset.id}.label`)}
+                                            {preset.id === RECOMMENDED_EXPRESS_PRESET_ID ? (
+                                                <span className="sl-badge-recommended">
+                                                    {t('wizard.mode.recommended')}
+                                                </span>
+                                            ) : null}
+                                        </strong>
+                                        <span className="muted sl-choice-item-hint">
+                                            {t(`wizard.expressPresets.${preset.id}.hint`)}
+                                        </span>
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                        <button
+                            type="button"
+                            className="sl-btn sl-btn-ghost sl-wizard-inline-action"
+                            onClick={startGuidedSetup}
+                        >
+                            {t('wizard.welcome.customizeSetup')}
+                        </button>
                     </div>
                 ) : null}
 
@@ -705,9 +813,11 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                     <div className="sl-panel">
                         <h3>{t('wizard.done.heading')}</h3>
                         <p className="muted" style={{ marginTop: 0 }}>
-                            {setupPath === 'preset-mode' && activeModeLabel
-                                ? t('wizard.done.summaryPreset', { mode: activeModeLabel })
-                                : t('wizard.done.summaryCustom')}
+                            {setupPath === 'express' && expressPresetLabel
+                                ? t('wizard.done.summaryExpress', { preset: expressPresetLabel })
+                                : setupPath === 'preset-mode' && activeModeLabel
+                                  ? t('wizard.done.summaryPreset', { mode: activeModeLabel })
+                                  : t('wizard.done.summaryCustom')}
                         </p>
                         <div className="sl-wizard-review">
                             <h4 className="sl-wizard-review-title">{t('wizard.done.reviewHeading')}</h4>
