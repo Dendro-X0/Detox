@@ -62,7 +62,7 @@ flowchart LR
 
 | # | Deliverable | Artifact | Status |
 |---|-------------|----------|--------|
-| C-R1 | Commit + tag **`v2.3.0`** unlisted (Chrome + Firefox) | Release zips + tag on `0cedcd6` | ✅ tag/zips · ☐ upload |
+| C-R1 | Commit + tag **`v2.3.0`** unlisted (Chrome + Firefox) | Release zips + tag on `bd29a15` | ✅ tag/zips · ☐ upload |
 | C-R2 | Firefox manual QA rows 1–8, 14 | [`firefox-qa.md`](../guides/firefox-qa.md) | ☐ manual |
 | C-R3 | §G engineering gates green on release branch | `pnpm release:preflight` + CI | ✅ automated |
 | C-R4 | Store assets refreshed for **text-filter** positioning (no authenticity hero) | [`store/SCREENSHOTS.md`](../../store/SCREENSHOTS.md) | ☐ capture |
