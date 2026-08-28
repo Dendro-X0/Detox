@@ -61,6 +61,7 @@ pnpm spike3              # both
 - [ ] Reddit tech: zero topic false-blocks on allow-list (manual live)
 - [ ] Reddit news: world-affairs blocks when enabled (manual live)
 - [ ] Badges distinguish topic vs noise when both layers match
+- [x] Badges distinguish topic vs noise when both layers match (P1-L2: topic primary + noise secondary chip / “also …”)
 - [ ] User can enable/disable without breaking noise-only browsing
 - [ ] Documented in scope FAQ + wizard copy (noise ≠ topic)
 

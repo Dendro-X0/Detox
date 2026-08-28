@@ -641,6 +641,7 @@
   },
   "filterReasons": {
     "revealed": "Revealed",
+    "withAlso": "{{primary}} · also {{also}}",
     "labels": {
       "noise": "Noise",
       "promo": "Promo",

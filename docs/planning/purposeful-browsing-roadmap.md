@@ -156,7 +156,7 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 | # | Deliverable | Notes |
 |---|-------------|-------|
 | P1-L1 | **Semantic topic diet exit criteria** | Per [`research-semantic-topics.md`](./research-semantic-topics.md); BBC/Reddit dogfood |
-| P1-L2 | **Separate reason chips** | Noise vs topic never merged |
+| P1-L2 | **Separate reason chips** | Noise vs topic never merged — topic primary badge keeps noise in `secondaryReasons` |
 | P1-L3 | **Policy coherence** | Mode + packs + topic policy don’t fight; Research stays conservative |
 | P1-L4 | **Core vs full honesty** | If L2 needs full build, Express path either bundles minimal centroids or offers clear upgrade |
 

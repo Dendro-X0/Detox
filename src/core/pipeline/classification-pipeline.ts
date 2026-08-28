@@ -228,6 +228,9 @@ export class ClassificationPipeline {
             score: verdict.score,
             labelId: verdict.labelId,
             detectorId: verdict.detectorId,
+            ...(verdict.secondaryReasons?.length
+                ? { secondaryReasons: verdict.secondaryReasons }
+                : {}),
             preview: this.sanitizePreview(content),
             hostname: location.hostname,
             pageKey: currentPageKey(),

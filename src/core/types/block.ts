@@ -13,6 +13,12 @@ export type FilteredItemRecord = {
     readonly score: number;
     readonly labelId: string;
     readonly detectorId: string;
+    /** Noise (etc.) kept when topic is the primary badge (P1-L2). */
+    readonly secondaryReasons?: readonly {
+        readonly labelId: string;
+        readonly detectorId: string;
+        readonly score: number;
+    }[];
     readonly preview: string;
     readonly hostname: string;
     readonly pageKey?: string;

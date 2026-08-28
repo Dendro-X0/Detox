@@ -641,6 +641,7 @@
   },
   "filterReasons": {
     "revealed": "Eingeblendet",
+    "withAlso": "{{primary}} · auch {{also}}",
     "labels": {
       "noise": "Rauschen",
       "promo": "Werbung",

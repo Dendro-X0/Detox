@@ -76,5 +76,36 @@ describe('topic classifier policy (Spike 3)', () => {
         expect(merged[0]?.matched).toBe(true);
         expect(merged[0]?.labelId).toBe('world-affairs');
         expect(merged[0]?.detectorId).toBe(TOPIC_CLASSIFIER_DETECTOR_ID);
+        expect(merged[0]?.secondaryReasons).toEqual([
+            {
+                labelId: 'engagement-hook',
+                detectorId: 'behavior-signals',
+                score: 0.95,
+            },
+        ]);
+    });
+
+    it('does not attach secondary when only topic matches', () => {
+        const primary = [
+            {
+                id: 'a',
+                matched: false,
+                score: 0.1,
+                labelId: 'noise',
+                detectorId: 'heuristic-keywords',
+            },
+        ];
+        const supplemental = [
+            {
+                id: 'a',
+                matched: true,
+                score: 0.4,
+                labelId: 'world-affairs',
+                detectorId: TOPIC_CLASSIFIER_DETECTOR_ID,
+            },
+        ];
+        const merged = mergeClassifyResults(primary, supplemental);
+        expect(merged[0]?.labelId).toBe('world-affairs');
+        expect(merged[0]?.secondaryReasons).toBeUndefined();
     });
 });

@@ -15,9 +15,17 @@ export function formatBlockReasonLabel(
 }
 
 export function formatBlockReasonSummary(
-    verdict: Pick<Verdict, 'labelId' | 'score'>,
-    translate: (key: string) => string
+    verdict: Pick<Verdict, 'labelId' | 'score' | 'secondaryReasons'>,
+    translate: (key: string, params?: Record<string, string | number>) => string
 ): string {
     const label = formatBlockReasonLabel(verdict.labelId, translate);
-    return `${label} · ${Math.round(verdict.score * 100)}%`;
+    const primary = `${label} · ${Math.round(verdict.score * 100)}%`;
+    const secondary = verdict.secondaryReasons?.[0];
+    if (!secondary) return primary;
+
+    const alsoLabel = formatBlockReasonLabel(secondary.labelId, translate);
+    return translate('filterReasons.withAlso', {
+        primary,
+        also: alsoLabel,
+    });
 }

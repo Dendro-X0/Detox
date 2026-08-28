@@ -38,6 +38,11 @@ export type BlockedItemLike = {
     readonly score: number;
     readonly labelId: string;
     readonly detectorId?: string;
+    readonly secondaryReasons?: readonly {
+        readonly labelId: string;
+        readonly detectorId: string;
+        readonly score: number;
+    }[];
     readonly preview: string;
     readonly hostname: string;
     readonly pageKey?: string;
@@ -72,6 +77,14 @@ export function BlockedItemRow({
                     score={item.score}
                     compact
                 />
+                {item.secondaryReasons?.[0] ? (
+                    <BlockReasonChip
+                        detectorId={item.secondaryReasons[0].detectorId}
+                        labelId={item.secondaryReasons[0].labelId}
+                        score={item.secondaryReasons[0].score}
+                        compact
+                    />
+                ) : null}
                 {item.revealed ? (
                     <span className="sl-block-revealed-tag">{t('filterReasons.revealed')}</span>
                 ) : null}

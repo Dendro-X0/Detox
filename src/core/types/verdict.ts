@@ -4,11 +4,20 @@
  */
 import type { DomContextSignals } from '../filtering/dom-context-signals';
 
+/** Extra matched signal kept when topic wins the badge over noise (P1-L2). */
+export type SecondaryMatchReason = {
+    readonly labelId: string;
+    readonly detectorId: string;
+    readonly score: number;
+};
+
 export type Verdict = {
     readonly matched: boolean;
     readonly score: number;
     readonly labelId: string;
     readonly detectorId: string;
+    /** Noise (or other) matches shown alongside a topic primary badge. */
+    readonly secondaryReasons?: readonly SecondaryMatchReason[];
 };
 
 export type ClassifyItemContext = {
@@ -27,6 +36,7 @@ export type ClassifyItemResult = {
     readonly score: number;
     readonly labelId: string;
     readonly detectorId: string;
+    readonly secondaryReasons?: readonly SecondaryMatchReason[];
 };
 
 export function verdictFromClassifyResult(result: ClassifyItemResult): Verdict {
@@ -35,6 +45,9 @@ export function verdictFromClassifyResult(result: ClassifyItemResult): Verdict {
         score: result.score,
         labelId: result.labelId,
         detectorId: result.detectorId,
+        ...(result.secondaryReasons?.length
+            ? { secondaryReasons: result.secondaryReasons }
+            : {}),
     };
 }
 
@@ -45,5 +58,8 @@ export function classifyResultFromVerdict(id: string, verdict: Verdict): Classif
         score: verdict.score,
         labelId: verdict.labelId,
         detectorId: verdict.detectorId,
+        ...(verdict.secondaryReasons?.length
+            ? { secondaryReasons: verdict.secondaryReasons }
+            : {}),
     };
 }

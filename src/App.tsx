@@ -70,6 +70,11 @@ type BlockedItem = {
   readonly score: number;
   readonly labelId: string;
   readonly detectorId?: string;
+  readonly secondaryReasons?: readonly {
+    readonly labelId: string;
+    readonly detectorId: string;
+    readonly score: number;
+  }[];
   readonly preview: string;
   readonly hostname: string;
   readonly timestamp: number;
