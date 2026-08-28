@@ -168,6 +168,8 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 
 **Theme:** Selection tools make browsing *useful*, not only quieter.
 
+**Detailed spec (draft, scope open):** [`assist-capability-spec.md`](./assist-capability-spec.md) — intents (search / define / verify / compare / personal index), principles, phases A0–A4.
+
 | # | Deliverable | Job |
 |---|-------------|-----|
 | P2-U1 | Context menu: **Search selection** (engine configurable) | Act |
@@ -242,6 +244,7 @@ Improvements that support every phase; prioritize by launch risk.
 | [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md) | **Unchanged** — P0 launch lock |
 | [`version-roadmap.md`](./version-roadmap.md) | Release versions; P1+ detail lives here |
 | [`ux-capability-roadmap.md`](./ux-capability-roadmap.md) | Personas A–E; this doc adds **intent presets** + Preferences IA |
+| [`assist-capability-spec.md`](./assist-capability-spec.md) | **Draft** Act-layer spec: verify / define / compare / source packs |
 | [`research-semantic-topics.md`](./research-semantic-topics.md) | Engineering spike for Layer 2 |
 | [`wizard-first-checklist.md`](./wizard-first-checklist.md) | Extend with Express path when implemented |
 
@@ -254,7 +257,7 @@ Improvements that support every phase; prioritize by launch risk.
 3. ~~**Wire Express path in wizard UI**~~ — welcome preset gallery → done in 2 steps; guided customize unchanged.
 4. ~~**Preferences IA sketch** against current `OptionsApp` tabs.~~ — Rules tab renamed to Preferences; grouped Interests | Noise | Sites | Style & sensitivity.
 5. **Gate semantic topic diet** — Spike 3 manual BBC/Reddit dogfood; then enable Layer 2 from Express seeds.
-6. **Only then** promote Assist convenience (P2) in store secondary copy.
+6. **Assist convenience (P2)** — **deferred**; see [`assist-capability-spec.md`](./assist-capability-spec.md). Reopen after P1 topic-diet gate + §7 decisions.
 
 ---
 

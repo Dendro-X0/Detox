@@ -7,6 +7,7 @@ Product direction, phased delivery, and technical roadmaps.
 | Document | Description | Status |
 |----------|-------------|--------|
 | [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) | **Platform plan: steer / act / understand, 1-min setup, Preferences, post–v3 phases** | **Active** |
+| [`assist-capability-spec.md`](./assist-capability-spec.md) | **Assist (Act): verify / define / compare / source packs — draft, deferred** | **Deferred** |
 | [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md) | **Option A: v3.0 text-filter launch scope (locked)** | **Active** |
 | [`ux-capability-roadmap.md`](./ux-capability-roadmap.md) | **Personas, text-first scope, v2.2→v3.0 priorities** | **Active** |
 | [`v3-acceptance-checklist.md`](./v3-acceptance-checklist.md) | **v3.0 public launch QA gates per persona** | **Active** |
@@ -24,6 +25,8 @@ Product direction, phased delivery, and technical roadmaps.
 ## Current focus
 
 **Platform direction:** [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) (personal browsing assistant; Preferences + interest diet after v3 wedge).
+
+**Assist (post–v3 Act layer):** [`assist-capability-spec.md`](./assist-capability-spec.md) — **deferred** (parking lot until §7 reopened).
 
 **Near-term ship:** **v2.3.0 → v3.0.0 (Option A)** — text-filter public launch; authenticity experimental only. **Release ops:** [`v2.3-release-ops.md`](./v2.3-release-ops.md). **Scope:** [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md). Persona matrix: [`ux-capability-roadmap.md`](./ux-capability-roadmap.md); release gates: [`version-roadmap.md`](./version-roadmap.md).
 
