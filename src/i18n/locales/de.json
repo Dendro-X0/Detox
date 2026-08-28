@@ -1054,5 +1054,33 @@
         "hint": "Konservative Filterung für Papers und lange Artikel"
       }
     }
+  },
+  "assist": {
+    "toolbar": {
+      "search": "Suchen",
+      "define": "Definieren",
+      "saveClip": "Clip speichern",
+      "compare": "Vergleichen",
+      "verify": "Prüfen",
+      "clipSaved": "Clip gespeichert — anderen Ausschnitt markieren, dann Vergleichen.",
+      "compareOpened": "Suchen für beide Clips und eine kombinierte Abfrage geöffnet."
+    },
+    "settings": {
+      "heading": "Auswahl-Assistent",
+      "description": "Markieren Sie Text auf einer Seite zum Suchen, Definieren, Speichern eines Vergleichs-Clips oder Prüfen von Aussagen. Rechtsklick öffnet ebenfalls das SignalLens-Menü.",
+      "toolbarLabel": "Schwebende Werkzeugleiste bei Textauswahl anzeigen",
+      "toolbarHint": "Erscheint neben markiertem Text. Ausschalten, wenn sie stört; Kontextmenü bleibt verfügbar.",
+      "engineLabel": "Suchmaschine",
+      "engines": {
+        "duckduckgo": "DuckDuckGo",
+        "google": "Google",
+        "bing": "Bing",
+        "custom": "Eigenes URL-Template"
+      },
+      "customUrlLabel": "Eigene Such-URL",
+      "customUrlHint": "Mit %s für die Abfrage, z. B. https://example.com/search?q=%s",
+      "contextMenuHint": "Vergleich: Clip speichern beim ersten Ausschnitt, dann Vergleichen beim zweiten. Prüfen braucht den Authentizitäts-Assistenten (Plugins → Erweitert).",
+      "saved": "Gespeichert"
+    }
   }
 }

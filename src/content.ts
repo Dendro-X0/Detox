@@ -19,6 +19,7 @@ import { subscribeToInstalledModChanges } from './core/mods/installed-mod-store'
 import { loadBuiltinMods } from './mods/load-builtin-mods';
 import { getBuildProfile } from './build-profile';
 import { installAuthenticityContentBridge } from './authenticity/content-bridge';
+import { installAssistSelectionToolbar } from './assist/selection-toolbar';
 import { initRuntimeLocale, refreshFilteredElementTitles, subscribeRuntimeLocale } from './i18n/runtime-locale';
 import { extractPageContext, getSelectionSnapshot } from './authenticity/page-extract';
 import { sessionRemove } from './core/storage/extension-session';
@@ -35,6 +36,7 @@ void initRuntimeLocale().then(() => {
 });
 
 installAuthenticityContentBridge();
+installAssistSelectionToolbar();
 
 let isEnabled = true;
 let scanCoordinator: ScanCoordinator | null = null;

@@ -4,9 +4,10 @@ import {
     OFFSCREEN_REQUEST_ID_PREFIX,
 } from './core/runtime/constants';
 import {
-    installAuthenticityContextMenu,
     registerAuthenticityBackgroundHandlers,
 } from './background-authenticity';
+import { registerAssistBackgroundHandlers } from './assist/background-assist';
+import { installAssistContextMenus } from './assist/install-assist-menus';
 import { installRoutingLoader } from './core/runtime/routing-settings';
 import {
     ensureInlineRuntimeHost,
@@ -117,11 +118,12 @@ function isRuntimeStatusMessage(message: CoreIpcMessage): message is Extract<Cor
 console.log('SignalLens: Background Service Worker Loaded');
 
 installRoutingLoader();
-installAuthenticityContextMenu();
+installAssistContextMenus();
+registerAssistBackgroundHandlers();
 registerAuthenticityBackgroundHandlers();
 
 chrome.runtime.onInstalled.addListener((details) => {
-    installAuthenticityContextMenu();
+    installAssistContextMenus();
     if (details.reason !== 'install') return;
 
     chrome.storage.local.get('onboardingComplete', (result: unknown) => {

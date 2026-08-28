@@ -1,5 +1,4 @@
 /// <reference types="chrome" />
-import { AUTHENTICITY_CONTEXT_MENU_ID } from './mods/analyzers/authenticity/constants';
 import type { AuthenticityMessage } from './mods/analyzers/authenticity/messages';
 import {
     consumeAuthenticityQuota,
@@ -15,15 +14,11 @@ import { buildAnalysisScope, detectSiteId } from './mods/analyzers/authenticity/
 import { openAuthenticityPanel } from './authenticity/open-panel';
 import { sessionSet } from './core/storage/extension-session';
 import { AUTHENTICITY_JOB_STORAGE_KEY } from './mods/analyzers/authenticity/constants';
+import { installAssistContextMenus } from './assist/install-assist-menus';
 
+/** @deprecated Prefer installAssistContextMenus — kept for call-site compatibility. */
 export function installAuthenticityContextMenu(): void {
-    chrome.contextMenus.removeAll(() => {
-        chrome.contextMenus.create({
-            id: AUTHENTICITY_CONTEXT_MENU_ID,
-            title: 'Analyze selection with SignalLens',
-            contexts: ['selection'],
-        });
-    });
+    installAssistContextMenus();
 }
 
 async function handleAnalyze(message: Extract<AuthenticityMessage, { type: 'authenticity:analyze' }>): Promise<{
@@ -33,7 +28,7 @@ async function handleAnalyze(message: Extract<AuthenticityMessage, { type: 'auth
     await loadAuthenticitySettings();
     const settings = getAuthenticitySettings();
     if (!settings.enabled) {
-        return { ok: false, error: 'Authenticity assist is disabled. Enable it in Options → Authenticity.' };
+        return { ok: false, error: 'Authenticity assist is disabled. Enable it in Options → Plugins (advanced).' };
     }
 
     const allowed = await consumeAuthenticityQuota();
@@ -80,28 +75,6 @@ async function handleAnalyze(message: Extract<AuthenticityMessage, { type: 'auth
 }
 
 export function registerAuthenticityBackgroundHandlers(): void {
-    chrome.contextMenus.onClicked.addListener((info, tab) => {
-        if (info.menuItemId !== AUTHENTICITY_CONTEXT_MENU_ID || !tab?.id) return;
-        const selection = info.selectionText?.trim();
-        if (!selection) return;
-        void (async () => {
-            const tabId = tab.id;
-            if (tabId === undefined) return;
-            await openAuthenticityPanel(tabId);
-            const url = tab.url ?? '';
-            const hostname = url ? new URL(url).hostname : '';
-            await handleAnalyze({
-                type: 'authenticity:analyze',
-                tabId,
-                scopeRequest: { kind: 'selection', text: selection },
-                selectionText: selection,
-                pageTitle: tab.title ?? '',
-                url,
-                hostname,
-            });
-        })();
-    });
-
     chrome.runtime.onMessage.addListener((message: unknown, sender, sendResponse) => {
         if (!message || typeof message !== 'object' || !('type' in message)) return;
 

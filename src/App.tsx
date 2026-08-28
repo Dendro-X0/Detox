@@ -35,6 +35,7 @@ import { useSettingsTab } from './dashboard/useSettingsTab';
 import { getSettingsTabLabels } from './i18n/settings-tabs';
 import { useLocale } from './i18n/LocaleContext';
 import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
+import AssistSettingsPanel from './dashboard/AssistSettingsPanel';
 import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
 import FilterModelsPanel from './dashboard/FilterModelsPanel';
 import AdaptationPacksPanel from './dashboard/AdaptationPacksPanel';
@@ -848,6 +849,7 @@ function App({ onRestartWizard }: AppProps) {
             />
             <div className="sl-span-full"><FilterModelsPanel /></div>
             <div className="sl-span-full"><AdaptationPacksPanel /></div>
+            <div className="sl-span-full"><AssistSettingsPanel /></div>
             <div className="sl-span-full"><PluginLibraryPanel /></div>
             <details className="sl-install-details sl-span-full">
               <summary>{t('plugins.advanced.authenticitySummary')}</summary>

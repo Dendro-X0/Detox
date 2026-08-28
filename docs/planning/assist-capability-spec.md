@@ -1,12 +1,12 @@
 # Assist capability — specification & roadmap (draft)
 
-> **Status:** Draft — **scope deferred** (no Assist build/store promotion until explicitly reopened)  
+> **Status:** Draft — **narrow A1 handoff shipped** (Search / Define / Compare clip / Verify bridge); full A2–A4 + store Assist promotion still deferred  
 > **Layer:** Act / Understand (not Steer / automatic filtering)  
 > **Related:** [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) P2 · [`../experimental/authenticity-analysis.md`](../experimental/authenticity-analysis.md) · [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md) (Assist is **not** v3.0 hero)
 
 This document turns the product picture — *users define value; Assist helps them do something with selected text* — into a **working specification** and **phased roadmap**. Nothing here expands the locked v3.0 text-noise launch unless explicitly promoted later.
 
-**2026-08-28:** Maintainer chose **defer** — keep this doc as a parking lot; do not start A1–A4 implementation or Assist store copy. Continue P0/P1 (Track C, Preferences, topic diet Spike 3). Reopen by deciding §7.
+**2026-08-28:** Full Assist A1–A4 / store copy deferred. **Reopened narrowly** for usable selection widgets: floating toolbar + context menu that open search / Wikipedia / compare tabs (and Verify when authenticity is enabled). A2–A4 and store Assist hero remain parked until §7.
 
 ---
 
@@ -212,12 +212,22 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 
 ---
 
-## 9. Immediate next steps (while scope is deferred)
+## 9. Immediate next steps
 
-1. ~~**Review §7**~~ — **Deferred** (2026-08-28); reopen when ready to lock D1–D8.
-2. **Do not** start A0 inventory, A1–A4 implementation, or Assist store listing work.
+1. ~~**Review §7**~~ — Full Assist still deferred; **narrow selection handoff implemented** (see changelog).
+2. **Do not** expand A2–A4, academic packs, personal index, or Assist store listing until §7 is locked.
 3. **Continue** P0 Track C (store upload / Firefox QA) and P1 (topic diet Spike 3 / Preferences polish).
-4. When reopened: decide §7 → A0-2 inventory → A1 tickets only.
+4. Dogfood: select text → toolbar Search / Define / Save clip → Compare; Options → Plugins → Selection Assist for engine + toolbar toggle.
+
+### Implemented surface (narrow A1 handoff)
+
+| Control | Behavior |
+|---------|----------|
+| Floating selection toolbar | Search, Define (Wikipedia), Save clip, Compare, Verify |
+| Context menu → SignalLens | Same actions |
+| Compare | Session clip + second selection → three search tabs (A, B, A+B) |
+| Verify | Opens authenticity panel when that experimental plugin is enabled |
+| Options → Plugins → Selection Assist | Toolbar on/off + search engine (DDG / Google / Bing / custom `%s`) |
 
 ---
 
@@ -227,3 +237,4 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 |------|------|
 | 2026-08-28 | Initial draft from Assist / verification / cross-reference product discussion |
 | 2026-08-28 | **Scope deferred** — §7 D1–D8 deferred; no A1–A4 or store Assist work until reopened |
+| 2026-08-28 | **Narrow A1 reopen** — selection toolbar + menus for Search/Define/Compare (+ Verify bridge); A2–A4 still deferred |

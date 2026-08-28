@@ -955,7 +955,8 @@
       "startBrowsing": "Start browsing",
       "fineTuneDashboard": "Fine-tune in dashboard",
       "openDashboard": "Open dashboard",
-      "trySamplePage": "Try on Reddit"
+      "trySamplePage": "Try on Reddit",
+      "topicsCount": "{{count}} selected"
     },
     "language": {
       "heading": "Interface language",
@@ -1052,6 +1053,34 @@
         "label": "Deep reading",
         "hint": "Conservative filtering for papers and long articles"
       }
+    }
+  },
+  "assist": {
+    "toolbar": {
+      "search": "Search",
+      "define": "Define",
+      "saveClip": "Save clip",
+      "compare": "Compare",
+      "verify": "Verify",
+      "clipSaved": "Clip saved — select another snippet, then Compare.",
+      "compareOpened": "Opened searches for both clips and a combined query."
+    },
+    "settings": {
+      "heading": "Selection Assist",
+      "description": "Select text on any page to search, define, save a clip for comparison, or verify claims. Right-click also opens the SignalLens menu.",
+      "toolbarLabel": "Show floating toolbar on text selection",
+      "toolbarHint": "Appears next to highlighted text. Turn off if it gets in the way; context menu still works.",
+      "engineLabel": "Search engine",
+      "engines": {
+        "duckduckgo": "DuckDuckGo",
+        "google": "Google",
+        "bing": "Bing",
+        "custom": "Custom URL template"
+      },
+      "customUrlLabel": "Custom search URL",
+      "customUrlHint": "Include %s where the query goes, e.g. https://example.com/search?q=%s",
+      "contextMenuHint": "Compare workflow: Save clip on the first snippet, then Compare on the second. Verify needs Authenticity assist enabled (Plugins → Advanced).",
+      "saved": "Saved"
     }
   }
 }

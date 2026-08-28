@@ -7,9 +7,10 @@
 
 import type { CoreIpcMessage } from './core/ipc/messages';
 import {
-    installAuthenticityContextMenu,
     registerAuthenticityBackgroundHandlers,
 } from './background-authenticity';
+import { registerAssistBackgroundHandlers } from './assist/background-assist';
+import { installAssistContextMenus } from './assist/install-assist-menus';
 import { ensureInlineRuntimeHost } from './core/runtime/runtime-host-bootstrap';
 import { installRoutingLoader } from './core/runtime/routing-settings';
 
@@ -38,11 +39,12 @@ function handleMessage(
 chrome.runtime.onMessage.addListener(handleMessage);
 
 installRoutingLoader();
-installAuthenticityContextMenu();
+installAssistContextMenus();
+registerAssistBackgroundHandlers();
 registerAuthenticityBackgroundHandlers();
 
 chrome.runtime.onInstalled.addListener((details) => {
-    installAuthenticityContextMenu();
+    installAssistContextMenus();
     if (details.reason !== 'install') return;
 
     chrome.storage.local.get('onboardingComplete', (result: unknown) => {
