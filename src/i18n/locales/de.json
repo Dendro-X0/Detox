@@ -372,6 +372,7 @@
       "allowGroup": "Immer erlauben (Block überschreiben)",
       "separateFromNoise": "Themen-Blocks zeigen Fachlabels (z. B. Weltpolitik), keine Rausch-Chips.",
       "expressSeedsHint": "Interessenlisten aus Ihrer {{preset}}-Einrichtung sind unten gespeichert — aktivieren Sie die Themen-Diät, wenn Sie bereit sind (Topic-classifier-Plugin erforderlich).",
+      "researchPausedNote": "Der Research-Modus bleibt konservativ — die Themen-Diät ist hier pausiert, damit Fach- und Langtexte nicht durch Themenfilter blockiert werden. Wechseln Sie zu Focus oder Unwind, um eine zuvor aktive Interessen-Diät fortzusetzen.",
       "topics": {
         "world-affairs": "Weltpolitik",
         "domestic-politics": "Innenpolitik",

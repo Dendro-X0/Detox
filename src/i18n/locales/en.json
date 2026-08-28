@@ -372,6 +372,7 @@
       "allowGroup": "Always allow (override block)",
       "separateFromNoise": "Topic blocks show subject labels (e.g. World affairs), not engagement/noise chips.",
       "expressSeedsHint": "Interest lists from your {{preset}} setup are saved below — enable Topic diet when you're ready (requires Topic classifier plugin).",
+      "researchPausedNote": "Research mode stays conservative — topic diet is paused here so academic and long-form reading aren’t blocked by subject filters. Switch to Focus or Unwind to resume an interest diet you had on.",
       "topics": {
         "world-affairs": "World affairs",
         "domestic-politics": "Domestic politics",

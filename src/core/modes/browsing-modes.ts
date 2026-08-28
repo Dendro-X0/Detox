@@ -6,11 +6,18 @@ import type { PolicyPreset, PolicySettings } from '../types/policy';
 import { PRESET_THRESHOLDS } from '../types/policy';
 import type { UserRulesSettings } from '../types/user-rules';
 import { BOTHER_KEYWORD_MAP, type BotherCategory } from '../types/bother-keywords';
+import type { TopicPolicyStorageRecord } from '../rules/topic-policy-store';
 import {
     FOCUS_ADAPTATION_MOD_IDS,
     RESEARCH_ADAPTATION_MOD_IDS,
     UNWIND_ADAPTATION_MOD_IDS,
 } from './adaptation-mode-bundles';
+import {
+    loadTopicPolicyFromRecord,
+    parseTopicDietModePause,
+    resolveModePolicyCoherence,
+    TOPIC_DIET_MODE_PAUSE_KEY,
+} from './policy-coherence';
 
 export type BrowsingModeId = 'focus' | 'research' | 'unwind';
 
@@ -150,7 +157,34 @@ export async function loadPreserveRulesForModeSwitch(): Promise<
 export async function applyBrowsingMode(modeId: BrowsingModeId): Promise<void> {
     const preserve = await loadPreserveRulesForModeSwitch();
     const patch = buildBrowsingModePatch(modeId, preserve);
-    await chrome.storage.local.set(patch);
+
+    const stored = await chrome.storage.local.get([
+        'enabledModIds',
+        'topicPolicy',
+        TOPIC_DIET_MODE_PAUSE_KEY,
+    ]);
+    const previousEnabledModIds = Array.isArray(
+        (stored as { readonly enabledModIds?: unknown }).enabledModIds
+    )
+        ? ((stored as { readonly enabledModIds: readonly string[] }).enabledModIds)
+        : [];
+    const topicPolicy = loadTopicPolicyFromRecord(stored as TopicPolicyStorageRecord);
+    const previousPause = parseTopicDietModePause(
+        (stored as Record<string, unknown>)[TOPIC_DIET_MODE_PAUSE_KEY]
+    );
+
+    const coherence = resolveModePolicyCoherence({
+        modeId,
+        modeEnabledModIds: patch.enabledModIds,
+        previousEnabledModIds,
+        topicPolicy,
+        previousPause,
+    });
+
+    await chrome.storage.local.set({
+        ...patch,
+        ...coherence,
+    });
 }
 
 export async function markSettingsCustomized(): Promise<void> {

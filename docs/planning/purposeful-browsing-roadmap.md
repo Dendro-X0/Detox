@@ -157,7 +157,7 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 |---|-------------|-------|
 | P1-L1 | **Semantic topic diet exit criteria** | Per [`research-semantic-topics.md`](./research-semantic-topics.md); BBC/Reddit dogfood |
 | P1-L2 | **Separate reason chips** | Noise vs topic never merged — topic primary badge keeps noise in `secondaryReasons` |
-| P1-L3 | **Policy coherence** | Mode + packs + topic policy don’t fight; Research stays conservative |
+| P1-L3 | **Policy coherence** | Mode + packs + topic policy don’t fight; Research pauses topic diet and restores on Focus/Unwind |
 | P1-L4 | **Core vs full honesty** | If L2 needs full build, Express path either bundles minimal centroids or offers clear upgrade |
 
 **Exit:** New user picks `tech-music` (or equivalent) in ≤ 60s; politics headlines dim on phrase-poor news **when L2 enabled**; tech/music mostly pass; dashboard Preferences editable without keyword editing.

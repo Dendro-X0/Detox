@@ -1,5 +1,10 @@
 import { isFullBuild } from '../build-profile';
 import { isModEnabled, subscribeToEnabledModChanges } from '../core/mods/mod-enablement-store';
+import { loadActiveBrowsingModeId } from '../core/modes/browsing-modes';
+import {
+    parseTopicDietModePause,
+    TOPIC_DIET_MODE_PAUSE_KEY,
+} from '../core/modes/policy-coherence';
 import {
     loadTopicPolicy,
     saveTopicPolicy,
@@ -20,16 +25,47 @@ export default function TopicDietPanel() {
     const [policy, setPolicy] = useState<TopicPolicySettings | null>(null);
     const [modEnabled, setModEnabled] = useState(() => isModEnabled('detector-topic-classifier'));
     const [expressPresetId, setExpressPresetId] = useState<string | null>(null);
+    const [researchModeActive, setResearchModeActive] = useState(false);
+    const [dietPausedByResearch, setDietPausedByResearch] = useState(false);
 
     useEffect(() => {
         void loadTopicPolicy().then(setPolicy);
-        void chrome.storage.local.get('expressPresetId').then((result) => {
+        void chrome.storage.local.get(['expressPresetId', TOPIC_DIET_MODE_PAUSE_KEY]).then((result) => {
             const id = (result as { readonly expressPresetId?: string }).expressPresetId;
             setExpressPresetId(id && isExpressPresetId(id) ? id : null);
+            const pause = parseTopicDietModePause(
+                (result as Record<string, unknown>)[TOPIC_DIET_MODE_PAUSE_KEY]
+            );
+            setDietPausedByResearch(pause?.paused === true);
+        });
+        void loadActiveBrowsingModeId().then((modeId) => {
+            setResearchModeActive(modeId === 'research');
         });
         return subscribeToEnabledModChanges(() => {
             setModEnabled(isModEnabled('detector-topic-classifier'));
         });
+    }, []);
+
+    useEffect(() => {
+        const onChanged = (
+            changes: Record<string, chrome.storage.StorageChange>,
+            area: string
+        ): void => {
+            if (area !== 'local') return;
+            if (changes.activeBrowsingModeId) {
+                const next = changes.activeBrowsingModeId.newValue;
+                setResearchModeActive(next === 'research');
+            }
+            if (changes[TOPIC_DIET_MODE_PAUSE_KEY]) {
+                const pause = parseTopicDietModePause(changes[TOPIC_DIET_MODE_PAUSE_KEY].newValue);
+                setDietPausedByResearch(pause?.paused === true);
+            }
+            if (changes.topicPolicy) {
+                void loadTopicPolicy().then(setPolicy);
+            }
+        };
+        chrome.storage.onChanged.addListener(onChanged);
+        return () => chrome.storage.onChanged.removeListener(onChanged);
     }, []);
 
     if (!isFullBuild() || !policy) return null;
@@ -37,6 +73,13 @@ export default function TopicDietPanel() {
     const persist = async (next: TopicPolicySettings): Promise<void> => {
         setPolicy(next);
         await saveTopicPolicy(next);
+        // Manual override clears Research pause bookkeeping (P1-L3).
+        if (next.enabled || dietPausedByResearch) {
+            await chrome.storage.local.set({
+                [TOPIC_DIET_MODE_PAUSE_KEY]: { paused: false, wasEnabled: false },
+            });
+            setDietPausedByResearch(false);
+        }
     };
 
     const hasExpressSeeds =
@@ -47,6 +90,10 @@ export default function TopicDietPanel() {
             <h4 className="sl-rules-section-title">{t('rules.topicDiet.heading')}</h4>
             <p className="muted sl-rules-section-desc">{t('rules.topicDiet.description')}</p>
             <p className="sl-topic-diet-experimental muted">{t('rules.topicDiet.experimental')}</p>
+
+            {researchModeActive || dietPausedByResearch ? (
+                <p className="sl-wizard-callout">{t('rules.topicDiet.researchPausedNote')}</p>
+            ) : null}
 
             {expressPresetId && hasExpressSeeds && !policy.enabled ? (
                 <p className="sl-wizard-callout">
