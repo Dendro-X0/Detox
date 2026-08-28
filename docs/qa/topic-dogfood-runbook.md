@@ -46,7 +46,9 @@ Save notes in [`dogfood-signoff.md`](./dogfood-signoff.md) or issue log.
 ```bash
 pnpm test:topic-classifier
 pnpm test:topic-embedding-audit
-pnpm spike3:bbc          # BBC seed corpus + live RSS gate; writes artifacts/spike3-bbc-dogfood-report.txt
+pnpm spike3:bbc          # BBC seed corpus + live RSS; artifacts/spike3-bbc-dogfood-report.txt
+pnpm spike3:reddit       # Reddit news recall + allow-list FP; artifacts/spike3-reddit-dogfood-report.txt
+pnpm spike3              # both
 ```
 
 ---
@@ -55,7 +57,9 @@ pnpm spike3:bbc          # BBC seed corpus + live RSS gate; writes artifacts/spi
 
 - [x] BBC seed corpus: majority of labeled political headlines blocked under topic diet (`pnpm spike3:bbc` — 6/6 on 2026-08-27)
 - [ ] BBC homepage: manual badge verify on live site (see [`spike3-bbc-results.md`](./spike3-bbc-results.md))
-- [ ] Reddit tech: zero topic false-blocks on allow-list
+- [x] Reddit seed corpus: news recall + zero allow-list topic FPs (`pnpm spike3:reddit` — 2026-08-28)
+- [ ] Reddit tech: zero topic false-blocks on allow-list (manual live)
+- [ ] Reddit news: world-affairs blocks when enabled (manual live)
 - [ ] Badges distinguish topic vs noise when both layers match
 - [ ] User can enable/disable without breaking noise-only browsing
 - [ ] Documented in scope FAQ + wizard copy (noise ≠ topic)

@@ -256,7 +256,7 @@ Improvements that support every phase; prioritize by launch risk.
 2. ~~**Define Express presets**~~ — `src/onboarding/express-presets.ts` + `setupPath: 'express'` apply path (keyword + topic seeds).
 3. ~~**Wire Express path in wizard UI**~~ — welcome preset gallery → done in 2 steps; guided customize unchanged.
 4. ~~**Preferences IA sketch** against current `OptionsApp` tabs.~~ — Rules tab renamed to Preferences; grouped Interests | Noise | Sites | Style & sensitivity.
-5. **Gate semantic topic diet** — Spike 3 manual BBC/Reddit dogfood; then enable Layer 2 from Express seeds.
+5. **Gate semantic topic diet** — Automated BBC+Reddit corpus gates green (`pnpm spike3`); remaining: manual live dogfood, then enable Layer 2 from Express seeds.
 6. **Assist convenience (P2)** — **deferred**; see [`assist-capability-spec.md`](./assist-capability-spec.md). Reopen after P1 topic-diet gate + §7 decisions.
 
 ---

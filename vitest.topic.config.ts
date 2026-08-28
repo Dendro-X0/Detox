@@ -9,6 +9,7 @@ export default defineConfig({
             'tests/core/topic-embedding-audit.spec.ts',
             'tests/core/topic-classifier-latency.spec.ts',
             'tests/core/spike3-bbc-dogfood.spec.ts',
+            'tests/core/spike3-reddit-dogfood.spec.ts',
             'tests/scripts/precompute-topic-centroids.spec.ts',
         ],
     },

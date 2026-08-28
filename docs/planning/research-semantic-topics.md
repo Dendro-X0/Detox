@@ -183,6 +183,7 @@ Notes: first model fetch uses `hf-mirror.com` when Hugging Face is unreachable. 
 - [x] Merge prefers topic label over noise when both match
 - [x] `pnpm test:topic-classifier` — policy unit tests + latency/FP gate on corpus
 - [x] **Exit (automated):** BBC seed corpus 100% political recall — `pnpm spike3:bbc` ([`spike3-bbc-results.md`](../qa/spike3-bbc-results.md))
+- [x] **Exit (automated):** Reddit news recall + zero allow-list FPs — `pnpm spike3:reddit` ([`spike3-reddit-results.md`](../qa/spike3-reddit-results.md))
 - [ ] **Exit (manual):** Dogfood on BBC + Reddit with mod enabled in full build
 
 ### Spike 4 — UX + positioning

@@ -24,6 +24,8 @@
     "test:topic-embedding-audit": "vitest run --config vitest.topic.config.ts tests/core/topic-embedding-audit.spec.ts",
     "test:topic-classifier": "vitest run --config vitest.config.ts tests/core/topic-classifier-policy.spec.ts && vitest run --config vitest.topic.config.ts tests/core/topic-classifier-latency.spec.ts",
     "spike3:bbc": "vitest run --config vitest.topic.config.ts tests/core/spike3-bbc-dogfood.spec.ts",
+    "spike3:reddit": "vitest run --config vitest.topic.config.ts tests/core/spike3-reddit-dogfood.spec.ts",
+    "spike3": "pnpm spike3:bbc && pnpm spike3:reddit",
     "precompute:topic-centroids": "vitest run --config vitest.topic.config.ts tests/scripts/precompute-topic-centroids.spec.ts",
     "dogfood:preflight": "node scripts/dogfood-preflight.mjs",
     "release:preflight": "node scripts/release-preflight.mjs",

@@ -143,6 +143,42 @@
       "text": "The new data center build needs another six months before we can migrate inference workloads off the legacy cluster."
     },
     {
+      "id": "reddit-news-coalition",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "reddit",
+      "language": "en",
+      "note": "Spike 3 — news-sub style headline; should block under topic diet",
+      "text": "Coalition government collapses after overnight vote as protests fill the capital square"
+    },
+    {
+      "id": "reddit-news-surveillance-bill",
+      "primaryTopic": "domestic-politics",
+      "blockUnderNewsDiet": true,
+      "source": "reddit",
+      "language": "en",
+      "note": "Spike 3 — politics thread title; phrase-poor but subject-rich",
+      "text": "Opposition calls for snap elections after parliament votes to expand domestic surveillance powers"
+    },
+    {
+      "id": "reddit-news-border-talks",
+      "primaryTopic": "world-affairs",
+      "blockUnderNewsDiet": true,
+      "source": "reddit",
+      "language": "en",
+      "note": "Spike 3 — geopolitics thread without classic keyword list hits",
+      "text": "Diplomats resume border talks after troops mass near disputed province"
+    },
+    {
+      "id": "reddit-medical-hypertension",
+      "primaryTopic": "health-science",
+      "blockUnderNewsDiet": false,
+      "source": "reddit",
+      "language": "en",
+      "note": "Spike 3 — clinical discussion must not false-block as politics",
+      "text": "My clinician adjusted the ACE inhibitor after ambulatory blood pressure readings stayed elevated overnight; we are repeating labs next week before any further titration."
+    },
+    {
       "id": "tech-saas-docs",
       "primaryTopic": "tech",
       "blockUnderNewsDiet": false,
