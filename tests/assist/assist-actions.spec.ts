@@ -2,9 +2,11 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { DEFAULT_ASSIST_SETTINGS } from '../../src/assist/types';
 import {
     ASSIST_QUOTA_ERROR,
+    prepareComparePanel,
     prepareSearchHandoff,
 } from '../../src/assist/assist-actions';
 import { resetAssistQuotaForTests } from '../../src/assist/assist-quota-store';
+import { readHandoffCache, writeHandoffCache } from '../../src/assist/handoff-cache';
 
 vi.mock('../../src/assist/handoff-cache', () => ({
     readHandoffCache: vi.fn(async () => null),
@@ -25,7 +27,20 @@ vi.mock('../../src/assist/assist-quota-store', async (importOriginal) => {
     };
 });
 
-import { readHandoffCache, writeHandoffCache } from '../../src/assist/handoff-cache';
+vi.mock('../../src/assist/compare-report', () => ({
+    buildCompareReport: vi.fn(async (clip: string, text: string) => ({
+        id: 'test-report',
+        createdAt: Date.now(),
+        sideA: { text: clip, label: 'clip' as const },
+        sideB: { text, label: 'selection' as const },
+        overlap: { sharedTerms: [], overlapScore: 0, noteKey: 'assist.compare.overlap.empty' },
+        combinedSearchUrl: 'https://example.test/compare',
+    })),
+    saveCompareReport: vi.fn(async () => undefined),
+    loadCompareReport: vi.fn(async () => null),
+}));
+
+import { saveCompareReport } from '../../src/assist/compare-report';
 
 describe('assist actions', () => {
     beforeEach(() => {
@@ -60,5 +75,13 @@ describe('assist actions', () => {
         const plan = await prepareSearchHandoff('hello', DEFAULT_ASSIST_SETTINGS);
         expect(plan.ok).toBe(false);
         expect(plan.error).toBe(ASSIST_QUOTA_ERROR);
+    });
+
+    it('builds compare panel report and stores session copy', async () => {
+        const plan = await prepareComparePanel('clip a', 'clip b', DEFAULT_ASSIST_SETTINGS);
+        expect(plan.ok).toBe(true);
+        expect(plan.urls?.[0]).toBe('https://example.test/compare');
+        expect(saveCompareReport).toHaveBeenCalled();
+        expect(writeHandoffCache).toHaveBeenCalled();
     });
 });

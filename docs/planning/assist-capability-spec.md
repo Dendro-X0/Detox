@@ -151,7 +151,7 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 
 | # | Deliverable | Job |
 |---|-------------|-----|
-| A3-1 | **Compare** selection vs second snippet / retrieved hit | Act |
+| A3-1 | **Compare** selection vs second snippet / retrieved hit | Act | **Done (slice)** |
 | A3-2 | Optional page outline / key claims (opt-in Understand) | Understand |
 | A3-3 | News + encyclopedia packs polish | Scope |
 
@@ -225,7 +225,7 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 |---------|----------|
 | Floating selection toolbar | Search, Define (Wikipedia), Save clip, Compare, Verify |
 | Context menu → SignalLens | Same actions |
-| Compare | Session clip + second selection → three search tabs (A, B, A+B) |
+| Compare | Session clip + second selection → **side panel** with excerpts + overlap; optional combined search | **Done (A3-1 slice)** |
 | Verify | Opens authenticity panel when that experimental plugin is enabled |
 | Options → Assist | Toolbar on/off + search engine (DDG / Google / Bing / custom `%s`) |
 
@@ -242,3 +242,4 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 | 2026-08-29 | **A2 slice** — search-only path always fetch+verify snippets; side panel excerpts + per-run search-only |
 | 2026-08-29 | **A2-4** — wizard Assist step (toolbar + optional Verify sub-opt-in); writes `assistSettings`; express path includes step |
 | 2026-08-29 | **A1-4** — Assist handoff quota + session cache; Define Wikipedia preview fetch; `assist:cancel` / `assist:getJob` |
+| 2026-08-29 | **A3-1** — Compare side panel with dual Wikipedia excerpts, overlap summary, optional combined search |

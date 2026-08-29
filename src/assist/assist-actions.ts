@@ -7,7 +7,11 @@ import {
     finishAssistNetworkJob,
 } from './network-job';
 import {
-    buildCompareSearchUrl,
+    buildCompareReport,
+    loadCompareReport,
+    saveCompareReport,
+} from './compare-report';
+import {
     buildSearchUrl,
     buildWikipediaDefineUrl,
 } from './search-urls';
@@ -97,18 +101,24 @@ export async function prepareDefineHandoff(text: string): Promise<AssistActionRe
     }
 }
 
-export async function prepareCompareHandoff(
+export async function prepareComparePanel(
     text: string,
     clip: string,
     settings: AssistSettings
 ): Promise<AssistActionResult> {
     const cacheKey = `${clip}\n---\n${text}`;
     const cached = await readHandoffCache('compare', cacheKey);
-    if (cached) {
+    const existing = await loadCompareReport();
+    if (
+        cached &&
+        existing &&
+        existing.sideA.text === clip &&
+        existing.sideB.text === text
+    ) {
         return {
             ok: true,
             cached: true,
-            urls: cached.urls,
+            urls: [existing.combinedSearchUrl],
             error: ASSIST_CACHE_HIT,
         };
     }
@@ -116,11 +126,37 @@ export async function prepareCompareHandoff(
     const blocked = await ensureQuota(settings);
     if (blocked) return blocked;
 
-    const urls = [
-        buildSearchUrl(clip, settings),
-        buildSearchUrl(text, settings),
-        buildCompareSearchUrl(clip, text, settings),
-    ];
-    await writeHandoffCache('compare', cacheKey, { urls, openedAt: Date.now() });
-    return { ok: true, urls };
+    const signal = beginAssistNetworkJob('compare');
+    try {
+        const report = await buildCompareReport(clip, text, settings, fetch, signal);
+        finishAssistNetworkJob();
+        await saveCompareReport(report);
+        await writeHandoffCache('compare', cacheKey, {
+            urls: [report.combinedSearchUrl],
+            openedAt: Date.now(),
+        });
+        return { ok: true, urls: [report.combinedSearchUrl] };
+    } catch (error) {
+        finishAssistNetworkJob();
+        const message = error instanceof Error ? error.message : 'Compare failed';
+        if (message === 'cancelled') {
+            return { ok: false, error: 'assist.job.cancelled' };
+        }
+        const report = await buildCompareReport(clip, text, settings);
+        await saveCompareReport(report);
+        await writeHandoffCache('compare', cacheKey, {
+            urls: [report.combinedSearchUrl],
+            openedAt: Date.now(),
+        });
+        return { ok: true, urls: [report.combinedSearchUrl] };
+    }
+}
+
+/** @deprecated Use prepareComparePanel — opens side-by-side report instead of tabs. */
+export async function prepareCompareHandoff(
+    text: string,
+    clip: string,
+    settings: AssistSettings
+): Promise<AssistActionResult> {
+    return prepareComparePanel(text, clip, settings);
 }

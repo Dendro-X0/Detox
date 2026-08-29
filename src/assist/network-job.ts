@@ -3,7 +3,7 @@ import {
     requestCancelAuthenticityJob,
 } from '../mods/analyzers/authenticity/pipeline';
 
-export type AssistNetworkJobKind = 'define' | 'verify';
+export type AssistNetworkJobKind = 'define' | 'compare' | 'verify';
 
 export type AssistNetworkJobState = {
     readonly jobId: string;

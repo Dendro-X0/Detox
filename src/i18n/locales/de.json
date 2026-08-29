@@ -1100,7 +1100,8 @@
       "compare": "Vergleichen",
       "verify": "Prüfen",
       "clipSaved": "Clip gespeichert — anderen Ausschnitt markieren, dann Vergleichen.",
-      "compareOpened": "Suchen für beide Clips und eine kombinierte Abfrage geöffnet.",
+      "compareOpened": "Vergleichsbericht bereit.",
+      "comparePanelOpened": "Vergleichs-Panel geöffnet — Ausschnitte nebeneinander prüfen.",
       "recentHandoff": "Gleiche Aktion kürzlich ausgeführt — keine doppelten Tabs.",
       "defineExcerpt": "Artikel geöffnet — {{excerpt}}"
     },
@@ -1127,6 +1128,28 @@
       "dailyQuotaCap": "Tägliches Handoff-Kontingent-Limit",
       "dailyQuotaHint": "Zählt Suchen-, Definieren- und Vergleichen-Tab-Öffnungen. Prüfen nutzt das separate Authentizitäts-Kontingent.",
       "saved": "Gespeichert"
+    },
+    "compare": {
+      "panel": {
+        "heading": "Ausschnitte vergleichen",
+        "empty": "Noch kein Vergleichsbericht. Clip speichern, zweiten Ausschnitt markieren, dann Vergleichen.",
+        "advisory": "Nur Hinweis — Wortüberlappung und öffentliche Auszüge, kein Wahrheitsurteil.",
+        "sideA": "Ausschnitt A",
+        "sideB": "Ausschnitt B",
+        "savedClip": "Gespeicherter Clip",
+        "currentSelection": "Aktuelle Auswahl",
+        "overlapHeading": "Überlappung",
+        "sharedTerms": "Gemeinsame Begriffe:",
+        "openSource": "Quelle öffnen",
+        "openSearch": "Kombinierte Websuche öffnen",
+        "openVerify": "Prüfen-Panel öffnen"
+      },
+      "overlap": {
+        "empty": "Nicht genug Text für Überlappungsvergleich.",
+        "distinct": "Unterschiedliche Formulierung — {{percent}} % gemeinsame Begriffe (meist verschiedene Themen).",
+        "partial": "Teilweise Überlappung — {{percent}} % gemeinsame Begriffe. Beide Auszüge prüfen.",
+        "similar": "Ähnliche Formulierung — {{percent}} % gemeinsame Begriffe. Prüfen, ob Behauptungen übereinstimmen."
+      }
     }
   }
 }

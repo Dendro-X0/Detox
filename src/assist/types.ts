@@ -1,3 +1,4 @@
+import type { AssistCompareReport } from './compare-overlap';
 import type { AssistNetworkJobState } from './network-job';
 
 export const ASSIST_MENU = {
@@ -32,6 +33,8 @@ export type AssistActionResponse = {
     readonly error?: string;
     readonly cached?: boolean;
     readonly excerpt?: string;
+    readonly urls?: readonly string[];
+    readonly panelOpened?: boolean;
 };
 
 export type AssistRuntimeMessage =
@@ -44,6 +47,7 @@ export type AssistRuntimeMessage =
     | { readonly type: 'assist:clearClip' }
     | { readonly type: 'assist:cancel' }
     | { readonly type: 'assist:getJob' }
+    | { readonly type: 'assist:getCompareReport' }
     | {
           readonly type: 'assist:clipState';
           readonly clip: string | null;
@@ -51,4 +55,8 @@ export type AssistRuntimeMessage =
     | {
           readonly type: 'assist:jobState';
           readonly job: AssistNetworkJobState | null;
+      }
+    | {
+          readonly type: 'assist:compareReportState';
+          readonly report: AssistCompareReport | null;
       };

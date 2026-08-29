@@ -1100,7 +1100,8 @@
       "compare": "Compare",
       "verify": "Verify",
       "clipSaved": "Clip saved — select another snippet, then Compare.",
-      "compareOpened": "Opened searches for both clips and a combined query.",
+      "compareOpened": "Compare report ready.",
+      "comparePanelOpened": "Compare panel opened — review snippets side by side.",
       "recentHandoff": "Same action ran recently — skipped duplicate tabs.",
       "defineExcerpt": "Opened article — {{excerpt}}"
     },
@@ -1122,11 +1123,33 @@
       },
       "customUrlLabel": "Custom search URL",
       "customUrlHint": "Include %s where the query goes, e.g. https://example.com/search?q=%s",
-      "contextMenuHint": "Compare workflow: Save clip on the first snippet, then Compare on the second. Verify needs Authenticity assist enabled (Assist → Advanced).",
+      "contextMenuHint": "Compare: save clip on the first snippet, then Compare on the second to open the side-by-side panel. Verify needs Authenticity assist enabled (Assist → Advanced).",
       "dailyQuotaUsed": "Daily handoff quota used",
       "dailyQuotaCap": "Daily handoff quota cap",
       "dailyQuotaHint": "Counts search, define, and compare tab opens. Verify uses the separate authenticity quota.",
       "saved": "Saved"
+    },
+    "compare": {
+      "panel": {
+        "heading": "Compare snippets",
+        "empty": "No compare report yet. Save a clip, select a second snippet, then choose Compare.",
+        "advisory": "Advisory only — word overlap and public excerpts, not a truth verdict.",
+        "sideA": "Snippet A",
+        "sideB": "Snippet B",
+        "savedClip": "Saved clip",
+        "currentSelection": "Current selection",
+        "overlapHeading": "Overlap",
+        "sharedTerms": "Shared terms:",
+        "openSource": "Open source",
+        "openSearch": "Open combined web search",
+        "openVerify": "Open Verify panel"
+      },
+      "overlap": {
+        "empty": "Not enough text to compare overlap.",
+        "distinct": "Different wording — {{percent}}% shared terms (mostly distinct topics).",
+        "partial": "Some overlap — {{percent}}% shared terms. Review both excerpts.",
+        "similar": "Similar wording — {{percent}}% shared terms. Check whether claims align."
+      }
     }
   }
 }

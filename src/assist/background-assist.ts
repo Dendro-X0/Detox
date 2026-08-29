@@ -1,17 +1,15 @@
 /// <reference types="chrome" />
 import { openAuthenticityPanel } from '../authenticity/open-panel';
 import { getAuthenticitySettings, loadAuthenticitySettings } from '../mods/analyzers/authenticity/settings-store';
-import {
-    prepareCompareHandoff,
-    prepareDefineHandoff,
-    prepareSearchHandoff,
-} from './assist-actions';
+import { prepareComparePanel, prepareDefineHandoff, prepareSearchHandoff } from './assist-actions';
 import { loadAssistSettings } from './assist-settings-store';
 import { clearCompareClip, loadCompareClip, saveCompareClip } from './compare-clip-store';
+import { loadCompareReport } from './compare-report';
 import {
     cancelAssistNetworkJob,
     getAssistNetworkJobState,
 } from './network-job';
+import { openComparePanel } from './open-compare-panel';
 import { ASSIST_MENU } from './types';
 import type { AssistActionResponse, AssistRuntimeMessage } from './types';
 
@@ -36,7 +34,7 @@ async function runDefine(text: string): Promise<AssistActionResponse> {
     return plan;
 }
 
-async function runCompare(text: string): Promise<AssistActionResponse> {
+async function runCompare(text: string, tabId?: number): Promise<AssistActionResponse> {
     const clip = await loadCompareClip();
     if (!clip) {
         return {
@@ -45,10 +43,14 @@ async function runCompare(text: string): Promise<AssistActionResponse> {
         };
     }
     const settings = await loadAssistSettings();
-    const plan = await prepareCompareHandoff(text, clip, settings);
-    if (!plan.ok || !plan.urls?.length) return plan;
-    if (!plan.cached) await openUrls(plan.urls);
-    return plan;
+    const plan = await prepareComparePanel(text, clip, settings);
+    if (!plan.ok) return plan;
+
+    if (tabId) {
+        await openComparePanel(tabId);
+    }
+
+    return { ...plan, panelOpened: Boolean(tabId) };
 }
 
 async function runVerify(tabId: number, text: string): Promise<AssistActionResponse> {
@@ -95,7 +97,7 @@ export function registerAssistBackgroundHandlers(): void {
                 return;
             }
             if (menuId === ASSIST_MENU.compare) {
-                await runCompare(selection);
+                await runCompare(selection, tab.id);
                 return;
             }
             if (menuId === ASSIST_MENU.verify) {
@@ -123,7 +125,8 @@ export function registerAssistBackgroundHandlers(): void {
             return true;
         }
         if (typed.type === 'assist:compare') {
-            void runCompare(typed.text).then(sendResponse);
+            const tabId = sender.tab?.id;
+            void runCompare(typed.text, tabId).then(sendResponse);
             return true;
         }
         if (typed.type === 'assist:verify') {
@@ -143,6 +146,15 @@ export function registerAssistBackgroundHandlers(): void {
         if (typed.type === 'assist:getJob') {
             void getAssistNetworkJobState().then((job) => {
                 sendResponse({ type: 'assist:jobState', job } satisfies AssistRuntimeMessage);
+            });
+            return true;
+        }
+        if (typed.type === 'assist:getCompareReport') {
+            void loadCompareReport().then((report) => {
+                sendResponse({
+                    type: 'assist:compareReportState',
+                    report,
+                } satisfies AssistRuntimeMessage);
             });
             return true;
         }

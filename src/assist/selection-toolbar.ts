@@ -128,6 +128,7 @@ function sendAssist(type: 'assist:search' | 'assist:define' | 'assist:saveClip' 
             error?: string;
             cached?: boolean;
             excerpt?: string;
+            panelOpened?: boolean;
         } | undefined;
         if (record && record.ok === false && record.error) {
             const message =
@@ -143,10 +144,17 @@ function sendAssist(type: 'assist:search' | 'assist:define' | 'assist:saveClip' 
             setStatus(host, runtimeTranslate('assist.toolbar.recentHandoff'));
             return;
         }
+        if (type === 'assist:compare' && record?.ok) {
+            setStatus(
+                host,
+                record.panelOpened
+                    ? runtimeTranslate('assist.toolbar.comparePanelOpened')
+                    : runtimeTranslate('assist.toolbar.compareOpened')
+            );
+            return;
+        }
         if (type === 'assist:saveClip') {
             setStatus(host, runtimeTranslate('assist.toolbar.clipSaved'));
-        } else if (type === 'assist:compare') {
-            setStatus(host, runtimeTranslate('assist.toolbar.compareOpened'));
         } else if (type === 'assist:define' && record?.excerpt) {
             const snippet =
                 record.excerpt.length > 72 ? `${record.excerpt.slice(0, 72)}…` : record.excerpt;
