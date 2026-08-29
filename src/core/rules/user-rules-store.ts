@@ -54,15 +54,37 @@ export function isDomainAllowlisted(hostname: string): boolean {
     return isHostnameAllowlisted(hostname, currentRules.allowDomains);
 }
 
-export function textMatchesAllowKeywords(text: string): boolean {
-    const normalized = text.toLowerCase();
-    return currentRules.allowKeywords.some((keyword) => normalized.includes(keyword));
+/** Assist-first: allow-keyword exemptions retired from UX; always false. */
+export function textMatchesAllowKeywords(_text: string): boolean {
+    return false;
 }
 
 export async function loadUserRules(): Promise<UserRulesSettings> {
-    const result = await chrome.storage.local.get(['userRules', 'userKeywords']);
-    const record = result as UserRulesStorageRecord;
+    const result = await chrome.storage.local.get([
+        'userRules',
+        'userKeywords',
+        'invisibleNoiseEngineMigrated',
+    ]);
+    const record = result as UserRulesStorageRecord & {
+        readonly invisibleNoiseEngineMigrated?: boolean;
+    };
     currentRules = mergeRulesFromStorage(record);
+
+    // One-time: clear user-authored block/allow lists; domains kept. Mode re-apply restores engine keywords.
+    if (!record.invisibleNoiseEngineMigrated) {
+        const cleared: UserRulesSettings = {
+            blockKeywords: [],
+            allowKeywords: [],
+            allowDomains: currentRules.allowDomains,
+        };
+        currentRules = cleared;
+        await chrome.storage.local.set({
+            userRules: cleared,
+            userKeywords: [],
+            invisibleNoiseEngineMigrated: true,
+        });
+    }
+
     return currentRules;
 }
 

@@ -147,6 +147,9 @@ export default function AuthenticitySettingsPanel() {
                     <span>{t('authenticity.searchOnlyDefault')}</span>
                 </label>
             </div>
+            <p className="sl-form-hint" style={{ marginTop: '0.35rem' }}>
+                {t('authenticity.searchOnlyDefaultHint')}
+            </p>
 
             <h4 className="sl-subsection-title">{t('authenticity.scopeHeading')}</h4>
             <label className="sl-check-row">

@@ -20,14 +20,14 @@ import {
 import { getBrowsingMode } from './core/modes/browsing-modes';
 import { loadOnboardingPrefill } from './onboarding/load-onboarding-prefill';
 import { openWizardSamplePage } from './onboarding/sample-page';
-import type { BotherCategory, OnboardingDraft } from './onboarding/types';
+import type { OnboardingDraft } from './onboarding/types';
 import FilterStylePreview from './dashboard/FilterStylePreview';
 import {
     SITE_WHITELIST_PRESETS,
     type SiteWhitelistPresetId,
 } from './core/rules/site-whitelist-presets';
 
-type WizardStep = 'welcome' | 'language' | 'mode' | 'topics' | 'style' | 'sensitivity' | 'whitelist' | 'authenticity' | 'done';
+type WizardStep = 'welcome' | 'language' | 'mode' | 'style' | 'sensitivity' | 'whitelist' | 'assist' | 'done';
 
 type SetupPath = 'express' | 'preset-mode' | 'custom';
 
@@ -41,15 +41,6 @@ type OnboardingWizardProps = {
     readonly onComplete: (options?: WizardCompleteOptions) => void;
 };
 
-const BOTHER_IDS: readonly BotherCategory[] = [
-    'outrage',
-    'spam',
-    'hostile',
-    'engagement-bait',
-    'low-effort',
-    'geopolitics',
-];
-
 const FILTER_STYLE_IDS: readonly { readonly id: EnforcementActionId; readonly fullOnly?: boolean }[] = [
     { id: 'dim' },
     { id: 'blur', fullOnly: true },
@@ -58,9 +49,9 @@ const FILTER_STYLE_IDS: readonly { readonly id: EnforcementActionId; readonly fu
 
 const SENSITIVITY_IDS: readonly PolicyPreset[] = ['conservative', 'balanced', 'strict'];
 
-const CUSTOM_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'topics', 'style', 'sensitivity', 'whitelist', 'authenticity', 'done'];
-const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whitelist', 'authenticity', 'done'];
-const EXPRESS_STEPS: readonly WizardStep[] = ['welcome', 'done'];
+const CUSTOM_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'style', 'sensitivity', 'whitelist', 'assist', 'done'];
+const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whitelist', 'assist', 'done'];
+const EXPRESS_STEPS: readonly WizardStep[] = ['welcome', 'assist', 'done'];
 
 const RECOMMENDED_MODE_ID: BrowsingModeId = 'focus';
 const RECOMMENDED_EXPRESS_PRESET_ID: ExpressPresetId = 'tech-music';
@@ -70,7 +61,11 @@ function stepLabelsForPath(
     t: (key: string) => string
 ): readonly string[] {
     if (setupPath === 'express') {
-        return [t('wizard.stepLabels.welcome'), t('wizard.stepLabels.done')];
+        return [
+            t('wizard.stepLabels.welcome'),
+            t('wizard.stepLabels.assist'),
+            t('wizard.stepLabels.done'),
+        ];
     }
     const keys =
         setupPath === 'custom'
@@ -78,11 +73,10 @@ function stepLabelsForPath(
                   'wizard.stepLabels.welcome',
                   'wizard.stepLabels.language',
                   'wizard.stepLabels.mode',
-                  'wizard.stepLabels.topics',
                   'wizard.stepLabels.style',
                   'wizard.stepLabels.sensitivity',
                   'wizard.stepLabels.whitelist',
-                  'wizard.stepLabels.authenticity',
+                  'wizard.stepLabels.assist',
                   'wizard.stepLabels.done',
               ]
             : [
@@ -90,7 +84,7 @@ function stepLabelsForPath(
                   'wizard.stepLabels.language',
                   'wizard.stepLabels.mode',
                   'wizard.stepLabels.whitelist',
-                  'wizard.stepLabels.authenticity',
+                  'wizard.stepLabels.assist',
                   'wizard.stepLabels.done',
               ];
     return keys.map((key) => t(key));
@@ -102,14 +96,14 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const [setupPath, setSetupPath] = useState<SetupPath | null>(null);
     const [expressPresetId, setExpressPresetId] = useState<ExpressPresetId | null>(null);
     const [browsingModeId, setBrowsingModeId] = useState<BrowsingModeId | null>(null);
-    const [bothers, setBothers] = useState<readonly BotherCategory[]>(['outrage', 'spam']);
     const [actionId, setActionId] = useState<EnforcementActionId>(DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId);
     const [preset, setPreset] = useState<PolicyPreset>('balanced');
     const [saving, setSaving] = useState(false);
     const [prefillReady, setPrefillReady] = useState(false);
     const [isSetupAgain, setIsSetupAgain] = useState(false);
     const [whitelistPresetIds, setWhitelistPresetIds] = useState<readonly SiteWhitelistPresetId[]>([]);
-    const [authenticityEnabled, setAuthenticityEnabled] = useState(false);
+    const [assistEnabled, setAssistEnabled] = useState(false);
+    const [verifyEnabled, setVerifyEnabled] = useState(false);
     const [authenticityLlmApiKey, setAuthenticityLlmApiKey] = useState('');
 
     useEffect(() => {
@@ -117,7 +111,8 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             setLocaleId(prefill.localeId);
             setIsSetupAgain(prefill.isSetupAgain);
             setWhitelistPresetIds(prefill.whitelistPresetIds);
-            setAuthenticityEnabled(prefill.authenticityEnabled);
+            setAssistEnabled(prefill.assistEnabled);
+            setVerifyEnabled(prefill.verifyEnabled);
             setAuthenticityLlmApiKey(prefill.authenticityLlmApiKey);
             if (prefill.setupPath === 'express' && prefill.expressPresetId) {
                 setSetupPath('express');
@@ -129,7 +124,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 setSetupPath('custom');
                 setActionId(prefill.actionId);
                 setPreset(prefill.preset);
-                setBothers(prefill.bothers);
+                setBrowsingModeId(prefill.browsingModeId ?? RECOMMENDED_MODE_ID);
             } else if (!prefill.isSetupAgain) {
                 setBrowsingModeId(RECOMMENDED_MODE_ID);
                 setExpressPresetId(RECOMMENDED_EXPRESS_PRESET_ID);
@@ -171,10 +166,6 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         };
     }, [activeSteps, step, wizardStepLabels, t]);
 
-    const toggleBother = (id: BotherCategory): void => {
-        setBothers((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]));
-    };
-
     const selectExpressPreset = (presetId: ExpressPresetId): void => {
         setSetupPath('express');
         setExpressPresetId(presetId);
@@ -190,7 +181,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const selectCustomPath = (): void => {
         setSetupPath('custom');
         setExpressPresetId(null);
-        setBrowsingModeId(null);
+        setBrowsingModeId((current) => current ?? RECOMMENDED_MODE_ID);
     };
 
     const startGuidedSetup = (): void => {
@@ -212,17 +203,20 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
 
     const buildDraft = (): OnboardingDraft => {
         const whitelist = whitelistPresetIds.length > 0 ? whitelistPresetIds : undefined;
-        const authenticityAssist = authenticityEnabled
+        const authenticityAssist = assistEnabled
             ? {
                   enabled: true as const,
-                  llmApiKey: authenticityLlmApiKey.trim() || undefined,
+                  verifyEnabled: verifyEnabled || undefined,
+                  llmApiKey: verifyEnabled && authenticityLlmApiKey.trim()
+                      ? authenticityLlmApiKey.trim()
+                      : undefined,
               }
             : undefined;
         if (setupPath === 'custom') {
             return {
                 setupPath: 'custom',
                 localeId,
-                bothers,
+                browsingModeId: browsingModeId ?? RECOMMENDED_MODE_ID,
                 actionId,
                 preset,
                 whitelistPresetIds: whitelist,
@@ -271,7 +265,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const next = (): void => {
         if (step === 'welcome') {
             if (setupPath === 'express' && expressPresetId) {
-                setStep('done');
+                setStep('assist');
                 return;
             }
             if (setupPath === null) {
@@ -289,17 +283,14 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
         }
         if (step === 'mode') {
             if (setupPath === 'custom') {
-                setStep('topics');
+                if (browsingModeId === null) setBrowsingModeId(RECOMMENDED_MODE_ID);
+                setStep('style');
                 return;
             }
             if (setupPath === 'preset-mode' && browsingModeId) {
                 setStep('whitelist');
                 return;
             }
-            return;
-        }
-        if (step === 'topics') {
-            setStep('style');
             return;
         }
         if (step === 'style') {
@@ -311,10 +302,10 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
             return;
         }
         if (step === 'whitelist') {
-            setStep('authenticity');
+            setStep('assist');
             return;
         }
-        if (step === 'authenticity') {
+        if (step === 'assist') {
             setStep('done');
             return;
         }
@@ -329,21 +320,13 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     };
 
     const modeStepValid =
-        setupPath === 'preset-mode' ? browsingModeId !== null : setupPath === 'custom';
-    const topicsStepValid = bothers.length > 0;
-    const stepValidationMessage =
-        step === 'mode' && !modeStepValid
-            ? t('wizard.mode.pickOne')
-            : step === 'topics' && !topicsStepValid
-              ? t('wizard.topics.pickAtLeastOne')
-              : null;
-
-    const canContinue =
-        saving ||
-        (step === 'mode' && !modeStepValid) ||
-        (step === 'topics' && !topicsStepValid)
-            ? false
+        setupPath === 'preset-mode' || setupPath === 'custom'
+            ? browsingModeId !== null
             : true;
+    const stepValidationMessage =
+        step === 'mode' && !modeStepValid ? t('wizard.mode.pickOne') : null;
+
+    const canContinue = saving || (step === 'mode' && !modeStepValid) ? false : true;
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent): void => {
@@ -365,12 +348,10 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
     const expressPresetLabel =
         expressPresetId !== null ? t(`wizard.expressPresets.${expressPresetId}.label`) : null;
 
-    const topicsSummary =
-        setupPath === 'custom'
-            ? t('wizard.done.topicsCount', { count: bothers.length })
-            : setupPath === 'express' && expressPresetLabel
-              ? expressPresetLabel
-              : activeModeLabel;
+    const pathSummary =
+        setupPath === 'express' && expressPresetLabel
+            ? expressPresetLabel
+            : activeModeLabel;
 
     const whitelistSummary =
         whitelistPresetIds.length > 0
@@ -379,11 +360,13 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
 
     const reviewRows = useMemo(() => {
         const whitelistRow = { label: t('wizard.done.reviewWhitelist'), value: whitelistSummary };
-        const authenticityRow = {
-            label: t('wizard.done.reviewAuthenticity'),
-            value: authenticityEnabled
-                ? t('wizard.done.authenticityEnabled')
-                : t('wizard.done.authenticityDisabled'),
+        const assistRow = {
+            label: t('wizard.done.reviewAssist'),
+            value: !assistEnabled
+                ? t('wizard.done.assistDisabled')
+                : verifyEnabled
+                  ? t('wizard.done.assistWithVerify')
+                  : t('wizard.done.assistEnabled'),
         };
         if (setupPath === 'express' && expressPresetId) {
             const express = getExpressPreset(expressPresetId);
@@ -404,7 +387,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 },
                 { label: t('wizard.done.reviewLanguage'), value: localeLabel },
                 whitelistRow,
-                authenticityRow,
+                assistRow,
             ];
             if (hasTopicSeeds) {
                 rows.splice(3, 0, {
@@ -419,27 +402,28 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 { label: t('wizard.done.reviewMode'), value: activeModeLabel ?? '—' },
                 { label: t('wizard.done.reviewLanguage'), value: localeLabel },
                 whitelistRow,
-                authenticityRow,
+                assistRow,
             ];
         }
         return [
-            { label: t('wizard.done.reviewTopics'), value: topicsSummary },
+            { label: t('wizard.done.reviewMode'), value: activeModeLabel ?? '—' },
             { label: t('wizard.done.reviewStyle'), value: t(`wizard.filterStyles.${actionId}`) },
             { label: t('wizard.done.reviewSensitivity'), value: t(`wizard.sensitivityPresets.${preset}.label`) },
             { label: t('wizard.done.reviewLanguage'), value: localeLabel },
             whitelistRow,
-            authenticityRow,
+            assistRow,
         ];
     }, [
         actionId,
         activeModeLabel,
-        authenticityEnabled,
+        assistEnabled,
+        verifyEnabled,
         localeLabel,
         preset,
         expressPresetId,
         setupPath,
         t,
-        topicsSummary,
+        pathSummary,
         whitelistSummary,
     ]);
 
@@ -654,30 +638,6 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                     </div>
                 ) : null}
 
-                {step === 'topics' ? (
-                    <div className="sl-panel">
-                        <h3>{t('wizard.topics.heading')}</h3>
-                        <p className="muted" style={{ marginTop: 0 }}>
-                            {t('wizard.topics.description')}
-                        </p>
-                        <p className="sl-wizard-callout">{t('wizard.topics.noiseVsTopicNote')}</p>
-                        <div className="sl-choice-list">
-                            {BOTHER_IDS.map((id) => (
-                                <label
-                                    key={id}
-                                    className={`sl-choice-item${bothers.includes(id) ? ' is-active' : ''}`}
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={bothers.includes(id)}
-                                        onChange={() => toggleBother(id)}
-                                    />
-                                    <span>{t(`wizard.botherCategories.${id}`)}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                ) : null}
 
                 {step === 'style' ? (
                     <div className="sl-panel">
@@ -786,48 +746,72 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                     </div>
                 ) : null}
 
-                {step === 'authenticity' ? (
+                {step === 'assist' ? (
                     <div className="sl-panel">
-                        <h3>{t('wizard.authenticity.heading')}</h3>
+                        <h3>{t('wizard.assist.heading')}</h3>
                         <p className="muted" style={{ marginTop: 0 }}>
-                            {t('wizard.authenticity.description')}
+                            {t('wizard.assist.description')}
                         </p>
-                        <p className="sl-wizard-callout">{t('wizard.authenticity.experimentalNote')}</p>
                         <label className="sl-choice-item sl-choice-item--checkbox">
                             <input
                                 type="checkbox"
-                                checked={authenticityEnabled}
-                                onChange={(event) => setAuthenticityEnabled(event.target.checked)}
+                                checked={assistEnabled}
+                                onChange={(event) => {
+                                    const checked = event.target.checked;
+                                    setAssistEnabled(checked);
+                                    if (!checked) setVerifyEnabled(false);
+                                }}
                             />
                             <span className="sl-choice-item-body">
-                                <strong>{t('wizard.authenticity.enableLabel')}</strong>
+                                <strong>{t('wizard.assist.enableLabel')}</strong>
                                 <span className="muted sl-choice-item-hint">
-                                    {t('wizard.authenticity.enableHint')}
+                                    {t('wizard.assist.enableHint')}
                                 </span>
                             </span>
                         </label>
-                        {authenticityEnabled ? (
+                        {assistEnabled ? (
+                            <label
+                                className="sl-choice-item sl-choice-item--checkbox"
+                                style={{ marginTop: '0.75rem' }}
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={verifyEnabled}
+                                    onChange={(event) => setVerifyEnabled(event.target.checked)}
+                                />
+                                <span className="sl-choice-item-body">
+                                    <strong>{t('wizard.assist.verifyLabel')}</strong>
+                                    <span className="muted sl-choice-item-hint">
+                                        {t('wizard.assist.verifyHint')}
+                                    </span>
+                                </span>
+                            </label>
+                        ) : null}
+                        {assistEnabled && verifyEnabled ? (
                             <div className="sl-form-stack" style={{ marginTop: '1rem' }}>
+                                <p className="sl-wizard-callout" style={{ marginBottom: 0 }}>
+                                    {t('wizard.assist.verifyExperimentalNote')}
+                                </p>
                                 <div className="sl-form-field">
-                                    <label className="sl-form-label" htmlFor="wizard-authenticity-llm-key">
-                                        {t('wizard.authenticity.llmApiKeyLabel')}
+                                    <label className="sl-form-label" htmlFor="wizard-assist-llm-key">
+                                        {t('wizard.assist.llmApiKeyLabel')}
                                     </label>
                                     <input
-                                        id="wizard-authenticity-llm-key"
+                                        id="wizard-assist-llm-key"
                                         type="password"
                                         className="sl-input"
-                                        placeholder={t('wizard.authenticity.llmApiKeyPlaceholder')}
+                                        placeholder={t('wizard.assist.llmApiKeyPlaceholder')}
                                         value={authenticityLlmApiKey}
                                         onChange={(event) => setAuthenticityLlmApiKey(event.target.value)}
                                     />
                                     <p className="sl-form-hint" style={{ marginBottom: 0 }}>
-                                        {t('wizard.authenticity.llmApiKeyHint')}
+                                        {t('wizard.assist.llmApiKeyHint')}
                                     </p>
                                 </div>
                             </div>
                         ) : null}
-                        <p className="muted" style={{ fontSize: '0.82rem', marginBottom: 0 }}>
-                            {t('wizard.authenticity.skipHint')}
+                        <p className="muted" style={{ fontSize: '0.82rem', marginBottom: 0, marginTop: '1rem' }}>
+                            {t('wizard.assist.skipHint')}
                         </p>
                     </div>
                 ) : null}
@@ -859,6 +843,7 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                             <p className="sl-wizard-callout">{t('wizard.done.expressTopicSeedsNote')}</p>
                         ) : null}
                         <ul className="sl-handoff-list">
+                            <li>{t('wizard.done.tipAssist')}</li>
                             <li>{t('wizard.done.tipDashboardHandoff')}</li>
                             <li>{t('wizard.done.tipBrowse')}</li>
                             <li>{t('wizard.done.tipReveal')}</li>

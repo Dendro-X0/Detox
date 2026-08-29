@@ -86,6 +86,7 @@ export function installAuthenticityContentBridge(): void {
                 pageTitle: document.title,
                 url: location.href,
                 hostname: location.hostname,
+                searchOnly: (record as { searchOnly?: boolean }).searchOnly,
             });
         }
     });

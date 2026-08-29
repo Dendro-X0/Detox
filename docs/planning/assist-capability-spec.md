@@ -1,12 +1,12 @@
-# Assist capability — specification & roadmap (draft)
+# Assist capability — specification & roadmap
 
-> **Status:** Draft — **narrow A1 handoff shipped** (Search / Define / Compare clip / Verify bridge); full A2–A4 + store Assist promotion still deferred  
-> **Layer:** Act / Understand (not Steer / automatic filtering)  
-> **Related:** [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) P2 · [`../experimental/authenticity-analysis.md`](../experimental/authenticity-analysis.md) · [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md) (Assist is **not** v3.0 hero)
+> **Status:** **A1 is the core product surface** (Search / Define / Compare / Verify bridge). A2–A4 remain phased.  
+> **Layer:** **Primary Act** (research / retrieve / compare) — Steer is secondary via [invisible noise](./invisible-noise-engine.md)  
+> **Related:** [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) · [`../experimental/authenticity-analysis.md`](../experimental/authenticity-analysis.md) · [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md)
 
-This document turns the product picture — *users define value; Assist helps them do something with selected text* — into a **working specification** and **phased roadmap**. Nothing here expands the locked v3.0 text-noise launch unless explicitly promoted later.
+SignalLens’s primary job is helping users **do something with selected text** — not curating keyword filters.
 
-**2026-08-28:** Full Assist A1–A4 / store copy deferred. **Reopened narrowly** for usable selection widgets: floating toolbar + context menu that open search / Wikipedia / compare tabs (and Verify when authenticity is enabled). A2–A4 and store Assist hero remain parked until §7.
+**2026-08-28:** Assist-first pivot — A1 toolbar/menus are the hero UX; Option A noise-filter store lock superseded. A2–A4 (academic packs, personal index, hardened verify depth) stay phased.
 
 ---
 
@@ -136,16 +136,16 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 
 **Exit:** User can select text and get search or definition without enabling Verify; Assist unused ≠ broken filtering.
 
-### Phase A2 — Harden Verify (news) · **~P2**
+### Phase A2 — Harden Verify (news) · **in progress**
 
-| # | Deliverable | Job |
-|---|-------------|-----|
-| A2-1 | Script-first retrieval hardening (existing authenticity target) | Logic |
-| A2-2 | Intent chip **Verify** from selection → side panel report | Act |
-| A2-3 | Auditable trail UI (sources, stances, limitations) | UX |
-| A2-4 | Optional wizard opt-in for Assist | UX |
+| # | Deliverable | Job | Status |
+|---|-------------|-----|--------|
+| A2-1 | Script-first retrieval hardening — search-only path fetches + verifies snippets | Logic | **Done (slice)** |
+| A2-2 | Intent chip **Verify** from selection → side panel report | Act | Done (A1 bridge) |
+| A2-3 | Auditable trail UI (excerpts, mode banner, per-run search-only) | UX | **Done (slice)** |
+| A2-4 | Optional wizard opt-in for Assist | UX | **Done (slice)** |
 
-**Exit:** Dogfood: selection → report with real links; zero feed auto-hide from Verify.
+**Exit:** Dogfood: selection → report with openable links **and fetched excerpts** on search-only; zero feed auto-hide from Verify.
 
 ### Phase A3 — Compare & deepen · **~P2 late / P3**
 
@@ -214,12 +214,12 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 
 ## 9. Immediate next steps
 
-1. ~~**Review §7**~~ — Full Assist still deferred; **narrow selection handoff implemented** (see changelog).
-2. **Do not** expand A2–A4, academic packs, personal index, or Assist store listing until §7 is locked.
-3. **Continue** P0 Track C (store upload / Firefox QA) and P1 (topic diet Spike 3 / Preferences polish).
-4. Dogfood: select text → toolbar Search / Define / Save clip → Compare; Options → Plugins → Selection Assist for engine + toolbar toggle.
+1. **Ship Assist-first IA** — dedicated Assist tab; no keyword editors; invisible noise.
+2. **Do not** expand A2–A4 until capacity allows; A1 remains the store-claimable Assist surface.
+3. **Rewrite store listing** before public list — Assist-first claims only; no “your keywords.”
+4. Dogfood: select text → Search / Define / Save clip → Compare; Options → Assist for engine + toolbar.
 
-### Implemented surface (narrow A1 handoff)
+### Implemented surface (A1 — core)
 
 | Control | Behavior |
 |---------|----------|
@@ -227,7 +227,7 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 | Context menu → SignalLens | Same actions |
 | Compare | Session clip + second selection → three search tabs (A, B, A+B) |
 | Verify | Opens authenticity panel when that experimental plugin is enabled |
-| Options → Plugins → Selection Assist | Toolbar on/off + search engine (DDG / Google / Bing / custom `%s`) |
+| Options → Assist | Toolbar on/off + search engine (DDG / Google / Bing / custom `%s`) |
 
 ---
 
@@ -238,3 +238,6 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 | 2026-08-28 | Initial draft from Assist / verification / cross-reference product discussion |
 | 2026-08-28 | **Scope deferred** — §7 D1–D8 deferred; no A1–A4 or store Assist work until reopened |
 | 2026-08-28 | **Narrow A1 reopen** — selection toolbar + menus for Search/Define/Compare (+ Verify bridge); A2–A4 still deferred |
+| 2026-08-28 | **Assist-first pivot** — A1 promoted to core product surface; Option A noise hero superseded |
+| 2026-08-29 | **A2 slice** — search-only path always fetch+verify snippets; side panel excerpts + per-run search-only |
+| 2026-08-29 | **A2-4** — wizard Assist step (toolbar + optional Verify sub-opt-in); writes `assistSettings`; express path includes step |

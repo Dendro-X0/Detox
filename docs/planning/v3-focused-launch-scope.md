@@ -1,23 +1,41 @@
-# v3.0 focused launch scope (Option A)
+# Launch scope (Assist-first pivot)
 
-> **Decision:** Ship **v3.0.0** as a **text noise filter** with excellent Track 1 UX.  
-> **Authenticity assist** remains in the codebase (experimental, off by default) but is **not** a launch gate or store hero claim.  
-> **Companion:** [`ux-capability-roadmap.md`](./ux-capability-roadmap.md) · [`v3-acceptance-checklist.md`](./v3-acceptance-checklist.md) · [`version-roadmap.md`](./version-roadmap.md)
+> **Status:** **Option A superseded** (2026-08-28).  
+> **Previous decision:** Ship v3.0.0 as a text noise filter (Option A).  
+> **Current decision:** Ship as an **Assist-first** browsing assistant — selection search / define / compare as the hero; noise quieting via an [invisible engine](./invisible-noise-engine.md) (no keyword editors).  
+> **Companion:** [`purposeful-browsing-roadmap.md`](./purposeful-browsing-roadmap.md) · [`assist-capability-spec.md`](./assist-capability-spec.md) · [`ux-capability-roadmap.md`](./ux-capability-roadmap.md)
 
 ---
 
-## What Option A means
+## What Assist-first means
+
+| Pillar | Current ship | Deferred / secondary |
+|--------|--------------|----------------------|
+| **Store positioning** | “Select text to search, define, and compare — research while you browse.” | Keyword-list marketing |
+| **Primary UX** | Selection toolbar + SignalLens context menu (A1) | Editable block/allow keywords |
+| **Secondary UX** | Modes + sensitivity + site pause; topic diet on full build | Noise as hero claim |
+| **Filtering engine** | Invisible fixed scorer (mode bother maps + packs + behavior) | User-authored phrase lists |
+| **Authenticity / Verify** | Optional advanced under Assist | Store hero “fact-check” claim |
+| **Track 3** | Out of scope | Visual analysis |
+
+Historical Option A table (noise-filter hero) is retained below for audit only — **do not use for new store copy**.
+
+### Historical — Option A (superseded)
 
 | Pillar | v3.0.0 (Option A) | Deferred |
 |--------|-------------------|----------|
 | **Store positioning** | “Reduce promotional, bait, and toxic **language** — always reversible.” | “Research assist” as primary headline |
 | **Launch gates** | Personas **A, B, C, D** + **§F scope honesty** + **§G engineering** | Persona **E** (authenticity E2–E3) |
-| **Track 2 work** | Keep mod off by default; wizard opt-in unchanged; no pipeline rewrite in this phase | Script-first gather hardening, store copy for assist |
-| **Track 3** | Out of scope | Visual analysis, OCR, image moderation |
+| **Track 2 work** | Keep mod off by default; wizard opt-in unchanged | Script-first gather hardening |
+| **Track 3** | Out of scope | Visual analysis |
 
 ---
 
-## Phase exit: v2.3.0 unlisted → v3.0.0 listed
+**Store listing follow-up (before public list):** rewrite Chrome/Firefox listing and FAQ to Assist-first claims (select → search / define / compare). Do **not** ship Option A “your keywords” copy. See [`invisible-noise-engine.md`](./invisible-noise-engine.md).
+
+---
+
+## Phase exit: v2.3.0 unlisted → listed (Assist-first)
 
 ```mermaid
 flowchart LR

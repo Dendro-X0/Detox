@@ -149,7 +149,7 @@ export async function loadPreserveRulesForModeSwitch(): Promise<
     const result = await chrome.storage.local.get('userRules');
     const rules = (result as { userRules?: UserRulesSettings }).userRules;
     return {
-        allowKeywords: rules?.allowKeywords ?? [],
+        allowKeywords: [],
         allowDomains: rules?.allowDomains ?? [],
     };
 }

@@ -1,6 +1,5 @@
 import type { EnforcementActionId } from '../core/types/enforcement';
 import type { PolicyPreset } from '../core/types/policy';
-import type { BotherCategory } from '../core/types/bother-keywords';
 import type { BrowsingModeId } from '../core/modes/browsing-modes';
 import type { LocaleId } from '../i18n/types';
 import type { SiteWhitelistPresetId } from '../core/rules/site-whitelist-presets';
@@ -11,9 +10,12 @@ export { BOTHER_KEYWORD_MAP } from '../core/types/bother-keywords';
 
 export type PreferredSite = 'reddit' | 'youtube';
 
-/** Optional wizard step — off by default; enables search-only Wikipedia assist. */
+/** Optional wizard Assist opt-in — off by default (selection toolbar + optional Verify). */
 export type AuthenticityAssistOptIn = {
+    /** Selection toolbar + context menu (search / define / compare). */
     readonly enabled: boolean;
+    /** Search-only Verify sub-feature; only applies when `enabled` is true. */
+    readonly verifyEnabled?: boolean;
     readonly llmApiKey?: string;
 };
 
@@ -37,7 +39,7 @@ export type ExpressOnboardingDraft = {
 export type CustomOnboardingDraft = {
     readonly setupPath: 'custom';
     readonly localeId: LocaleId;
-    readonly bothers: readonly BotherCategory[];
+    readonly browsingModeId: BrowsingModeId;
     readonly actionId: EnforcementActionId;
     readonly preset: PolicyPreset;
     readonly whitelistPresetIds?: readonly SiteWhitelistPresetId[];

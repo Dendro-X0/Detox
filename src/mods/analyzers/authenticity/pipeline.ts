@@ -10,6 +10,7 @@ import { enrichClaimReviewReferences, type ClaimReviewSearchHit } from './claimr
 import { enrichWikipediaReferences } from './wikipedia-retrieval';
 import { buildSearchOnlyAssessments, synthesizeAssessments } from './t3-synthesis';
 import type { AnalysisScope, AuthenticityJobState, AuthenticityReport, SearchQueryRecord, SourceReference } from './types';
+import type { AuthenticitySettings } from './settings';
 import { filterReferencesToAllowlist } from './url-allowlist';
 import { scopeTextForCache } from './scope-resolver';
 import { i18nMessage } from '../../../i18n/localize';
@@ -26,6 +27,29 @@ async function updateJob(state: AuthenticityJobState): Promise<void> {
 
 export async function getAuthenticityJob(): Promise<AuthenticityJobState | null> {
     return (await sessionGet<AuthenticityJobState>(AUTHENTICITY_JOB_STORAGE_KEY)) ?? null;
+}
+
+/** Fetch and snippet-verify refs that are not already enriched (search-only and T3 paths). */
+export async function enrichUnverifiedReferencesFromFetch(
+    refs: readonly SourceReference[],
+    allowedUrls: ReadonlySet<string>,
+    settings: AuthenticitySettings
+): Promise<SourceReference[]> {
+    const cap = settings.maxSearchResults * settings.maxClaims;
+    const head = refs.slice(0, cap);
+    const tail = refs.slice(cap);
+    const enriched: SourceReference[] = [];
+
+    for (const ref of head) {
+        if (cancelRequested) throw new Error('cancelled');
+        if (ref.snippetVerified && ref.fetchedAt > 0) {
+            enriched.push(ref);
+            continue;
+        }
+        enriched.push(await enrichReferenceFromFetch(ref, allowedUrls, settings));
+    }
+
+    return [...enriched, ...tail];
 }
 
 export async function runAuthenticityAnalysis(input: {
@@ -136,27 +160,26 @@ export async function runAuthenticityAnalysis(input: {
         vettedReferences = enrichClaimReviewReferences(vettedReferences, claimReviewHitsByUrl);
     }
 
-    if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim() && settings.llmModel.trim()) {
+    const needsGenericFetch = vettedReferences.some(
+        (ref) => !(ref.snippetVerified && ref.fetchedAt > 0)
+    );
+    if (needsGenericFetch && vettedReferences.length > 0) {
         await updateJob({
             jobId,
             phase: 'fetching',
-            progress: 55,
+            progress: searchOnly ? 60 : 52,
             message: i18nMessage('authenticity.job.fetchingSnippets'),
             report: null,
             error: null,
         });
+        vettedReferences = await enrichUnverifiedReferencesFromFetch(
+            vettedReferences,
+            allowedUrls,
+            settings
+        );
+    }
 
-        const enriched: SourceReference[] = [];
-        for (const ref of vettedReferences.slice(0, settings.maxSearchResults * settings.maxClaims)) {
-            if (cancelRequested) throw new Error('cancelled');
-            if (ref.snippetVerified && ref.fetchedAt > 0) {
-                enriched.push(ref);
-                continue;
-            }
-            enriched.push(await enrichReferenceFromFetch(ref, allowedUrls, settings));
-        }
-        vettedReferences = enriched;
-
+    if (!searchOnly && settings.tierT3 && settings.llmEndpoint.trim() && settings.llmModel.trim()) {
         await updateJob({
             jobId,
             phase: 'synthesizing',
@@ -181,7 +204,7 @@ export async function runAuthenticityAnalysis(input: {
             assessments,
             t0Notes,
             t1Notes,
-            limitations: buildLimitations(input.scope, searchOnly, vettedReferences.length),
+            limitations: buildLimitations(input.scope, false, vettedReferences.length),
             searchOnly: false,
             createdAt: Date.now(),
             advisoryOnly: true,
@@ -204,8 +227,8 @@ export async function runAuthenticityAnalysis(input: {
         assessments,
         t0Notes,
         t1Notes,
-        limitations: buildLimitations(input.scope, true, vettedReferences.length),
-        searchOnly: true,
+        limitations: buildLimitations(input.scope, searchOnly, vettedReferences.length),
+        searchOnly,
         createdAt: Date.now(),
         advisoryOnly: true,
     };

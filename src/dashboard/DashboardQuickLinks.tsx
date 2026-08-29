@@ -5,7 +5,7 @@ type DashboardQuickLinksProps = {
     readonly onNavigate: (tabId: SettingsTabId) => void;
 };
 
-const ESSENTIAL_LINK_IDS: readonly SettingsTabId[] = ['filtering', 'preferences'];
+const ESSENTIAL_LINK_IDS: readonly SettingsTabId[] = ['assist', 'preferences', 'filtering'];
 const ADVANCED_LINK_IDS: readonly SettingsTabId[] = ['plugins', 'privacy'];
 
 export default function DashboardQuickLinks({ onNavigate }: DashboardQuickLinksProps) {

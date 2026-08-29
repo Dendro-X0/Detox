@@ -41,7 +41,7 @@ async function runVerify(tabId: number, text: string): Promise<{ readonly ok: bo
     if (!getAuthenticitySettings().enabled) {
         return {
             ok: false,
-            error: 'Verify is off. Enable Authenticity assist under Options → Plugins (advanced).',
+            error: 'Verify is off. Enable Authenticity assist under Options → Assist (advanced).',
         };
     }
     await openAuthenticityPanel(tabId);

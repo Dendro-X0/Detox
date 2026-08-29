@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { isSettingsTabId, parseSettingsTabFromHash, resolveSettingsTabId } from '../../src/dashboard/settings-tabs';
 
 describe('settings tabs', () => {
-    it('accepts preferences and legacy rules hash alias', () => {
+    it('accepts assist and preferences tabs', () => {
+        expect(isSettingsTabId('assist')).toBe(true);
         expect(isSettingsTabId('preferences')).toBe(true);
         expect(resolveSettingsTabId('rules')).toBe('preferences');
-        expect(resolveSettingsTabId('preferences')).toBe('preferences');
+        expect(resolveSettingsTabId('assist')).toBe('assist');
     });
 
     it('maps legacy rules hash to preferences tab', () => {

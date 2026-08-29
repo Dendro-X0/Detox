@@ -87,20 +87,29 @@
       "preferences": "Präferenzen",
       "rules": "Regeln",
       "plugins": "Plugins",
-      "privacy": "Datenschutz"
+      "privacy": "Datenschutz",
+      "assist": "Assistent"
     },
     "preferences": {
-      "tabIntro": "Stimmen Sie ab, was Sie sehen — Interessen, Rausch-Phrasen, vertrauenswürdige Seiten und wie gefilterte Inhalte erscheinen.",
+      "tabIntro": "Interessen, automatische Beruhigung, vertrauenswürdige Seiten und Darstellung — ohne Keyword-Listen.",
       "sections": {
         "style": "Stil & Empfindlichkeit",
         "styleDescription": "Wie aggressiv Inhalte markiert werden und wie gefilterte Blöcke auf der Seite aussehen.",
         "interests": "Interessen",
-        "interestsDescription": "Themenbasierte Filterung für Nachrichten und Feeds (Full Build, experimentell). Getrennt von Rausch-Voreinstellungen.",
-        "interestsCoreNote": "Themen-Diät erfordert den Full Build mit dem Topic-classifier-Plugin. Rausch-Voreinstellungen und Schlüsselwörter unten funktionieren in allen Builds.",
-        "noise": "Rausch",
-        "noiseDescription": "Phrasen-Voreinstellungen und eigene Schlüsselwörter für Promo, Köder und feindseligen Ton — keine Schlagzeilen-Themen.",
+        "interestsDescription": "Themenbasierte Filterung für Nachrichten und Feeds (Vollversion). Getrennt von der automatischen Rauschberuhigung.",
+        "interestsCoreNote": "Themen-Diät braucht die Vollversion mit Themen-Klassifikator. Automatische Beruhigung funktioniert in allen Builds.",
+        "noise": "Automatische Beruhigung",
+        "noiseDescription": "Hintergrund-Rauschreduktion über eine feste Engine — nur Modus und Empfindlichkeit. Keyword-Listen sind nicht editierbar.",
         "sites": "Seiten",
         "sitesDescription": "Filterung auf Arbeits-Tools, E-Mail und anderen vertrauenswürdigen Domains pausieren."
+      },
+      "quieting": {
+        "heading": "Automatische Rauschberuhigung",
+        "description": "SignalLens dämpft Promo, Köder und feindlichen Ton mit eingebauten Mustern. Intensität über Modus und Empfindlichkeit — ohne Keyword-Listen.",
+        "modeLabel": "Browsing-Modus",
+        "sensitivityLabel": "Empfindlichkeit",
+        "hint": "Moduswechsel auch unter Übersicht. Filterstatistiken bleiben unter Filtern.",
+        "saved": "Gespeichert"
       }
     },
     "language": {
@@ -116,7 +125,7 @@
       "scanned7Day": "7-Tage gescannt"
     },
     "overview": {
-      "tabIntro": "Ihre Schaltzentrale — Surfmodus wählen, Aktivität sehen und zu Details springen.",
+      "tabIntro": "Text markieren zum Suchen, Definieren oder Vergleichen — Beruhigung und Seiten bei Bedarf nachjustieren.",
       "currentSettings": "Aktuelle Einstellungen",
       "focusMode": "Fokusmodus",
       "browsingMode": "Surfmodus",
@@ -164,10 +173,11 @@
       "quickLinksAdvancedHint": "Plugins, Authentizitäts-Assistent, Export/Import und Entwicklerwerkzeuge.",
       "quickLinks": {
         "filtering": "Inferenz, Detektoren und Erscheinungsbild",
-        "preferences": "Interessen, Rausch, Seiten und Filterstil",
+        "preferences": "Interessen, Beruhigung, Seiten und Filterstil",
         "rules": "Schlüsselwörter, Allowlisten und Seiten-Schwellen",
         "plugins": "Detektoren, Seiten-Hinweise und Authentizität",
-        "privacy": "Export, Import und Entwicklerwerkzeuge"
+        "privacy": "Export, Import und Entwicklerwerkzeuge",
+        "assist": "Markierten Text suchen, definieren und vergleichen"
       },
       "gettingStarted": {
         "heading": "Erste Schritte",
@@ -328,6 +338,9 @@
       "recentBlockedHeading": "Zuletzt blockierte Elemente ({{count}})",
       "noItemsBlocked": "Noch keine Elemente blockiert.",
       "noiseLabel": "Rauschen"
+    },
+    "assist": {
+      "tabIntro": "Auswahlwerkzeuge für Recherche und Abruf. Filterung bleibt sekundär unter Einstellungen."
     }
   },
   "rules": {
@@ -536,7 +549,7 @@
     "tierT1": "T1 — lokale Checkworthiness-Rangfolge (kostenlos)",
     "tierT2": "T2 — Such-API",
     "tierT3": "T3 — LLM vergleicht Snippets (Benutzer-Endpunkt)",
-    "searchOnlyDefault": "Standardmäßig nur Suche (empfohlen)",
+    "searchOnlyDefault": "Standard: nur Suche (Abruf + Auszüge, kein LLM)",
     "scopeHeading": "Umfang",
     "allowFullPage": "Ganzseiten-Analyse im Seitenpanel erlauben (auf Social Feeds nicht empfohlen)",
     "searchHeading": "Suche",
@@ -591,12 +604,13 @@
       "searchOnlyLimitation": "Nur-Suche-Modus — keine automatische Synthese.",
       "llmUnavailable": "LLM-Vergleich nicht verfügbar — Quellen manuell prüfen.",
       "verifyYourself": "Automatisierter Vergleich — Quellen selbst verifizieren."
-    }
+    },
+    "searchOnlyDefaultHint": "Empfohlen. Skripte suchen, laden und prüfen Auszüge; T3 + LLM nur für automatischen Vergleich aktivieren."
   },
   "sidepanel": {
     "heading": "Authentizitäts-Assistent",
     "reportHeading": "Authentizitätsbericht",
-    "disabledHint": "Funktion ist aus. Aktivieren unter Optionen → Plugins → Authentizitäts-Assistent.",
+    "disabledHint": "Funktion ist aus. Aktivieren unter Optionen → Assistent (Erweitert).",
     "openSettings": "Einstellungen öffnen",
     "advisory": "Nur Hinweis — blockiert nie Inhalte.",
     "reportTabNote": " (Bericht öffnet in diesem Browser in einem eigenen Tab.)",
@@ -638,7 +652,11 @@
       "selectTextFirst": "Zuerst Text auf der Seite auswählen (oder auf Ganzseiten-Umfang wechseln).",
       "fullPageDisabled": "Ganzseiten-Analyse ist in den Einstellungen deaktiviert.",
       "extractFailed": "Seitentext konnte nicht extrahiert werden. Tab neu laden."
-    }
+    },
+    "runSearchOnly": "Nur Suche (Quellen abrufen, keine LLM-Synthese)",
+    "runSearchOnlyHint": "Lädt öffentliche Seiten und zeigt Auszüge zum Öffnen. Nur ausschalten, wenn LLM-Synthese (T3) konfiguriert ist.",
+    "modeBannerSearchOnly": "Nur-Suche-Modus — Quellen und Auszüge zum Selbstlesen. Beratend, kein Urteil.",
+    "modeBannerSynthesis": "Synthese-Modus — LLM verglich die Aussage mit abgerufenen Auszügen. Quellen selbst prüfen."
   },
   "filterReasons": {
     "revealed": "Eingeblendet",
@@ -898,6 +916,7 @@
       "style": "Stil",
       "sensitivity": "Empfindlichkeit",
       "whitelist": "Arbeits-Apps",
+      "assist": "Assist",
       "authenticity": "Recherche-Hilfe",
       "done": "Fertig"
     },
@@ -913,7 +932,7 @@
       "quickStartHint": "Schnellstart aktiviert den Fokus-Surfmodus. Modus und Regeln können Sie jederzeit im Dashboard ändern.",
       "expressHeading": "Was möchten Sie beim Surfen?",
       "expressDescription": "Wählen Sie einen Startpunkt — Interessen und Regeln können Sie jederzeit unter Einstellungen ändern.",
-      "expressHint": "Preset wählen, dann Weiter — zwei Schritte bis zur Filterung.",
+      "expressHint": "Preset wählen, dann Weiter — optional Assist einrichten, bevor Sie starten.",
       "customizeSetup": "Stattdessen anpassen",
       "textOnlyLimitation": "SignalLens liest Seitentext, keine Bilder oder Videos. Beiträge nur mit Bildern werden nicht gefiltert.",
       "setupAgainNote": "Ihre bisherigen Auswahlen sind vorausgewählt. Passen Sie an und schließen Sie ab, um zu übernehmen."
@@ -922,7 +941,7 @@
       "heading": "Surfmodus wählen",
       "description": "Modi bündeln Empfindlichkeit, Themen, Filterstil und Seiten-Hinweise. Wählen Sie einen zum Start oder passen Sie alles an.",
       "customLabel": "Eigene Einstellungen",
-      "customHint": "Themen, Filterstil und Empfindlichkeit Schritt für Schritt festlegen.",
+      "customHint": "Stil und Empfindlichkeit selbst wählen — ohne Keyword-Listen.",
       "recommended": "Empfohlen",
       "pickOne": "Wählen Sie einen Surfmodus oder „Eigene Einstellungen“, um fortzufahren."
     },
@@ -939,6 +958,10 @@
       "reviewSensitivity": "Empfindlichkeit",
       "reviewLanguage": "Sprache",
       "reviewWhitelist": "Seiten-Whitelist",
+      "reviewAssist": "Assist",
+      "assistEnabled": "An (Suchen, Definieren, Vergleichen)",
+      "assistWithVerify": "An (inkl. Verify, nur Suche)",
+      "assistDisabled": "Aus",
       "reviewAuthenticity": "Authentizitäts-Assistent",
       "authenticityEnabled": "Aktiviert (nur Suche)",
       "authenticityDisabled": "Aus",
@@ -956,7 +979,8 @@
       "startBrowsing": "Surfen starten",
       "fineTuneDashboard": "Im Dashboard feinabstimmen",
       "openDashboard": "Dashboard öffnen",
-      "trySamplePage": "Auf Reddit ausprobieren"
+      "trySamplePage": "Auf Reddit ausprobieren",
+      "tipAssist": "Markieren Sie Text auf einer Seite, um mit dem Assistenten zu suchen, zu definieren oder zu vergleichen."
     },
     "language": {
       "heading": "Oberflächensprache",
@@ -1006,6 +1030,19 @@
       "description": "Optional. SignalLens scannt und filtert diese Seiten nicht — nützlich für E-Mail, Dokumente und Tabellen.",
       "skipHint": "Sie können diesen Schritt überspringen oder die Whitelist jederzeit unter Regeln im Dashboard ändern.",
       "noneSelected": "Keine"
+    },
+    "assist": {
+      "heading": "Auswahl-Assist (optional)",
+      "description": "Markieren Sie Text auf einer Seite zum Suchen, Definieren oder Vergleichen. Nichts wird automatisch ausgeblendet.",
+      "enableLabel": "Auswahl-Assist aktivieren",
+      "enableHint": "Zeigt eine schwebende Symbolleiste und Kontextmenü bei Textmarkierung.",
+      "verifyLabel": "Auch Verify aktivieren (experimentell)",
+      "verifyHint": "Prüft markierte Behauptungen anhand öffentlicher Quellen — standardmäßig nur Suche, keine LLM-Tokens.",
+      "verifyExperimentalNote": "Verify ist experimentell. Standardmäßig Wikipedia (kein API-Schlüssel). Nur öffentliche Quellen.",
+      "llmApiKeyLabel": "LLM-API-Schlüssel (optional)",
+      "llmApiKeyPlaceholder": "Überspringen für Verify nur Suche",
+      "llmApiKeyHint": "Nur für LLM-Synthese (T3) nötig. Später unter Optionen → Assist hinzufügbar.",
+      "skipHint": "Deaktiviert lassen zum Überspringen — jederzeit unter Optionen → Assist im Dashboard aktivierbar."
     },
     "authenticity": {
       "heading": "Ausgewählten Text recherchieren (optional)",
@@ -1079,7 +1116,7 @@
       },
       "customUrlLabel": "Eigene Such-URL",
       "customUrlHint": "Mit %s für die Abfrage, z. B. https://example.com/search?q=%s",
-      "contextMenuHint": "Vergleich: Clip speichern beim ersten Ausschnitt, dann Vergleichen beim zweiten. Prüfen braucht den Authentizitäts-Assistenten (Plugins → Erweitert).",
+      "contextMenuHint": "Vergleich: Clip speichern beim ersten Ausschnitt, dann Vergleichen beim zweiten. Prüfen braucht Authentizitäts-Assistent (Assistent → Erweitert).",
       "saved": "Gespeichert"
     }
   }

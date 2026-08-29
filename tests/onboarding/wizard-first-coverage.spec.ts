@@ -74,21 +74,21 @@ describe('wizard-first storage coverage', () => {
         }
     });
 
-    it('custom path clears browsing mode and writes policy + keywords', () => {
+    it('custom path writes mode + policy without keyword curation', () => {
         const patch = buildCustomOnboardingPatch({
             setupPath: 'custom',
             localeId: 'en',
-            bothers: ['spam', 'outrage'],
+            browsingModeId: 'focus',
             actionId: 'dim',
             preset: 'strict',
             whitelistPresetIds: ['music-lyrics'],
         });
 
-        expect(patch.activeBrowsingModeId).toBeNull();
+        expect(patch.activeBrowsingModeId).toBe('focus');
         expect(patch.policy).toMatchObject({ preset: 'strict', threshold: 0.3 });
         expect(patch.userRules).toMatchObject({
-            blockKeywords: expect.arrayContaining(['buy now', 'outrageous']),
             allowDomains: expect.arrayContaining(['open.spotify.com']),
+            allowKeywords: [],
         });
         expect(patch.enforcementAction).toMatchObject({ activeActionId: 'dim' });
     });

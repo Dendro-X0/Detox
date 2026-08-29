@@ -44,7 +44,7 @@ export const WIZARD_CUSTOM_STORAGE_KEYS = [
     'enabledModIds',
 ] as const;
 
-/** Nested fields under `userRules` set by wizard whitelist step. */
+/** Nested fields under `userRules` set by wizard (domains + engine-written keyword mirrors). */
 export const WIZARD_USER_RULES_FIELDS = ['blockKeywords', 'allowKeywords', 'allowDomains'] as const;
 
 /** Dashboard surfaces that should not be required for first-run setup. */
@@ -55,7 +55,7 @@ export const DASHBOARD_ADVANCED_SURFACES = [
     'rules.customKeywordEditor',
     'rules.perSiteThresholds',
     'plugins.modInstall',
-    'plugins.authenticityAssist',
+    'assist.authenticityAdvanced',
     'privacy.exportImport',
     'privacy.debugDiagnostics',
     'overview.runtimeStatus',
@@ -72,15 +72,17 @@ export const WIZARD_STEP_COVERAGE = {
     language: { storageKeys: ['preferredLocale'] as const, notes: 'UI locale only.' },
     mode: {
         storageKeys: ['activeBrowsingModeId', 'policy', 'userRules', 'userKeywords', 'enforcementAction', 'enabledModIds'] as const,
-        notes: 'Preset path bundles mode; custom path defers topics/style/sensitivity.',
+        notes: 'Selects browsing mode; invisible engine derives keywords from mode (no keyword-list step).',
     },
-    topics: { storageKeys: ['userRules', 'userKeywords'] as const, notes: 'Custom path only — blockKeywords from bother categories.' },
     style: { storageKeys: ['enforcementAction'] as const, notes: 'Custom path only — dim/blur/collapse.' },
     sensitivity: { storageKeys: ['policy'] as const, notes: 'Custom path only — preset + threshold.' },
     whitelist: { storageKeys: ['userRules'] as const, notes: 'Merges preset domains into userRules.allowDomains.' },
-    authenticity: {
-        storageKeys: ['authenticitySettings'] as const,
-        notes: 'Optional opt-in; search-only Wikipedia default when enabled.',
+    assist: {
+        storageKeys: ['assistSettings', 'authenticitySettings'] as const,
+        notes: 'Optional Assist opt-in (toolbar off by default); Verify sub-opt-in enables search-only Wikipedia.',
     },
-    done: { storageKeys: ['onboardingComplete', 'enabled'] as const, notes: 'Marks setup complete; enables filtering.' },
+    done: {
+        storageKeys: ['onboardingComplete', 'enabled'] as const,
+        notes: 'Marks setup complete; enables Assist + invisible quieting.',
+    },
 } as const;

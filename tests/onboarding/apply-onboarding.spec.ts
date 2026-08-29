@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi, beforeEach } from 'vitest';
 import {
     buildCustomOnboardingPatch,
     buildOnboardingStoragePatch,
@@ -19,19 +19,20 @@ describe('apply onboarding', () => {
         expect(patch.enabledModIds).toContain('detector-heuristic-keywords');
     });
 
-    it('applies custom rules without an active browsing mode', () => {
+    it('applies custom path with browsing mode and style overrides', () => {
         const patch = buildCustomOnboardingPatch({
             setupPath: 'custom',
             localeId: 'en',
-            bothers: ['spam'],
+            browsingModeId: 'research',
             actionId: 'dim',
             preset: 'balanced',
         });
-        expect(patch.activeBrowsingModeId).toBeNull();
+        expect(patch.activeBrowsingModeId).toBe('research');
         expect(patch.enabledModIds).toContain('detector-noise-patterns');
         expect(patch.enabledModIds).toContain('detector-behavior-signals');
+        expect(patch.policy).toMatchObject({ preset: 'balanced' });
         expect(patch.userRules).toMatchObject({
-            blockKeywords: expect.arrayContaining(['buy now']),
+            allowKeywords: [],
         });
     });
 

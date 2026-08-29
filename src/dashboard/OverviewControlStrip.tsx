@@ -49,8 +49,12 @@ export default function OverviewControlStrip({
 
     const chips: readonly { readonly label: string; readonly tab: SettingsTabId }[] = [
         {
+            label: t('settings.tabs.assist'),
+            tab: 'assist',
+        },
+        {
             label: `${t('settings.overview.controlStrip.mode')}: ${modeLabel}`,
-            tab: 'overview',
+            tab: 'preferences',
         },
         {
             label: `${t('settings.overview.controlStrip.sensitivity')}: ${t(`wizard.sensitivityPresets.${sensitivity}.label`)}`,

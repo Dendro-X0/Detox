@@ -92,7 +92,7 @@
 | E1 | Off by default | Fresh install | Authenticity mod disabled | Manual |
 | E2 | Select text analyze | Enable assist → select claim → analyze | Report with **fetched** URLs only | Manual + tests |
 | E3 | Could not verify | Obscure claim | Clear failure state; no invented URL | Manual |
-| E4 | Wizard opt-in | Complete wizard with authenticity unchecked | Assist remains off | Unit |
+| E4 | Wizard opt-in | Complete wizard with Assist unchecked | Assist remains off | Unit (`authenticity-opt-in.spec.ts`) |
 
 **Gate pass:** E1, E4 required; E2–E3 **optional under Option A** (authenticity not in v3.0 store hero). Required if authenticity is promoted in listing copy.
 

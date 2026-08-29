@@ -5,6 +5,7 @@ export function getSettingsTabLabels(
 ): readonly { readonly id: SettingsTabId; readonly label: string }[] {
     return [
         { id: 'overview', label: t('settings.tabs.overview') },
+        { id: 'assist', label: t('settings.tabs.assist') },
         { id: 'preferences', label: t('settings.tabs.preferences') },
         { id: 'filtering', label: t('settings.tabs.filtering') },
         { id: 'plugins', label: t('settings.tabs.plugins') },

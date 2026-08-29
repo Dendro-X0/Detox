@@ -3,12 +3,11 @@ import { buildBrowsingModePatch, getBrowsingMode } from '../core/modes/browsing-
 import { DEFAULT_ENFORCEMENT_ACTION_SETTINGS } from '../core/types/enforcement';
 import { PRESET_THRESHOLDS } from '../core/types/policy';
 import { DEFAULT_ROUTING_SETTINGS } from '../core/types/routing';
-import { DEFAULT_USER_RULES } from '../core/types/user-rules';
 import { isModUnlocked, REQUIRED_MOD_IDS } from '../mods/mod-manifest';
 import { LOCALE_STORAGE_KEY } from '../i18n/types';
 import { domainsFromPresetIds, type SiteWhitelistPresetId } from '../core/rules/site-whitelist-presets';
-import { BOTHER_KEYWORD_MAP } from '../core/types/bother-keywords';
-import { buildWizardAuthenticitySettings } from './authenticity-opt-in';
+import { BOTHER_KEYWORD_MAP, type BotherCategory } from '../core/types/bother-keywords';
+import { buildWizardAssistSettings, buildWizardAuthenticitySettings } from './authenticity-opt-in';
 import { getExpressPreset } from './express-presets';
 import type { OnboardingDraft } from './types';
 
@@ -18,7 +17,7 @@ function resolveAllowDomains(
     return domainsFromPresetIds(whitelistPresetIds ?? []);
 }
 
-function keywordsFromBothers(bothers: readonly (keyof typeof BOTHER_KEYWORD_MAP)[]): readonly string[] {
+function keywordsFromBothers(bothers: readonly BotherCategory[]): readonly string[] {
     const keywords = new Set<string>();
     for (const category of bothers) {
         for (const keyword of BOTHER_KEYWORD_MAP[category]) {
@@ -53,8 +52,11 @@ const INFERENCE_DEFAULTS = {
     onboardingComplete: true,
 };
 
-function authenticityPatchForDraft(draft: OnboardingDraft): Record<string, unknown> {
-    return { authenticitySettings: buildWizardAuthenticitySettings(draft.authenticityAssist) };
+function assistPatchForDraft(draft: OnboardingDraft): Record<string, unknown> {
+    return {
+        assistSettings: buildWizardAssistSettings(draft.authenticityAssist),
+        authenticitySettings: buildWizardAuthenticitySettings(draft.authenticityAssist),
+    };
 }
 
 export function buildPresetModeOnboardingPatch(
@@ -69,13 +71,14 @@ export function buildPresetModeOnboardingPatch(
         ...INFERENCE_DEFAULTS,
         [LOCALE_STORAGE_KEY]: draft.localeId,
         ...modePatch,
-        ...authenticityPatchForDraft(draft),
+        ...assistPatchForDraft(draft),
     };
 }
 
 /**
- * Express lifestyle preset: browsing mode + optional extra noise categories +
- * topic-diet seeds (stored disabled until Layer 2 is turned on).
+ * Express lifestyle preset: browsing mode + optional extra noise categories (engine)
+ * + topic-diet seeds (stored disabled until Layer 2 is turned on).
+ * Keyword lists in storage are engine mirrors only — not user-edited.
  */
 export function buildExpressOnboardingPatch(
     draft: Extract<OnboardingDraft, { setupPath: 'express' }>
@@ -110,39 +113,39 @@ export function buildExpressOnboardingPatch(
             ...modePatch.userRules,
             blockKeywords,
             allowDomains,
+            allowKeywords: [],
         },
         userKeywords: blockKeywords,
         topicPolicy: express.topicPolicy,
         expressPresetId: express.id,
-        ...authenticityPatchForDraft(draft),
+        ...assistPatchForDraft(draft),
     };
 }
 
+/** Custom path: mode + style/sensitivity — no user keyword lists. */
 export function buildCustomOnboardingPatch(draft: Extract<OnboardingDraft, { setupPath: 'custom' }>): Record<string, unknown> {
-    const preset = draft.preset;
-    const blockKeywords = keywordsFromBothers(draft.bothers);
     const allowDomains = resolveAllowDomains(draft.whitelistPresetIds);
+    const modePatch = buildBrowsingModePatch(draft.browsingModeId, {
+        allowDomains,
+        allowKeywords: [],
+    });
 
     return {
         ...INFERENCE_DEFAULTS,
         [LOCALE_STORAGE_KEY]: draft.localeId,
-        activeBrowsingModeId: null,
-        userRules: {
-            ...DEFAULT_USER_RULES,
-            blockKeywords,
-            allowDomains,
-        },
-        userKeywords: blockKeywords,
-        enabledModIds: resolveCustomEnabledModIds(),
+        ...modePatch,
+        enabledModIds: resolveCustomEnabledModIds().length
+            ? resolveCustomEnabledModIds()
+            : modePatch.enabledModIds,
         policy: {
-            preset,
-            threshold: PRESET_THRESHOLDS[preset],
+            preset: draft.preset,
+            threshold: PRESET_THRESHOLDS[draft.preset],
             perSite: {},
         },
         enforcementAction: {
             activeActionId: draft.actionId ?? DEFAULT_ENFORCEMENT_ACTION_SETTINGS.activeActionId,
         },
-        ...authenticityPatchForDraft(draft),
+        ...assistPatchForDraft(draft),
     };
 }
 

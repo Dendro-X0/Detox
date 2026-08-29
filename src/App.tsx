@@ -36,12 +36,12 @@ import { getSettingsTabLabels } from './i18n/settings-tabs';
 import { useLocale } from './i18n/LocaleContext';
 import AuthenticitySettingsPanel from './dashboard/AuthenticitySettingsPanel';
 import AssistSettingsPanel from './dashboard/AssistSettingsPanel';
+import AutomaticQuietingCard from './dashboard/AutomaticQuietingCard';
 import PluginLibraryPanel from './dashboard/PluginLibraryPanel';
 import FilterModelsPanel from './dashboard/FilterModelsPanel';
 import AdaptationPacksPanel from './dashboard/AdaptationPacksPanel';
 import SetupCompleteBanner from './dashboard/SetupCompleteBanner';
 import ThemeToggle from './dashboard/ThemeToggle';
-import UserRulesPanel from './dashboard/UserRulesPanel';
 import SiteWhitelistPanel from './dashboard/SiteWhitelistPanel';
 import SensitivitySettingsCard from './dashboard/SensitivitySettingsCard';
 import FilterStyleSettingsCard from './dashboard/FilterStyleSettingsCard';
@@ -782,6 +782,20 @@ function App({ onRestartWizard }: AppProps) {
           </div>
         ) : null}
 
+        {settingsTab === 'assist' ? (
+          <div className="sl-dashboard-grid">
+            <DashboardTabIntro
+              title={t('settings.tabs.assist')}
+              description={t('settings.assist.tabIntro')}
+            />
+            <div className="sl-span-full"><AssistSettingsPanel /></div>
+            <details className="sl-install-details sl-span-full">
+              <summary>{t('plugins.advanced.authenticitySummary')}</summary>
+              <AuthenticitySettingsPanel />
+            </details>
+          </div>
+        ) : null}
+
         {settingsTab === 'filtering' ? (
           <div className="sl-dashboard-grid">
             <DashboardTabIntro
@@ -827,7 +841,7 @@ function App({ onRestartWizard }: AppProps) {
             <section className="sl-preferences-section sl-span-full">
               <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.noise')}</h3>
               <p className="muted sl-preferences-section-desc">{t('settings.preferences.sections.noiseDescription')}</p>
-              <UserRulesPanel embedded hideTopicDiet />
+              <AutomaticQuietingCard />
             </section>
             <section className="sl-preferences-section sl-span-full">
               <h3 className="sl-preferences-section-heading">{t('settings.preferences.sections.sites')}</h3>
@@ -849,12 +863,7 @@ function App({ onRestartWizard }: AppProps) {
             />
             <div className="sl-span-full"><FilterModelsPanel /></div>
             <div className="sl-span-full"><AdaptationPacksPanel /></div>
-            <div className="sl-span-full"><AssistSettingsPanel /></div>
             <div className="sl-span-full"><PluginLibraryPanel /></div>
-            <details className="sl-install-details sl-span-full">
-              <summary>{t('plugins.advanced.authenticitySummary')}</summary>
-              <AuthenticitySettingsPanel />
-            </details>
           </div>
         ) : null}
 

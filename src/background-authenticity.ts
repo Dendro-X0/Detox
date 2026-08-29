@@ -28,7 +28,7 @@ async function handleAnalyze(message: Extract<AuthenticityMessage, { type: 'auth
     await loadAuthenticitySettings();
     const settings = getAuthenticitySettings();
     if (!settings.enabled) {
-        return { ok: false, error: 'Authenticity assist is disabled. Enable it in Options → Plugins (advanced).' };
+        return { ok: false, error: 'Authenticity assist is disabled. Enable it in Options → Assist (advanced).' };
     }
 
     const allowed = await consumeAuthenticityQuota();

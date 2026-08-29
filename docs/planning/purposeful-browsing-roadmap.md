@@ -7,16 +7,16 @@
 
 ## Product identity
 
-**SignalLens helps people browse with intent:** keep what matters, quiet what doesn’t, and act on what they’re reading — with setup that fits diverse tastes in about a minute.
+**SignalLens helps people browse and research efficiently:** select text to search, define, compare, and analyze — while an invisible engine quietly dims bait and toxic language in the background.
 
-| Job | User question | Product surface |
-|-----|---------------|-----------------|
-| **Steer** | “More of what I care about, less of what I don’t.” | Modes, noise rules, interest / topic diet, packs |
-| **Act** | “Help me do something with this text.” | Selection search, authenticity assist, compare |
-| **Understand** | “What’s going on on this page?” | Page / selection analysis (opt-in) |
+| Job | User question | Product surface | Priority |
+|-----|---------------|-----------------|----------|
+| **Act** | “Help me do something with this text.” | Selection Assist (search / define / compare / verify) | **Primary** |
+| **Understand** | “What’s going on on this page?” | Page / selection analysis (opt-in) | Primary-adjacent |
+| **Steer** | “Quiet noise; keep what I care about.” | Modes, sensitivity, topic diet, site pause — **no keyword editors** | **Secondary** |
 
-**Store wedge (v3.0 Option A):** excellent **text noise** steering (promo, bait, toxic language), reveal-first, honest text-only scope.  
-**Platform identity (ongoing):** the three jobs above — noise filtering is chapter one, not the whole story.
+**Near-term ship (Assist-first pivot):** selection retrieval tools as the hero; noise via [`invisible-noise-engine.md`](./invisible-noise-engine.md).  
+**Superseded:** v3.0 Option A store lock (“text noise filter” as sole hero) — see [`v3-focused-launch-scope.md`](./v3-focused-launch-scope.md).
 
 ### Non-goals (keep explicit)
 
@@ -29,33 +29,33 @@
 
 ## Preference model (three layers)
 
-Users confuse “less politics” with “less spam.” The product must keep these **separate in UX and badges**.
+Users confuse “less politics” with “less spam.” Keep these **separate in UX and badges**. Assist is the primary job; noise is invisible steer.
 
 ```mermaid
 flowchart TB
-  subgraph layer1 [Layer 1 — Noise tone]
-    N[Promo / bait / toxic / repetition]
+  subgraph layerAssist [Primary — Assist]
+    A[Select text → search / define / compare / verify]
   end
-  subgraph layer2 [Layer 2 — Interest diet]
-    I[Subjects: politics, tech, music, sports…]
+  subgraph layerNoise [Secondary — Invisible noise]
+    N[Mode defaults + packs + behavior]
   end
-  subgraph layer3 [Layer 3 — Assist]
-    A[Select text → search / verify / analyze]
+  subgraph layerInterest [Secondary — Interest diet]
+    I[Subjects: politics, tech, music…]
   end
-  Page[Page text units] --> layer1
-  Page --> layer2
-  Select[User selection] --> layer3
-  layer1 --> Enforce[Dim + reason chip]
-  layer2 --> Enforce
+  Select[User selection] --> layerAssist
+  Page[Page text units] --> layerNoise
+  Page --> layerInterest
+  layerNoise --> Enforce[Dim + reason chip]
+  layerInterest --> Enforce
 ```
 
-| Layer | Example goal | Mechanism today | Productization target |
-|-------|--------------|-----------------|------------------------|
-| **1 Noise** | Less engagement bait & toxic comments | Keywords, behavior signals, adaptation packs | v3.0 launch hero |
-| **2 Interest** | Less world affairs; keep tech & music | Keyword “geopolitics” preset (weak on phrase-poor headlines); semantic topic diet (full build, experimental) | v3.1 — first-class, wizard + Preferences |
-| **3 Assist** | Check / search a selected claim | Authenticity side panel (experimental) | v3.2 — selection tools bundle |
+| Layer | Example goal | Mechanism | Productization |
+|-------|--------------|-----------|----------------|
+| **Assist** | Research / retrieve / compare | Selection toolbar + menus | **Core product surface** (A1 shipped) |
+| **Invisible noise** | Less bait & toxic comments | Fixed engine — no keyword UI ([spec](./invisible-noise-engine.md)) | Secondary, always-on defaults |
+| **Interest** | Less world affairs; keep tech & music | Semantic topic diet (full build) | Preferences Interests |
 
-**Example persona (maintainer):** enjoy music + tech, reduce political content → Layer 2 allow `tech`/`music`, block `world-affairs` / `domestic-politics`, with Layer 1 still catching bait in any topic.
+**Example persona:** research a claim while browsing → Assist search/compare; topic diet (full) quiets politics; invisible noise still dims bait in any topic.
 
 ---
 
@@ -84,18 +84,18 @@ The dashboard is the **ongoing personalization hub**, not the required first ste
 
 | Area | Job | Priority |
 |------|-----|----------|
-| **Overview** | Mode, on/off, “what happened today,” jump to Preferences | P0 |
-| **Preferences** (new IA name or Rules redesign) | Interests, noise presets, whitelist, sensitivity, filter style | P0 |
-| **Insights** | Why blocked, feedback patterns, wrong-block fixes | P1 |
-| **Assist** | Selection tools, authenticity (experimental) | P1 |
+| **Overview** | Assist tip, mode, on/off, activity | P0 |
+| **Assist** | Selection tools, search engine, authenticity (advanced) | P0 |
+| **Preferences** | Interests, automatic quieting, whitelist, sensitivity, filter style | P0 |
+| **Insights** | Why blocked, feedback patterns | P1 |
 | **Advanced** | Packs, mods, remote API, debug | P2 |
 
-**Preferences must support diverse users without writing keyword lists:**
+**Preferences without keyword lists:**
 
-- Lifestyle / interest chips (tech, music, sports, politics, business, culture…)  
-- Noise intensity (Focus / Unwind / Research)  
-- Site pause / whitelist presets (work, university, music players)  
-- One-click “restore recommended for my preset”
+- Interest chips / topic diet (full build)  
+- Noise intensity via mode + sensitivity only (invisible engine)  
+- Site pause / whitelist presets  
+- No block/allow keyword editors anywhere in the dashboard
 
 ### 3. Instant feedback loop
 
@@ -122,18 +122,17 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 
 ## Delivery roadmap
 
-### Phase P0 — Ship the wedge · **v2.3 → v3.0** (locked Option A)
+### Phase P0 — Assist-first pivot · **current**
 
-**Theme:** Trustworthy text noise filter + honest scope + store ops. Do not block launch on interest diet or assist hero.
+**Theme:** Selection Assist as hero; invisible noise engine; remove keyword editors. Option A noise-only store lock is **superseded**.
 
 | Track | Work | Type |
 |-------|------|------|
-| **Ops** | Track C: unlisted v2.3.0 → dogfood → listed v3.0.0 | Release |
-| **Logic** | FP tuning (non-social), block reasons, reveal feedback | Functional |
-| **UX** | Wizard &lt; 2 min; Overview + Rules usable; scope FAQ | User-facing |
-| **Docs** | Positioning: personal browsing layer; store = noise wedge | Messaging |
-
-**Done when:** [`v3-acceptance-checklist.md`](./v3-acceptance-checklist.md) §A–§D + §F + §G pass.
+| **Act** | A1 toolbar/menus (search / define / compare / verify bridge) | Functional |
+| **Steer** | Invisible noise contract; no dashboard/wizard keyword UI | Functional |
+| **UX** | Assist tab; Preferences without Noise keyword lists | User-facing |
+| **Docs** | Assist-first identity; store listing rewrite follow-up | Messaging |
+| **Ops** | Track C release path continues; copy must match Assist-first before public list | Release |
 
 ---
 
@@ -164,22 +163,21 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 
 ---
 
-### Phase P2 — Assist as convenience · **v3.2.x**
+### Phase P2 — Assist depth · **post-A1**
 
-**Theme:** Selection tools make browsing *useful*, not only quieter.
+**Theme:** Deepen Assist beyond A1 handoff (still never auto-filters the feed).
 
-**Detailed spec (draft, scope open):** [`assist-capability-spec.md`](./assist-capability-spec.md) — intents (search / define / verify / compare / personal index), principles, phases A0–A4.
+**Spec:** [`assist-capability-spec.md`](./assist-capability-spec.md) — A2–A4 (academic packs, personal index, hardened verify).
 
 | # | Deliverable | Job |
 |---|-------------|-----|
-| P2-U1 | Context menu: **Search selection** (engine configurable) | Act |
-| P2-U2 | Context menu / side panel: **Verify / authenticity** (hardened script-first) | Act |
-| P2-U3 | **Compare** selected snippet to page or cached sources (lightweight) | Act |
-| P2-U4 | Optional **page outline / key claims** (opt-in, not auto-filter) | Understand |
+| P2-U1 | ~~Search / Define / Compare toolbar~~ | **Done (A1)** |
+| P2-U2 | Hardened **Verify** (script-first authenticity) | Act |
+| P2-U3 | Richer compare / source packs | Act |
+| P2-U4 | Optional **page outline / key claims** | Understand |
 | P2-L1 | Assist quota, cache, auditable trail | Logic |
-| P2-L2 | Wizard: optional “enable assist tools” (off by default) | UX |
 
-**Exit:** Assist is discoverable from selection; never auto-hides feed content; store may mention as optional secondary feature.
+**Exit:** Assist remains primary store story; A2–A4 optional depth.
 
 ---
 
@@ -198,14 +196,15 @@ Presets are **starting points**, not locked profiles — one tap opens Preferenc
 ## Dashboard information architecture (target)
 
 ```
-Overview          → status, mode, recent activity, “Edit preferences”
-Preferences       → Interests | Noise | Sites | Style & sensitivity
-Insights          → filtered history, reasons, feedback
-Assist            → selection tools, authenticity (experimental)
-Advanced          → packs, plugins, models, privacy/debug
+Overview          → Assist tip, status, mode, recent activity
+Assist            → selection tools, search engine, authenticity (advanced)
+Preferences       → Interests | Automatic quieting | Sites | Style & sensitivity
+Filtering         → stats / preview (secondary)
+Plugins           → packs, models, detectors
+Privacy           → data, theme, debug
 ```
 
-**Migration note:** Today’s **Rules / Filtering / Plugins** tabs map into Preferences + Advanced without removing power features — rename and regroup first; avoid a second parallel settings tree.
+**Invariant:** no keyword list editors under Preferences or wizard.
 
 ---
 

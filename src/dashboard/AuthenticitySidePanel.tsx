@@ -38,6 +38,7 @@ export default function AuthenticitySidePanel() {
     const [denseSiteWarning, setDenseSiteWarning] = useState(false);
     const [runError, setRunError] = useState<string | null>(null);
     const [running, setRunning] = useState(false);
+    const [runSearchOnly, setRunSearchOnly] = useState(true);
 
     const refresh = useCallback(() => {
         chrome.runtime.sendMessage({ type: 'authenticity:getJob' }, (response: unknown) => {
@@ -61,7 +62,10 @@ export default function AuthenticitySidePanel() {
     }, []);
 
     useEffect(() => {
-        void loadAuthenticitySettings().then(setSettings);
+        void loadAuthenticitySettings().then((loaded) => {
+            setSettings(loaded);
+            setRunSearchOnly(loaded.searchOnlyDefault);
+        });
         refresh();
         void refreshSelectionPreview();
         const interval = window.setInterval(refresh, 800);
@@ -158,6 +162,7 @@ export default function AuthenticitySidePanel() {
                 pageTitle: tab.title ?? '',
                 url,
                 hostname,
+                searchOnly: runSearchOnly,
             },
             (response: unknown) => {
                 setRunning(false);
@@ -220,10 +225,21 @@ export default function AuthenticitySidePanel() {
                     </p>
                 ) : null}
                 {scopeChoice === 'full_page' && denseSiteWarning ? (
-                    <p className="muted" style={{ fontSize: '0.75rem', margin: '0.35rem 0 0', color: '#92400e' }}>
+                    <p className="muted" style={{ fontSize: '0.75rem', margin: '0.35rem 0 0' }}>
                         {t('sidepanel.denseSiteWarning')}
                     </p>
                 ) : null}
+                <label className="sl-check-row" style={{ marginTop: '0.65rem' }}>
+                    <input
+                        type="checkbox"
+                        checked={runSearchOnly}
+                        onChange={(e) => setRunSearchOnly(e.target.checked)}
+                    />
+                    <span>{t('sidepanel.runSearchOnly')}</span>
+                </label>
+                <p className="muted" style={{ fontSize: '0.75rem', margin: '0.35rem 0 0' }}>
+                    {t('sidepanel.runSearchOnlyHint')}
+                </p>
                 <button
                     type="button"
                     className="preset-btn active"
@@ -267,6 +283,9 @@ export default function AuthenticitySidePanel() {
 
             {report && (
                 <div style={{ marginTop: '0.75rem' }}>
+                    <p className="sl-wizard-callout" style={{ fontSize: '0.8rem', marginTop: 0 }}>
+                        {report.searchOnly ? t('sidepanel.modeBannerSearchOnly') : t('sidepanel.modeBannerSynthesis')}
+                    </p>
                     <p className="muted" style={{ fontSize: '0.8rem' }}>
                         {t('sidepanel.reportMeta', {
                             title: report.title,
@@ -305,12 +324,20 @@ export default function AuthenticitySidePanel() {
                                     </p>
                                 )}
                                 {refs.length > 0 ? (
-                                    <ul className="blocked-list" style={{ maxHeight: '200px', marginTop: '0.35rem' }}>
+                                    <ul className="blocked-list" style={{ maxHeight: '280px', marginTop: '0.35rem' }}>
                                         {refs.map((ref) => (
                                             <li key={ref.id} className="blocked-item">
                                                 <a href={ref.url} target="_blank" rel="noopener noreferrer">
                                                     {ref.title}
                                                 </a>
+                                                {ref.snippet ? (
+                                                    <p
+                                                        className="muted"
+                                                        style={{ fontSize: '0.75rem', margin: '0.25rem 0 0', lineHeight: 1.35 }}
+                                                    >
+                                                        {ref.snippet.length > 280 ? `${ref.snippet.slice(0, 280)}…` : ref.snippet}
+                                                    </p>
+                                                ) : null}
                                                 <p className="muted" style={{ fontSize: '0.75rem', margin: '0.25rem 0 0' }}>
                                                     {ref.snippetVerified ? t('sidepanel.snippetVerified') : t('sidepanel.snippetUnverified')} · {ref.stance}
                                                 </p>
@@ -358,6 +385,14 @@ export default function AuthenticitySidePanel() {
                                                       : t('sidepanel.evidenceFetchFailed')}
                                                 {' · '}{ref.stance}
                                             </p>
+                                            {ref.snippet ? (
+                                                <p
+                                                    className="muted"
+                                                    style={{ fontSize: '0.72rem', margin: '0.2rem 0 0', lineHeight: 1.35 }}
+                                                >
+                                                    {ref.snippet.length > 200 ? `${ref.snippet.slice(0, 200)}…` : ref.snippet}
+                                                </p>
+                                            ) : null}
                                         </li>
                                     ))}
                                 </ul>

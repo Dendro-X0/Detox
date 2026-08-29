@@ -111,7 +111,8 @@ Copy stresses that dashboard fine-tuning is **optional**.
 ## Exit criteria (v3.0.0)
 
 - [ ] Wizard covers mode, sensitivity, style, topics, whitelist, locale
-- [x] Authenticity opt-in via wizard step (optional; off by default) or Plugins advanced
+- [x] Assist opt-in via wizard step (optional; off by default) — selection toolbar + optional Verify sub-opt-in
+- [x] Authenticity opt-in via wizard step (optional; off by default) or Options → Assist advanced
 - [ ] No required dashboard visit documented in user-facing FAQ
 
 ---

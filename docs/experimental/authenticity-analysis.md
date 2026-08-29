@@ -92,6 +92,8 @@ flowchart LR
 
 **LLMs never fetch pages, never emit unconstrained URLs, and never substitute for retrieval.** If scripts find nothing, the report states that honestly.
 
+**2026-08-29:** Search-only mode (default) now runs the same **fetch + snippet verify** step as synthesis for non-Wikipedia providers (Brave/custom/etc.), not only Wikipedia/ClaimReview enrich. Reports show excerpts in the side panel for user review.
+
 ### Standardized analysis framework
 
 All T3 output maps to a fixed epistemic schema (not free-form verdicts):
