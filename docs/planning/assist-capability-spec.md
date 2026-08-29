@@ -132,7 +132,7 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 | A1-1 | Context menu **Search selection** (engine configurable) | Act |
 | A1-2 | Context menu / panel **Define** (Wikipedia/Wikidata script path) | Act |
 | A1-3 | Dashboard Assist: toggles + “how this differs from filtering” | UX |
-| A1-4 | Quota / cache / cancel for any network Assist job | Logic |
+| A1-4 | Quota / cache / cancel for any network Assist job | Logic | **Done (slice)** |
 
 **Exit:** User can select text and get search or definition without enabling Verify; Assist unused ≠ broken filtering.
 
@@ -241,3 +241,4 @@ Fill these in before promoting Assist in store copy or expanding engineering bey
 | 2026-08-28 | **Assist-first pivot** — A1 promoted to core product surface; Option A noise hero superseded |
 | 2026-08-29 | **A2 slice** — search-only path always fetch+verify snippets; side panel excerpts + per-run search-only |
 | 2026-08-29 | **A2-4** — wizard Assist step (toolbar + optional Verify sub-opt-in); writes `assistSettings`; express path includes step |
+| 2026-08-29 | **A1-4** — Assist handoff quota + session cache; Define Wikipedia preview fetch; `assist:cancel` / `assist:getJob` |

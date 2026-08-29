@@ -11,6 +11,7 @@ export default defineConfig({
             'tests/modes/**/*.spec.ts',
             'tests/detectors/**/*.spec.ts',
             'tests/authenticity/**/*.spec.ts',
+            'tests/assist/**/*.spec.ts',
             'tests/firefox/**/*.spec.ts',
             'tests/i18n/**/*.spec.ts',
             'tests/onboarding/**/*.spec.ts',

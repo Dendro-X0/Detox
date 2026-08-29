@@ -1100,7 +1100,13 @@
       "compare": "Vergleichen",
       "verify": "Prüfen",
       "clipSaved": "Clip gespeichert — anderen Ausschnitt markieren, dann Vergleichen.",
-      "compareOpened": "Suchen für beide Clips und eine kombinierte Abfrage geöffnet."
+      "compareOpened": "Suchen für beide Clips und eine kombinierte Abfrage geöffnet.",
+      "recentHandoff": "Gleiche Aktion kürzlich ausgeführt — keine doppelten Tabs.",
+      "defineExcerpt": "Artikel geöffnet — {{excerpt}}"
+    },
+    "errors": {
+      "quotaExhausted": "Tägliches Assist-Handoff-Kontingent erreicht. Unter Optionen → Assist anpassen.",
+      "cancelled": "Assist-Aktion abgebrochen."
     },
     "settings": {
       "heading": "Auswahl-Assistent",
@@ -1117,6 +1123,9 @@
       "customUrlLabel": "Eigene Such-URL",
       "customUrlHint": "Mit %s für die Abfrage, z. B. https://example.com/search?q=%s",
       "contextMenuHint": "Vergleich: Clip speichern beim ersten Ausschnitt, dann Vergleichen beim zweiten. Prüfen braucht Authentizitäts-Assistent (Assistent → Erweitert).",
+      "dailyQuotaUsed": "Tägliches Handoff-Kontingent genutzt",
+      "dailyQuotaCap": "Tägliches Handoff-Kontingent-Limit",
+      "dailyQuotaHint": "Zählt Suchen-, Definieren- und Vergleichen-Tab-Öffnungen. Prüfen nutzt das separate Authentizitäts-Kontingent.",
       "saved": "Gespeichert"
     }
   }

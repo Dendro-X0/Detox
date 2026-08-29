@@ -4,6 +4,7 @@ import {
     loadAssistSettings,
     saveAssistSettings,
 } from '../assist/assist-settings-store';
+import { loadAssistQuota } from '../assist/assist-quota-store';
 import { DEFAULT_ASSIST_SETTINGS } from '../assist/types';
 import type { AssistSearchEngineId, AssistSettings } from '../assist/types';
 import { useLocale } from '../i18n/LocaleContext';
@@ -18,15 +19,19 @@ const ENGINE_IDS: readonly AssistSearchEngineId[] = [
 export default function AssistSettingsPanel() {
     const { t } = useLocale();
     const [settings, setSettings] = useState<AssistSettings>(DEFAULT_ASSIST_SETTINGS);
+    const [quotaUsed, setQuotaUsed] = useState(0);
     const [status, setStatus] = useState<string | null>(null);
 
     useEffect(() => {
         void loadAssistSettings().then(setSettings);
+        void loadAssistQuota().then((quota) => setQuotaUsed(quota.used));
     }, []);
 
     const persist = async (next: AssistSettings): Promise<void> => {
         setSettings(next);
         await saveAssistSettings(next);
+        const quota = await loadAssistQuota();
+        setQuotaUsed(quota.used);
         setStatus(t('assist.settings.saved'));
         window.setTimeout(() => setStatus(null), 1500);
     };
@@ -95,6 +100,32 @@ export default function AssistSettingsPanel() {
                     </span>
                 </label>
             ) : null}
+
+            <div className="sl-form-field" style={{ marginTop: '1rem' }}>
+                <span className="sl-form-label">{t('assist.settings.dailyQuotaUsed')}</span>
+                <span className="sl-form-value">
+                    {quotaUsed} / {settings.dailyActionQuota}
+                </span>
+            </div>
+            <label className="sl-form-field" style={{ marginTop: '0.75rem' }}>
+                <span className="sl-form-label">{t('assist.settings.dailyQuotaCap')}</span>
+                <input
+                    type="number"
+                    className="sl-input"
+                    min={1}
+                    max={500}
+                    value={settings.dailyActionQuota}
+                    onChange={(e) => {
+                        void persist({
+                            ...settings,
+                            dailyActionQuota: Number(e.target.value),
+                        });
+                    }}
+                />
+            </label>
+            <p className="muted" style={{ fontSize: '0.8rem', marginTop: '0.35rem' }}>
+                {t('assist.settings.dailyQuotaHint')}
+            </p>
 
             <p className="muted" style={{ fontSize: '0.8rem', marginBottom: 0, marginTop: '1rem' }}>
                 {t('assist.settings.contextMenuHint')}

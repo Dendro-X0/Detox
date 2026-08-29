@@ -1,42 +1,57 @@
 /// <reference types="chrome" />
 import { openAuthenticityPanel } from '../authenticity/open-panel';
 import { getAuthenticitySettings, loadAuthenticitySettings } from '../mods/analyzers/authenticity/settings-store';
+import {
+    prepareCompareHandoff,
+    prepareDefineHandoff,
+    prepareSearchHandoff,
+} from './assist-actions';
 import { loadAssistSettings } from './assist-settings-store';
 import { clearCompareClip, loadCompareClip, saveCompareClip } from './compare-clip-store';
-import { ASSIST_MENU } from './types';
-import type { AssistRuntimeMessage } from './types';
 import {
-    buildCompareSearchUrl,
-    buildSearchUrl,
-    buildWikipediaDefineUrl,
-} from './search-urls';
+    cancelAssistNetworkJob,
+    getAssistNetworkJobState,
+} from './network-job';
+import { ASSIST_MENU } from './types';
+import type { AssistActionResponse, AssistRuntimeMessage } from './types';
 
-async function openUrl(url: string): Promise<void> {
-    await chrome.tabs.create({ url });
+async function openUrls(urls: readonly string[]): Promise<void> {
+    for (const url of urls) {
+        await chrome.tabs.create({ url });
+    }
 }
 
-async function runSearch(text: string): Promise<void> {
+async function runSearch(text: string): Promise<AssistActionResponse> {
     const settings = await loadAssistSettings();
-    await openUrl(buildSearchUrl(text, settings));
+    const plan = await prepareSearchHandoff(text, settings);
+    if (!plan.ok || !plan.urls?.length) return plan;
+    if (!plan.cached) await openUrls(plan.urls);
+    return plan;
 }
 
-async function runDefine(text: string): Promise<void> {
-    await openUrl(buildWikipediaDefineUrl(text));
+async function runDefine(text: string): Promise<AssistActionResponse> {
+    const plan = await prepareDefineHandoff(text);
+    if (!plan.ok || !plan.urls?.length) return plan;
+    if (!plan.cached) await openUrls(plan.urls);
+    return plan;
 }
 
-async function runCompare(text: string): Promise<{ readonly ok: boolean; readonly error?: string }> {
+async function runCompare(text: string): Promise<AssistActionResponse> {
     const clip = await loadCompareClip();
     if (!clip) {
-        return { ok: false, error: 'No saved clip. Choose “Save as compare clip” on the first snippet first.' };
+        return {
+            ok: false,
+            error: 'No saved clip. Choose “Save as compare clip” on the first snippet first.',
+        };
     }
     const settings = await loadAssistSettings();
-    await openUrl(buildSearchUrl(clip, settings));
-    await openUrl(buildSearchUrl(text, settings));
-    await openUrl(buildCompareSearchUrl(clip, text, settings));
-    return { ok: true };
+    const plan = await prepareCompareHandoff(text, clip, settings);
+    if (!plan.ok || !plan.urls?.length) return plan;
+    if (!plan.cached) await openUrls(plan.urls);
+    return plan;
 }
 
-async function runVerify(tabId: number, text: string): Promise<{ readonly ok: boolean; readonly error?: string }> {
+async function runVerify(tabId: number, text: string): Promise<AssistActionResponse> {
     await loadAuthenticitySettings();
     if (!getAuthenticitySettings().enabled) {
         return {
@@ -94,11 +109,11 @@ export function registerAssistBackgroundHandlers(): void {
         const typed = message as AssistRuntimeMessage;
 
         if (typed.type === 'assist:search') {
-            void runSearch(typed.text).then(() => sendResponse({ ok: true }));
+            void runSearch(typed.text).then(sendResponse);
             return true;
         }
         if (typed.type === 'assist:define') {
-            void runDefine(typed.text).then(() => sendResponse({ ok: true }));
+            void runDefine(typed.text).then(sendResponse);
             return true;
         }
         if (typed.type === 'assist:saveClip') {
@@ -118,6 +133,17 @@ export function registerAssistBackgroundHandlers(): void {
                 return true;
             }
             void runVerify(tabId, typed.text).then(sendResponse);
+            return true;
+        }
+        if (typed.type === 'assist:cancel') {
+            cancelAssistNetworkJob();
+            sendResponse({ ok: true });
+            return true;
+        }
+        if (typed.type === 'assist:getJob') {
+            void getAssistNetworkJobState().then((job) => {
+                sendResponse({ type: 'assist:jobState', job } satisfies AssistRuntimeMessage);
+            });
             return true;
         }
         if (typed.type === 'assist:getClip') {

@@ -123,15 +123,34 @@ function sendAssist(type: 'assist:search' | 'assist:define' | 'assist:saveClip' 
             setStatus(host, chrome.runtime.lastError.message ?? 'Failed', true);
             return;
         }
-        const record = response as { ok?: boolean; error?: string } | undefined;
+        const record = response as {
+            ok?: boolean;
+            error?: string;
+            cached?: boolean;
+            excerpt?: string;
+        } | undefined;
         if (record && record.ok === false && record.error) {
-            setStatus(host, record.error, true);
+            const message =
+                record.error === 'assist.quota.exhausted'
+                    ? runtimeTranslate('assist.errors.quotaExhausted')
+                    : record.error === 'assist.job.cancelled'
+                      ? runtimeTranslate('assist.errors.cancelled')
+                      : record.error;
+            setStatus(host, message, true);
+            return;
+        }
+        if (record?.cached && record.error === 'assist.cache.recentHandoff') {
+            setStatus(host, runtimeTranslate('assist.toolbar.recentHandoff'));
             return;
         }
         if (type === 'assist:saveClip') {
             setStatus(host, runtimeTranslate('assist.toolbar.clipSaved'));
         } else if (type === 'assist:compare') {
             setStatus(host, runtimeTranslate('assist.toolbar.compareOpened'));
+        } else if (type === 'assist:define' && record?.excerpt) {
+            const snippet =
+                record.excerpt.length > 72 ? `${record.excerpt.slice(0, 72)}…` : record.excerpt;
+            setStatus(host, runtimeTranslate('assist.toolbar.defineExcerpt', { excerpt: snippet }));
         }
     });
 }

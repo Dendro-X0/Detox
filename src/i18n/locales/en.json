@@ -1100,7 +1100,13 @@
       "compare": "Compare",
       "verify": "Verify",
       "clipSaved": "Clip saved — select another snippet, then Compare.",
-      "compareOpened": "Opened searches for both clips and a combined query."
+      "compareOpened": "Opened searches for both clips and a combined query.",
+      "recentHandoff": "Same action ran recently — skipped duplicate tabs.",
+      "defineExcerpt": "Opened article — {{excerpt}}"
+    },
+    "errors": {
+      "quotaExhausted": "Daily Assist action quota reached. Adjust under Options → Assist.",
+      "cancelled": "Assist action cancelled."
     },
     "settings": {
       "heading": "Selection Assist",
@@ -1117,6 +1123,9 @@
       "customUrlLabel": "Custom search URL",
       "customUrlHint": "Include %s where the query goes, e.g. https://example.com/search?q=%s",
       "contextMenuHint": "Compare workflow: Save clip on the first snippet, then Compare on the second. Verify needs Authenticity assist enabled (Assist → Advanced).",
+      "dailyQuotaUsed": "Daily handoff quota used",
+      "dailyQuotaCap": "Daily handoff quota cap",
+      "dailyQuotaHint": "Counts search, define, and compare tab opens. Verify uses the separate authenticity quota.",
       "saved": "Saved"
     }
   }

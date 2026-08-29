@@ -26,6 +26,12 @@ export function parseAssistSettings(raw: unknown): AssistSettings {
             record.customSearchUrlTemplate.includes('%s')
                 ? record.customSearchUrlTemplate
                 : DEFAULT_ASSIST_SETTINGS.customSearchUrlTemplate,
+        dailyActionQuota:
+            typeof record.dailyActionQuota === 'number' &&
+            record.dailyActionQuota >= 1 &&
+            record.dailyActionQuota <= 500
+                ? Math.floor(record.dailyActionQuota)
+                : DEFAULT_ASSIST_SETTINGS.dailyActionQuota,
     };
 }
 

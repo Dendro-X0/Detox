@@ -68,6 +68,7 @@ describe('parseAssistSettings', () => {
             selectionToolbarEnabled: false,
             searchEngineId: 'bing',
             customSearchUrlTemplate: 'https://x.test?q=%s',
+            dailyActionQuota: 100,
         });
     });
 });
