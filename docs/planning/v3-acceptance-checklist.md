@@ -107,7 +107,7 @@
 | F1 | Text-only limitation in wizard welcome | `wizard.welcome.textOnlyLimitation` | ✅ |
 | F2 | FAQ / known limitations mentions image-only gap | [`docs/scope-faq.md`](../scope-faq.md) | ✅ |
 | F2b | Link from Filtering tab | `FilteringSettingsPanel` + `store-meta.json` | ✅ |
-| F3 | Store listing says “textual noise” not “blocks misinformation” | [`store/listing-chrome.md`](../../store/listing-chrome.md), [`listing-firefox.md`](../../store/listing-firefox.md); `pnpm store:verify:scope` | ☐ submit |
+| F3 | Store listing says Assist-first + textual noise, not “blocks misinformation” | [`store/listing-chrome.md`](../../store/listing-chrome.md), [`listing-firefox.md`](../../store/listing-firefox.md); `pnpm store:verify:scope` | ✅ draft |
 | F4 | Privacy policy: filtering local; authenticity public-only | [`store/PRIVACY.md`](../../store/PRIVACY.md) | ✅ |
 | F5 | Adaptation packs described as text patterns | `plugins.adaptationPacks.description` | ✅ |
 

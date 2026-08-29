@@ -6,22 +6,21 @@ Use this copy when submitting the **core** build (`signallens-chrome-core-*.zip`
 
 ## Single purpose
 
-Help users reduce distracting **textual** noise on the web using **personal** keyword and mode settings — always reversible (dim/reveal), never permanent blocking.
+Help users **research selected text** and browse with less distracting **textual** noise — always reversible (dim/reveal), never permanent blocking.
 
 ## Short description (≤ 132 characters)
 
-Reduce textual noise — promo, bait, toxic language. Reveal-first dimming. Local rules, your keywords. Image-only posts not filtered.
+Select text to search, define, compare. Reversible dimming for textual noise. Local-first. Image-only posts not filtered.
 
 ## Detailed description
 
-**SignalLens** is a personal browsing layer for **text-first** noise reduction — not a feed fact-checker or image moderator.
+**SignalLens** is a personal browsing layer: **selection Assist** for quick research, plus automatic quieting of low-value **text** — not a feed fact-checker or image moderator.
 
 ### What it does
 
-- Scans **readable text** on pages you visit (posts, comments, headlines, captions)
-- Dims text that matches **your** block keywords and browsing mode (Focus / Research / Unwind)
-- Keeps filtered content **revealable** — click any match or the in-page badge to show it again
-- Runs core filtering **locally** in your browser
+- **Assist (primary):** Select text on any page to **search**, **define**, or **compare** snippets via toolbar or context menu (user-enabled in setup)
+- **Quieting (secondary):** Dims readable **text** that matches your browsing mode (Focus / Research / Unwind) — click any match or the in-page badge to reveal again
+- Runs core filtering **locally** in your browser; no account required
 
 ### What it does not do
 
@@ -32,11 +31,11 @@ Reduce textual noise — promo, bait, toxic language. Reveal-first dimming. Loca
 
 ### Optional experimental features
 
-**Authenticity assist** (off by default) lets you research a **selected passage** with advisory source links. It does not filter your feed and is not required for core noise reduction.
+**Verify** (off by default) lets you check a **selected passage** against public sources with advisory links and fetched excerpts. It does not filter your feed and is not required for search/define/compare.
 
 ### Privacy
 
-Core filtering runs on your device. See our privacy policy (privacy policy at https://github.com/Dendro-X0/Detox/blob/main/store/PRIVACY.md).
+Core filtering runs on your device. Optional Assist network calls are user-initiated only. See our privacy policy (privacy policy at https://github.com/Dendro-X0/Detox/blob/main/store/PRIVACY.md).
 
 ## Category
 
@@ -50,25 +49,25 @@ English
 
 Capture at 1280×800 or 640×400:
 
-1. **Onboarding wizard** — welcome step showing text-only limitation, or done step with **Start browsing**
-2. Popup — Focus mode enabled + browsing mode switcher
-3. Options dashboard — Filtering tab (scope note + sensitivity)
+1. **Selection Assist** — toolbar on highlighted text (search / define / compare)
+2. **Onboarding wizard** — Assist opt-in step or done step with **Start browsing**
+3. Popup — Focus mode enabled + browsing mode switcher
 4. Page with dimmed content + reveal hint / badge
-5. Browsing modes panel (Overview tab)
-6. *(Optional)* Authenticity side panel — selection scope (experimental, not hero)
+5. Options dashboard — **Assist** tab (toolbar toggle)
+6. *(Optional)* Verify side panel — selection scope (experimental, not hero)
 
 ## Permission justifications (review form)
 
 | Permission | Justification |
 |------------|---------------|
-| `storage` | Persist user filtering rules, modes, and scan statistics locally. |
-| `activeTab` | Access the active tab when the user opens the popup or triggers analysis. |
-| `contextMenus` | “Analyze selection” entry for optional authenticity assist. |
+| `storage` | Persist user filtering rules, modes, Assist settings, and scan statistics locally. |
+| `activeTab` | Access the active tab when the user opens the popup or triggers Assist. |
+| `contextMenus` | Search / define / compare / verify entries for user-selected text. |
 | `offscreen` | On-device inference host for optional full-profile ONNX packs. |
 | `scripting` | Inject/update content scripts when enabling features on the active tab. |
-| `sidePanel` | Display authenticity analysis reports the user explicitly requests. |
-| `<all_urls>` | Content script must run on sites the user browses to apply personal filters. |
-| `https://en.wikipedia.org/*` | Optional authenticity search provider (user-enabled). |
+| `sidePanel` | Display Verify analysis reports the user explicitly requests. |
+| `<all_urls>` | Content script must run on sites the user browses to apply filters and selection Assist. |
+| `https://en.wikipedia.org/*` | Optional Define and Verify search provider (user-enabled). |
 | `https://api.search.brave.com/*` | Optional Brave Search API (user-supplied key). |
 | Hugging Face hosts | Legacy/full-profile model pack loading only when user enables local ONNX pack. |
 

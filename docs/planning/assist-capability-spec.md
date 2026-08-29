@@ -136,7 +136,7 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 
 **Exit:** User can select text and get search or definition without enabling Verify; Assist unused ≠ broken filtering.
 
-### Phase A2 — Harden Verify (news) · **in progress**
+### Phase A2 — Harden Verify (news) · **done (slice)**
 
 | # | Deliverable | Job | Status |
 |---|-------------|-----|--------|
@@ -145,7 +145,7 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 | A2-3 | Auditable trail UI (excerpts, mode banner, per-run search-only) | UX | **Done (slice)** |
 | A2-4 | Optional wizard opt-in for Assist | UX | **Done (slice)** |
 
-**Exit:** Dogfood: selection → report with openable links **and fetched excerpts** on search-only; zero feed auto-hide from Verify.
+**Exit:** Dogfood: selection → report with openable links **and fetched excerpts** on search-only; zero feed auto-hide from Verify. **Next:** A3 Compare deepen or A1-4 Assist quota/cache/cancel.
 
 ### Phase A3 — Compare & deepen · **~P2 late / P3**
 

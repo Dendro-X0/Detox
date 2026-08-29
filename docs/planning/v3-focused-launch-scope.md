@@ -31,7 +31,7 @@ Historical Option A table (noise-filter hero) is retained below for audit only �
 
 ---
 
-**Store listing follow-up (before public list):** rewrite Chrome/Firefox listing and FAQ to Assist-first claims (select → search / define / compare). Do **not** ship Option A “your keywords” copy. See [`invisible-noise-engine.md`](./invisible-noise-engine.md).
+**Store listing follow-up (before public list):** rewrite Chrome/Firefox listing and FAQ to Assist-first claims (select → search / define / compare). Do **not** ship Option A “your keywords” copy. See [`invisible-noise-engine.md`](./invisible-noise-engine.md). **Draft listings updated** in [`store/listing-chrome.md`](../../store/listing-chrome.md) / [`listing-firefox.md`](../../store/listing-firefox.md) — capture screenshots per [`store/SCREENSHOTS.md`](../../store/SCREENSHOTS.md) before submit.
 
 ---
 
