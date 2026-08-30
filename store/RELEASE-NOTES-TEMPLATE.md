@@ -1,20 +1,16 @@
-## SignalLens 2.4.0
+## SignalLens 2.4.1
 
 See [CHANGELOG.md](../CHANGELOG.md) for full notes.
 
 ### Install
 
-- **Chrome:** Upload `signallens-chrome-core-2.4.0.zip` to Chrome Web Store (unlisted)
-- **Firefox:** Upload `signallens-firefox-core-2.4.0.zip` to AMO (unlisted)
+- **Chrome:** Upload `signallens-chrome-core-2.4.1.zip` to Chrome Web Store (unlisted)
+- **Firefox:** Upload `signallens-firefox-core-2.4.1.zip` to AMO (unlisted)
 
 ### Highlights
 
-- **Assist-first** — selection search, define, and compare; optional Verify and page outline (Understand)
-- **Compare panel** — side-by-side excerpts with overlap hints (A3-1)
-- **Page outline** — opt-in local headings + key claims in side panel (A3-2)
-- **Invisible noise engine** — mode-driven filtering; no dashboard keyword lists
-- **Assist hardening** — daily handoff quota, cache, and cancel for network jobs
-- **Store copy** — listings repositioned for Assist-first launch
+- **Wizard UX** — express presets no longer default to or badge “Tech & music” as recommended
+- **Assist-first** — selection search, define, compare; optional Verify and page outline (from 2.4.0)
 
 ### Privacy
 

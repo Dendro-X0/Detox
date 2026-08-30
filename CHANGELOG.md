@@ -8,6 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+## [2.4.1] - 2026-08-29
+
+### Changed
+- **Wizard welcome** — removed “Recommended” badge from Tech & music express preset; no lifestyle preset pre-selected on first install
+
 ## [2.4.0] - 2026-08-29
 
 ### Added — Assist-first (P2)
