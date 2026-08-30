@@ -8,6 +8,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 
+## [2.4.0] - 2026-08-29
+
+### Added — Assist-first (P2)
+- **Selection Assist** — context menu search, define (Wikipedia), save/compare clip, optional Verify
+- **Assist settings** — Options → Assist toggles, search engine choice, optional wizard opt-in
+- **Assist quota / cache / cancel** — daily handoff cap, cached define/search results, cancel in-flight jobs (A1-4)
+- **Compare side panel** — dual excerpts, overlap hints, combined search link (A3-1)
+- **Page outline (Understand)** — opt-in page-level headings + heuristic key claims in side panel (A3-2)
+- **Verify hardening** — search-only path fetches excerpts; auditable trail UI (mode banner, per-run search-only)
+
+### Changed
+- **Assist-first positioning** — filtering secondary under Preferences; store listings rewritten
+- **Invisible noise engine** — user-authored block/allow keyword lists retired from UX; mode-driven keywords only
+- **Browsing modes + topic diet** — policy coherence when Layer 2 topic diet is enabled
+- **Express onboarding** — clearer post-setup confirmation and Layer 2 discoverability
+
+### Fixed
+- **Playwright CI** — ESM JSON import attributes; E2E reveal via filter frame label; wizard preset path; perf snapshot seeding
+- **Topic dogfood gates** — Spike 3 BBC/Reddit automated corpus checks
+
 ## [2.3.0] - 2026-06-06
 
 ### Added — Track A (filtering trust)
