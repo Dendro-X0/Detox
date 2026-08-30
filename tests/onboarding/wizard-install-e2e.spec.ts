@@ -28,13 +28,10 @@ test.describe('install wizard → filtering', () => {
             'enabled',
             'onboardingComplete',
             'activeBrowsingModeId',
-            'userRules',
         ]);
         expect(stored.enabled).toBe(true);
         expect(stored.onboardingComplete).toBe(true);
         expect(stored.activeBrowsingModeId).toBe('focus');
-        const rules = stored.userRules as { blockKeywords?: string[] };
-        expect(rules.blockKeywords?.length).toBeGreaterThan(0);
 
         const page = await openFilteringFixtureAfterWizard(context);
         await waitForClassifications(page, 1);

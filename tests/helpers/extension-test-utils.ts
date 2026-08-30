@@ -245,10 +245,11 @@ export async function completeWizardQuickStart(page: Page): Promise<void> {
     await page.getByRole('button', { name: 'Quick start (Focus)' }).click();
 }
 
-/** Preset path: Welcome → … → Done → Start browsing (no dashboard). */
+/** Preset path: Welcome → Customize → … → Done → Open dashboard. */
 export async function completeWizardPresetStartBrowsing(page: Page): Promise<void> {
+    await page.getByRole('button', { name: 'Customize setup instead' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.locator('.sl-choice-item').filter({ hasText: 'Focus' }).first().click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Continue' }).click();

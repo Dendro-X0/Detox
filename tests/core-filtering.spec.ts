@@ -70,7 +70,7 @@ test.describe('core filtering pipeline', () => {
         });
 
         await waitForBlockedCount(page, 1);
-        await page.locator('#signallens-blocked-target').click();
+        await page.locator('.sl-filter-frame-label').click();
         await expect(page.locator('#signallens-blocked-target')).not.toHaveAttribute('data-sl-blocked', 'true');
 
         await page.close();
