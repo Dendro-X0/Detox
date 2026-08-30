@@ -1,5 +1,5 @@
-import en from './locales/en.json';
-import de from './locales/de.json';
+import en from './locales/en.json' with { type: 'json' };
+import de from './locales/de.json' with { type: 'json' };
 import type { LocaleBundle, LocaleCatalogEntry, LocaleId } from './types';
 
 export const DEFAULT_LOCALE_ID: LocaleId = 'en';

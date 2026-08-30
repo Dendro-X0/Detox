@@ -1,4 +1,4 @@
-import storeMeta from '../../store/store-meta.json';
+import storeMeta from '../../store/store-meta.json' with { type: 'json' };
 
 export const PRIVACY_POLICY_URL = storeMeta.privacyPolicyUrl;
 export const SCOPE_FAQ_URL = storeMeta.scopeFaqUrl;

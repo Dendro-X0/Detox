@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import en from '../../src/i18n/locales/en.json';
+import en from '../../src/i18n/locales/en.json' with { type: 'json' };
 import { i18nMessage, localizeCompoundMessage, localizeMessage } from '../../src/i18n/localize';
 import { translate } from '../../src/i18n/translate';
 

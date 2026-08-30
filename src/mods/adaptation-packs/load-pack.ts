@@ -3,15 +3,15 @@ import {
     parseAdaptationPackRules,
     type AdaptationPackRules,
 } from '../../core/adaptation/adaptation-pack-types';
-import deClickbait from './bundled/de-clickbait.pack.json';
-import dePhishing from './bundled/de-phishing.pack.json';
-import dePromo from './bundled/de-promo.pack.json';
-import deToxic from './bundled/de-toxic.pack.json';
-import enClickbait from './bundled/en-clickbait.pack.json';
-import enPhishing from './bundled/en-phishing.pack.json';
-import enPromo from './bundled/en-promo.pack.json';
-import enToxic from './bundled/en-toxic.pack.json';
-import universalSocial from './bundled/universal-social.pack.json';
+import deClickbait from './bundled/de-clickbait.pack.json' with { type: 'json' };
+import dePhishing from './bundled/de-phishing.pack.json' with { type: 'json' };
+import dePromo from './bundled/de-promo.pack.json' with { type: 'json' };
+import deToxic from './bundled/de-toxic.pack.json' with { type: 'json' };
+import enClickbait from './bundled/en-clickbait.pack.json' with { type: 'json' };
+import enPhishing from './bundled/en-phishing.pack.json' with { type: 'json' };
+import enPromo from './bundled/en-promo.pack.json' with { type: 'json' };
+import enToxic from './bundled/en-toxic.pack.json' with { type: 'json' };
+import universalSocial from './bundled/universal-social.pack.json' with { type: 'json' };
 
 const BUNDLED_RULES: Record<string, AdaptationPackRules> = {
     'adaptation-en-promo': enPromo as AdaptationPackRules,

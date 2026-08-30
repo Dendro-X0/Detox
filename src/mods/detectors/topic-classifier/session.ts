@@ -5,7 +5,7 @@ import {
     promptEmbeddingsFromSnapshot,
     type TopicCentroidsSnapshot,
 } from '../../../core/filtering/topic-embedding-classifier';
-import promptSnapshot from './prompt-embeddings.snapshot.json';
+import promptSnapshot from './prompt-embeddings.snapshot.json' with { type: 'json' };
 
 type ClassifierHandle = {
     classify: (text: string) => Promise<TopicClassification>;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import de from '../../src/i18n/locales/de.json';
-import en from '../../src/i18n/locales/en.json';
+import de from '../../src/i18n/locales/de.json' with { type: 'json' };
+import en from '../../src/i18n/locales/en.json' with { type: 'json' };
 import { LOCALE_CATALOG, getLocaleBundle, localeIdFromBrowserLanguage, resolveLocaleId } from '../../src/i18n/registry';
 import { translate } from '../../src/i18n/translate';
 
