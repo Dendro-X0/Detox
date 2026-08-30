@@ -54,7 +54,6 @@ const PRESET_STEPS: readonly WizardStep[] = ['welcome', 'language', 'mode', 'whi
 const EXPRESS_STEPS: readonly WizardStep[] = ['welcome', 'assist', 'done'];
 
 const RECOMMENDED_MODE_ID: BrowsingModeId = 'focus';
-const RECOMMENDED_EXPRESS_PRESET_ID: ExpressPresetId = 'tech-music';
 
 function stepLabelsForPath(
     setupPath: SetupPath | null,
@@ -127,8 +126,6 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                 setBrowsingModeId(prefill.browsingModeId ?? RECOMMENDED_MODE_ID);
             } else if (!prefill.isSetupAgain) {
                 setBrowsingModeId(RECOMMENDED_MODE_ID);
-                setExpressPresetId(RECOMMENDED_EXPRESS_PRESET_ID);
-                setSetupPath('express');
             }
             setPrefillReady(true);
         });
@@ -530,11 +527,6 @@ function OnboardingWizardContent({ onComplete }: OnboardingWizardProps) {
                                     <span className="sl-choice-item-body">
                                         <strong>
                                             {t(`wizard.expressPresets.${preset.id}.label`)}
-                                            {preset.id === RECOMMENDED_EXPRESS_PRESET_ID ? (
-                                                <span className="sl-badge-recommended">
-                                                    {t('wizard.mode.recommended')}
-                                                </span>
-                                            ) : null}
                                         </strong>
                                         <span className="muted sl-choice-item-hint">
                                             {t(`wizard.expressPresets.${preset.id}.hint`)}
