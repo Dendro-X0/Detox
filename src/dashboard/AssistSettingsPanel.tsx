@@ -57,6 +57,46 @@ export default function AssistSettingsPanel() {
                 {t('assist.settings.toolbarHint')}
             </p>
 
+            <label className="sl-check-row" style={{ marginTop: '1rem' }}>
+                <input
+                    type="checkbox"
+                    checked={settings.pageUnderstandEnabled}
+                    onChange={(e) => {
+                        void persist({ ...settings, pageUnderstandEnabled: e.target.checked });
+                    }}
+                />
+                <span>{t('assist.settings.pageUnderstandLabel')}</span>
+            </label>
+            <p className="muted" style={{ fontSize: '0.8rem', marginTop: '0.35rem' }}>
+                {t('assist.settings.pageUnderstandHint')}
+            </p>
+            {settings.pageUnderstandEnabled ? (
+                <button
+                    type="button"
+                    className="preset-btn"
+                    style={{ marginTop: '0.65rem' }}
+                    onClick={() => {
+                        void chrome.runtime.sendMessage({ type: 'assist:outlinePage' }, (response) => {
+                            const record = response as { ok?: boolean; error?: string } | undefined;
+                            if (record?.ok) {
+                                setStatus(t('assist.settings.outlineStarted'));
+                            } else if (record?.error) {
+                                const message =
+                                    record.error === 'assist.quota.exhausted'
+                                        ? t('assist.errors.quotaExhausted')
+                                        : record.error.startsWith('assist.')
+                                          ? t(record.error)
+                                          : record.error;
+                                setStatus(message);
+                            }
+                            window.setTimeout(() => setStatus(null), 2500);
+                        });
+                    }}
+                >
+                    {t('assist.settings.outlineActiveTab')}
+                </button>
+            ) : null}
+
             <label className="sl-form-field" style={{ marginTop: '1rem' }}>
                 <span className="sl-form-label">{t('assist.settings.engineLabel')}</span>
                 <select

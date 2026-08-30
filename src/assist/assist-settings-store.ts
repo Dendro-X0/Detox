@@ -32,6 +32,7 @@ export function parseAssistSettings(raw: unknown): AssistSettings {
             record.dailyActionQuota <= 500
                 ? Math.floor(record.dailyActionQuota)
                 : DEFAULT_ASSIST_SETTINGS.dailyActionQuota,
+        pageUnderstandEnabled: record.pageUnderstandEnabled === true,
     };
 }
 

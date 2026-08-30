@@ -152,7 +152,7 @@ Versions are **indicative** and sit under purposeful-browsing **P2 / P3**. Reord
 | # | Deliverable | Job |
 |---|-------------|-----|
 | A3-1 | **Compare** selection vs second snippet / retrieved hit | Act | **Done (slice)** |
-| A3-2 | Optional page outline / key claims (opt-in Understand) | Understand |
+| A3-2 | Optional page outline / key claims (opt-in Understand) | Understand | **Done (slice)** |
 | A3-3 | News + encyclopedia packs polish | Scope |
 
 ### Phase A4 — Specialist value · **~P3+ (scope TBD)**

@@ -3,6 +3,7 @@ import { resolveSiteHints } from '../core/scanner/hint-registry';
 import { scanUniversal } from '../core/scanner/universal-scanner';
 import { buildMainTextFromUnits, type PageContext } from '../mods/analyzers/authenticity/page-context';
 import { detectSiteId, isDenseSite } from '../mods/analyzers/authenticity/scope-resolver';
+import { buildPageUnderstandReport, extractHeadingOutline } from '../assist/page-outline';
 
 const MAX_MAIN_CHARS = 12_000;
 
@@ -53,4 +54,25 @@ export function getSelectionSnapshot(): { readonly text: string; readonly blockI
     const blockId = block?.dataset[ENFORCEMENT_DATASET.blockId];
 
     return { text: selection, blockId };
+}
+
+export function buildPageUnderstandFromDocument() {
+    const context = extractPageContext();
+    const roots = ['article', 'main', '[role="main"]', '#content', 'body'];
+    let outlineRoot: ParentNode = document.body;
+    for (const selector of roots) {
+        const element = document.querySelector(selector);
+        if (element) {
+            outlineRoot = element;
+            break;
+        }
+    }
+    const outline = extractHeadingOutline(outlineRoot);
+    return buildPageUnderstandReport({
+        url: context.url,
+        title: context.title,
+        mainText: context.mainText,
+        outline,
+        isDenseSite: context.isDenseSite,
+    });
 }

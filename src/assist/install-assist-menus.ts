@@ -40,6 +40,11 @@ export function installAssistContextMenus(): void {
             title: 'Verify (experimental)',
             contexts: ['selection'],
         });
+        chrome.contextMenus.create({
+            id: ASSIST_MENU.outline,
+            title: 'Outline page (Understand)',
+            contexts: ['page'],
+        });
         // Keep legacy id as alias so older docs/tests still resolve if referenced.
         void AUTHENTICITY_CONTEXT_MENU_ID;
     });

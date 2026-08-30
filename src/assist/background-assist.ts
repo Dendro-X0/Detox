@@ -2,6 +2,8 @@
 import { openAuthenticityPanel } from '../authenticity/open-panel';
 import { getAuthenticitySettings, loadAuthenticitySettings } from '../mods/analyzers/authenticity/settings-store';
 import { prepareComparePanel, prepareDefineHandoff, prepareSearchHandoff } from './assist-actions';
+import { consumeAssistActionQuota } from './assist-quota-store';
+import { ASSIST_QUOTA_ERROR } from './assist-actions';
 import { loadAssistSettings } from './assist-settings-store';
 import { clearCompareClip, loadCompareClip, saveCompareClip } from './compare-clip-store';
 import { loadCompareReport } from './compare-report';
@@ -10,6 +12,9 @@ import {
     getAssistNetworkJobState,
 } from './network-job';
 import { openComparePanel } from './open-compare-panel';
+import { openUnderstandPanel } from './open-understand-panel';
+import type { AssistPageUnderstandReport } from './page-outline';
+import { savePageUnderstandReport, loadPageUnderstandReport } from './page-understand-store';
 import { ASSIST_MENU } from './types';
 import type { AssistActionResponse, AssistRuntimeMessage } from './types';
 
@@ -77,11 +82,50 @@ async function runVerify(tabId: number, text: string): Promise<AssistActionRespo
     return { ok: true };
 }
 
+async function runOutlinePage(tabId: number): Promise<AssistActionResponse> {
+    const settings = await loadAssistSettings();
+    if (!settings.pageUnderstandEnabled) {
+        return { ok: false, error: 'assist.understand.errors.disabled' };
+    }
+
+    const tab = await chrome.tabs.get(tabId);
+    const url = tab.url ?? '';
+    if (!url.startsWith('http')) {
+        return { ok: false, error: 'assist.understand.errors.httpOnly' };
+    }
+
+    const allowed = await consumeAssistActionQuota(settings);
+    if (!allowed) {
+        return { ok: false, error: ASSIST_QUOTA_ERROR };
+    }
+
+    try {
+        const report = (await chrome.tabs.sendMessage(tabId, {
+            type: 'assist:buildPageUnderstand',
+        })) as AssistPageUnderstandReport | undefined;
+        if (!report?.id) {
+            return { ok: false, error: 'assist.understand.errors.empty' };
+        }
+        await savePageUnderstandReport(report);
+        await openUnderstandPanel(tabId);
+        return { ok: true, panelOpened: true };
+    } catch {
+        return { ok: false, error: 'assist.understand.errors.unreachable' };
+    }
+}
+
 export function registerAssistBackgroundHandlers(): void {
     chrome.contextMenus.onClicked.addListener((info, tab) => {
-        const selection = info.selectionText?.trim();
-        if (!selection || !tab?.id) return;
         const menuId = String(info.menuItemId);
+        if (!tab?.id) return;
+
+        if (menuId === ASSIST_MENU.outline) {
+            void runOutlinePage(tab.id);
+            return;
+        }
+
+        const selection = info.selectionText?.trim();
+        if (!selection) return;
 
         void (async () => {
             if (menuId === ASSIST_MENU.search) {
@@ -147,6 +191,31 @@ export function registerAssistBackgroundHandlers(): void {
             void getAssistNetworkJobState().then((job) => {
                 sendResponse({ type: 'assist:jobState', job } satisfies AssistRuntimeMessage);
             });
+            return true;
+        }
+        if (typed.type === 'assist:getPageUnderstand') {
+            void loadPageUnderstandReport().then((report) => {
+                sendResponse({
+                    type: 'assist:pageUnderstandState',
+                    report,
+                } satisfies AssistRuntimeMessage);
+            });
+            return true;
+        }
+        if (typed.type === 'assist:outlinePage') {
+            const tabId = sender.tab?.id;
+            void (async () => {
+                if (!tabId) {
+                    const activeId = (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id;
+                    if (!activeId) {
+                        sendResponse({ ok: false, error: 'No active tab' });
+                        return;
+                    }
+                    sendResponse(await runOutlinePage(activeId));
+                    return;
+                }
+                sendResponse(await runOutlinePage(tabId));
+            })();
             return true;
         }
         if (typed.type === 'assist:getCompareReport') {

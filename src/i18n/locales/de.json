@@ -1126,7 +1126,11 @@
       "contextMenuHint": "Vergleich: Clip speichern beim ersten Ausschnitt, dann Vergleichen beim zweiten. Prüfen braucht Authentizitäts-Assistent (Assistent → Erweitert).",
       "dailyQuotaUsed": "Tägliches Handoff-Kontingent genutzt",
       "dailyQuotaCap": "Tägliches Handoff-Kontingent-Limit",
-      "dailyQuotaHint": "Zählt Suchen-, Definieren- und Vergleichen-Tab-Öffnungen. Prüfen nutzt das separate Authentizitäts-Kontingent.",
+      "dailyQuotaHint": "Zählt Suchen-, Definieren-, Vergleichen- und Seiten-Outline-Aktionen. Prüfen nutzt das separate Authentizitäts-Kontingent.",
+      "pageUnderstandLabel": "Seiten-Outline aktivieren (Understand)",
+      "pageUnderstandHint": "Rechtsklick auf die Seite (ohne Auswahl) → Seite gliedern. Nur lokale Überschriften + Schlüsselbehauptungen — opt-in.",
+      "outlineActiveTab": "Aktiven Tab jetzt gliedern",
+      "outlineStarted": "Outline-Panel für den aktiven Tab geöffnet.",
       "saved": "Gespeichert"
     },
     "compare": {
@@ -1149,6 +1153,37 @@
         "distinct": "Unterschiedliche Formulierung — {{percent}} % gemeinsame Begriffe (meist verschiedene Themen).",
         "partial": "Teilweise Überlappung — {{percent}} % gemeinsame Begriffe. Beide Auszüge prüfen.",
         "similar": "Ähnliche Formulierung — {{percent}} % gemeinsame Begriffe. Prüfen, ob Behauptungen übereinstimmen."
+      }
+    },
+    "understand": {
+      "panel": {
+        "heading": "Seiten-Outline",
+        "empty": "Noch keine Outline. Unter Optionen → Assist aktivieren, dann Rechtsklick auf die Seite oder „Aktiven Tab gliedern“.",
+        "advisory": "Understand-Ebene — lokale Überschriften und heuristische Schlüsselbehauptungen. Kein Ersatz fürs Lesen.",
+        "meta": "{{chars}} Zeichen gescannt · {{headings}} Überschriften · {{claims}} Schlüsselbehauptungen",
+        "denseWarning": "Dichtes Feed-Layout — Outline kann die Hauptstruktur verfehlen.",
+        "outlineHeading": "Gliederung",
+        "noOutline": "Keine Überschriften im Hauptinhalt gefunden.",
+        "claimsHeading": "Schlüsselbehauptungen (heuristisch)",
+        "noClaims": "Keine prüfwürdigen Sätze im gescannten Text."
+      },
+      "claimTypes": {
+        "factual": "Faktisch",
+        "opinion": "Meinung",
+        "prediction": "Prognose",
+        "unknown": "Behauptung"
+      },
+      "limitations": {
+        "localHeuristics": "Nur lokale Heuristiken — keine Netzwerkaufrufe oder LLM-Synthese.",
+        "denseSite": "Social/Feed-Hosts können unvollständige Outlines liefern.",
+        "noHeadings": "Keine h1–h6-Überschriften in der gescannten Region.",
+        "shortPage": "Sehr wenig lesbarer Text zum Scannen verfügbar."
+      },
+      "errors": {
+        "disabled": "Seiten-Outline ist aus. Unter Optionen → Assist aktivieren.",
+        "httpOnly": "Outline funktioniert nur auf http(s)-Seiten.",
+        "unreachable": "Tab konnte nicht gelesen werden. Seite neu laden und erneut versuchen.",
+        "empty": "Für diese Seite konnte keine Outline erstellt werden."
       }
     }
   }

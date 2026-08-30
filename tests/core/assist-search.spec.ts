@@ -69,6 +69,12 @@ describe('parseAssistSettings', () => {
             searchEngineId: 'bing',
             customSearchUrlTemplate: 'https://x.test?q=%s',
             dailyActionQuota: 100,
+            pageUnderstandEnabled: false,
         });
+    });
+
+    it('enables page understand only when explicitly true', () => {
+        expect(parseAssistSettings({ pageUnderstandEnabled: true }).pageUnderstandEnabled).toBe(true);
+        expect(parseAssistSettings({ pageUnderstandEnabled: false }).pageUnderstandEnabled).toBe(false);
     });
 });

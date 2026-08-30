@@ -1126,7 +1126,11 @@
       "contextMenuHint": "Compare: save clip on the first snippet, then Compare on the second to open the side-by-side panel. Verify needs Authenticity assist enabled (Assist → Advanced).",
       "dailyQuotaUsed": "Daily handoff quota used",
       "dailyQuotaCap": "Daily handoff quota cap",
-      "dailyQuotaHint": "Counts search, define, and compare tab opens. Verify uses the separate authenticity quota.",
+      "dailyQuotaHint": "Counts search, define, compare, and page outline actions. Verify uses the separate authenticity quota.",
+      "pageUnderstandLabel": "Enable page outline (Understand)",
+      "pageUnderstandHint": "Right-click the page (not selection) → Outline page. Local headings + key claims only — opt-in, no auto-run.",
+      "outlineActiveTab": "Outline active tab now",
+      "outlineStarted": "Outline panel opened for the active tab.",
       "saved": "Saved"
     },
     "compare": {
@@ -1149,6 +1153,37 @@
         "distinct": "Different wording — {{percent}}% shared terms (mostly distinct topics).",
         "partial": "Some overlap — {{percent}}% shared terms. Review both excerpts.",
         "similar": "Similar wording — {{percent}}% shared terms. Check whether claims align."
+      }
+    },
+    "understand": {
+      "panel": {
+        "heading": "Page outline",
+        "empty": "No outline yet. Enable Understand under Options → Assist, then right-click the page or use Outline active tab.",
+        "advisory": "Understand layer — local headings and heuristic key claims. Not a substitute for reading the page.",
+        "meta": "{{chars}} chars scanned · {{headings}} headings · {{claims}} key claims",
+        "denseWarning": "Dense feed layout — outline may miss the main article structure.",
+        "outlineHeading": "Outline",
+        "noOutline": "No headings found in the main content region.",
+        "claimsHeading": "Key claims (heuristic)",
+        "noClaims": "No check-worthy sentences detected in the scanned text."
+      },
+      "claimTypes": {
+        "factual": "Factual",
+        "opinion": "Opinion",
+        "prediction": "Prediction",
+        "unknown": "Claim"
+      },
+      "limitations": {
+        "localHeuristics": "Local heuristics only — no network calls or LLM synthesis.",
+        "denseSite": "Social/feed hosts may produce incomplete outlines.",
+        "noHeadings": "No h1–h6 headings detected in the scanned region.",
+        "shortPage": "Very little readable text was available to scan."
+      },
+      "errors": {
+        "disabled": "Page outline is off. Enable it under Options → Assist.",
+        "httpOnly": "Outline works only on http(s) pages.",
+        "unreachable": "Could not read this tab. Reload the page and try again.",
+        "empty": "Could not build an outline for this page."
       }
     }
   }

@@ -1,4 +1,5 @@
 import type { AssistCompareReport } from './compare-overlap';
+import type { AssistPageUnderstandReport } from './page-outline';
 import type { AssistNetworkJobState } from './network-job';
 
 export const ASSIST_MENU = {
@@ -8,6 +9,7 @@ export const ASSIST_MENU = {
     saveClip: 'signallens-assist-save-clip',
     compare: 'signallens-assist-compare',
     verify: 'signallens-assist-verify',
+    outline: 'signallens-assist-outline',
 } as const;
 
 export type AssistSearchEngineId = 'duckduckgo' | 'google' | 'bing' | 'custom';
@@ -19,6 +21,8 @@ export type AssistSettings = {
     readonly customSearchUrlTemplate: string;
     /** Daily cap for search / define / compare handoffs (Verify uses authenticity quota). */
     readonly dailyActionQuota: number;
+    /** Enables page-level Outline (Understand) in context menu — off by default. */
+    readonly pageUnderstandEnabled: boolean;
 };
 
 export const DEFAULT_ASSIST_SETTINGS: AssistSettings = {
@@ -26,6 +30,7 @@ export const DEFAULT_ASSIST_SETTINGS: AssistSettings = {
     searchEngineId: 'duckduckgo',
     customSearchUrlTemplate: 'https://duckduckgo.com/?q=%s',
     dailyActionQuota: 100,
+    pageUnderstandEnabled: false,
 };
 
 export type AssistActionResponse = {
@@ -47,6 +52,8 @@ export type AssistRuntimeMessage =
     | { readonly type: 'assist:clearClip' }
     | { readonly type: 'assist:cancel' }
     | { readonly type: 'assist:getJob' }
+    | { readonly type: 'assist:outlinePage' }
+    | { readonly type: 'assist:getPageUnderstand' }
     | { readonly type: 'assist:getCompareReport' }
     | {
           readonly type: 'assist:clipState';
@@ -59,4 +66,8 @@ export type AssistRuntimeMessage =
     | {
           readonly type: 'assist:compareReportState';
           readonly report: AssistCompareReport | null;
+      }
+    | {
+          readonly type: 'assist:pageUnderstandState';
+          readonly report: AssistPageUnderstandReport | null;
       };

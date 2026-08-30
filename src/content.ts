@@ -21,7 +21,7 @@ import { getBuildProfile } from './build-profile';
 import { installAuthenticityContentBridge } from './authenticity/content-bridge';
 import { installAssistSelectionToolbar } from './assist/selection-toolbar';
 import { initRuntimeLocale, refreshFilteredElementTitles, subscribeRuntimeLocale } from './i18n/runtime-locale';
-import { extractPageContext, getSelectionSnapshot } from './authenticity/page-extract';
+import { buildPageUnderstandFromDocument, extractPageContext, getSelectionSnapshot } from './authenticity/page-extract';
 import { sessionRemove } from './core/storage/extension-session';
 import { resetPageScanStats } from './core/storage/scan-stats-store';
 import { detectPageLanguage } from './v2/core/language-pack-manager';
@@ -434,6 +434,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
     }
     if (message.type === 'authenticity:getSelection') {
         sendResponse(getSelectionSnapshot());
+        return true;
+    }
+    if (message.type === 'assist:buildPageUnderstand') {
+        sendResponse(buildPageUnderstandFromDocument());
         return true;
     }
     if (message.type === 'revealBlockedUnit') {
